@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Pixel Normal Edit là công cụ vẽ và chỉnh sửa Pixel Art trực tuyến chuyên nghiệp. Hỗ trợ đa dạng kích thước tùy chỉnh, nén ảnh pixel, đổ màu gradient thông minh, và nhiều chức năng nâng cao dành cho Game Developer và Artist." />
+  <meta name="keywords" content="Pixel Normal Edit, Pixel Art, Pixel Editor, Vẽ Pixel, Tạo ảnh Pixel, Nén ảnh Pixel, Game Art, Pixel Art Maker, Công cụ vẽ Pixel, 8-bit, 16-bit, Pixel Art Online" />
+  <meta name="author" content="Pixel Normal Edit" />
+  <meta name="robots" content="index, follow" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Pixel Normal Edit - Trình chỉnh sửa Pixel Art Thông Minh" />
+  <meta property="og:description" content="Công cụ tạo và chỉnh sửa Pixel Art miễn phí. Tích hợp đổ màu Gradient, xóa nền thông minh và tùy chỉnh kích thước đa dạng." />
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:title" content="Pixel Normal Edit - Trình chỉnh sửa Pixel Art Thông Minh" />
+  <meta property="twitter:description" content="Công cụ tạo và chỉnh sửa Pixel Art miễn phí. Tích hợp đổ màu Gradient, xóa nền thông minh và tùy chỉnh kích thước đa dạng." />
+
+  <title data-i18n="app.title">Pixel Normal Edit</title>
+  <link rel="stylesheet" href="/style.css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    (function() {
+      var theme = localStorage.getItem('pixel-edit-theme');
+      if (theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        if (theme === 'custom') {
+          var bg = localStorage.getItem('pixel-edit-custom-bg');
+          var primary = localStorage.getItem('pixel-edit-custom-primary');
+          if (bg) document.documentElement.style.setProperty('--custom-bg', bg);
+          if (primary) document.documentElement.style.setProperty('--custom-primary', primary);
+        }
+      }
+    })();
+  </script>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
+</html>
