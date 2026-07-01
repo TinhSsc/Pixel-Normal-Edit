@@ -1,9 +1,10 @@
 import { els, currentTool, GRID_WIDTH, GRID_HEIGHT, pixelMap, setPreviewPixels, setStatus } from './core/state.js';
-import { getCellPx, applyTransform, getZoom, getPan, setPan } from './core/viewport.js';
+import { getCellPx, applyTransform, getZoom, getPan, setPan, setZoom } from './core/viewport.js';
 import { isTaskRunning, abortCurrentTask } from './core/task-manager.js';
 import { t } from './lang/i18n.js';
 import { renderPixels } from './core/render.js';
 import { beginStroke, commitStroke } from './core/history.js';
+import { debouncedSaveWorkspace } from './core/tab-manager.js';
 import { writePixel } from './shared/pixel-writer.js';
 
 import { usePencil } from './tools/pencil.js';
@@ -106,6 +107,7 @@ function spawnParticle(x, y, color) {
 }
 
 let lastParticleTime = 0;
+let lastMoveEvent = null;
 
 function onPointerDown(e) {
   if (isTaskRunning()) {
@@ -118,10 +120,12 @@ function onPointerDown(e) {
   if (e.button === 2) {
     e.preventDefault();
     if (cell) {
-      const key = (cell.x << 16) | cell.y;
-      const picked = pixelMap.get(key);
+      const idx = cell.y * GRID_WIDTH + cell.x;
+      const picked = pixelMap[idx];
       if (picked && els.colorPicker) {
-        els.colorPicker.value = picked;
+        import('./core/color-utils.js').then(({ parseUint32ToHex }) => {
+           els.colorPicker.value = parseUint32ToHex(picked);
+        });
       }
     }
     updateBrushCursor(e, cell);
@@ -136,7 +140,7 @@ function onPointerDown(e) {
   }
 
   if (!cell) {
-    if (e.target.closest('#pixelCanvas') || e.target.closest('.canvas-wrap')) {
+    if (e.target.closest('.canvas-wrap') && !e.target.closest('.toolbar-container')) {
       spawnParticle(e.clientX, e.clientY, getColor(e.button));
     }
     updateBrushCursor(e, null);
@@ -164,7 +168,7 @@ function onPointerMove(e) {
   const cell = getCellPx(e.clientX, e.clientY);
   
   if (!cell) {
-    if (e.target.closest('.canvas-wrap')) {
+    if (e.target.closest('.canvas-wrap') && !e.target.closest('.toolbar-container')) {
       const now = Date.now();
       if (now - lastParticleTime > 40) {
         spawnParticle(e.clientX, e.clientY, getColor(e.buttons === 2 ? 2 : 0));
@@ -182,24 +186,29 @@ function onPointerMove(e) {
   if (cell.x === lastCell?.x && cell.y === lastCell?.y) return;
 
   const color = getColor(e.buttons & 2 ? 2 : 0);
+  const isPreviewTool = currentTool === 'rect' || currentTool === 'circle' || currentTool === 'line';
+
   dispatchTool(currentTool, 'move', cell, color, e, lastCell);
   lastCell = cell;
-  renderPixels();
+  renderPixels(isPreviewTool);
 }
 
 function onPointerUp(e) {
   if (panStart) { panStart = null; return; }
   if (!isDrawing) return;
+
   isDrawing = false;
 
   const cell = getCellPx(e.clientX, e.clientY);
   const color = getColor(e.button);
-  dispatchTool(currentTool, 'up', cell, color, e);
+  dispatchTool(currentTool, 'up', cell || lastCell || {x: 0, y: 0}, color, e, lastCell);
+
 
   setPreviewPixels(null);
   commitStroke(pixelMap);
   renderPixels();
   lastCell = null;
+  debouncedSaveWorkspace();
 }
 
 function onWheel(e) {
@@ -226,10 +235,8 @@ function onWheel(e) {
   );
 
   // inline zoom update
-  import('./core/viewport.js').then(({ setZoom, applyTransform }) => {
-    setZoom(newZoom);
-    applyTransform(canvas);
-  });
+  setZoom(newZoom);
+  applyTransform(canvas);
 }
 
 function dispatchTool(tool, event, cell, color, e, prevCell) {

@@ -56,7 +56,7 @@ export const offscreenCtx = offscreenCanvas.getContext('2d', { willReadFrequentl
 export let offscreenImageData = null;
 export let offscreenData32 = null;
 
-export let pixelMap = new Map();
+export let pixelMap = new Uint32Array(GRID_WIDTH * GRID_HEIGHT);
 export let groupMap = new Map();
 export let previewPixels = null;
 
@@ -69,8 +69,8 @@ export function setGridSizeParams(w, h, imageData, data32) {
   offscreenData32 = data32;
 }
 
-export function resetMaps(newPixelMap = new Map(), newGroupMap = new Map()) {
-  pixelMap = newPixelMap;
+export function resetMaps(newPixelMap = null, newGroupMap = new Map()) {
+  pixelMap = newPixelMap ?? new Uint32Array(GRID_WIDTH * GRID_HEIGHT);
   groupMap = newGroupMap;
 }
 

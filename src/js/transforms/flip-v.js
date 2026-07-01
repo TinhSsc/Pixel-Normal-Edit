@@ -2,28 +2,38 @@ import { pixelMap, GRID_WIDTH, GRID_HEIGHT, setStatus } from '../core/state.js';
 import { beginStroke, commitStroke, recordChange } from '../core/history.js';
 import { renderPixels } from '../core/render.js';
 import { t } from '../lang/i18n.js';
+import { debouncedSaveWorkspace } from '../core/tab-manager.js';
 
+let isSetup = false;
 export function setupFlipV() {
-  document.getElementById('flipVBtn')?.addEventListener('click', () => {
-    const newMap = new Map();
-    pixelMap.forEach((color, key) => {
-      const x = key >> 16;
-      const y = key & 0xFFFF;
-      newMap.set((x << 16) | (GRID_HEIGHT - 1 - y), color);
-    });
+  if (isSetup) return;
+  isSetup = true;
+  document.body.addEventListener('click', (e) => {
+    const btn = e.target.closest('#flipVBtn');
+    if (!btn) return;
+    const newMap = new Uint32Array(GRID_WIDTH * GRID_HEIGHT);
+    
+    for (let y = 0; y < GRID_HEIGHT; y++) {
+      for (let x = 0; x < GRID_WIDTH; x++) {
+        const oldIdx = y * GRID_WIDTH + x;
+        const newIdx = (GRID_HEIGHT - 1 - y) * GRID_WIDTH + x;
+        newMap[newIdx] = pixelMap[oldIdx];
+      }
+    }
 
     beginStroke();
-    pixelMap.forEach((color, key) => {
-      recordChange(key, color, null);
-    });
-    newMap.forEach((color, key) => {
-      recordChange(key, null, color);
-    });
+    for (let i = 0; i < pixelMap.length; i++) {
+       const oldColor = pixelMap[i];
+       const newColor = newMap[i];
+       if (oldColor !== newColor) {
+         recordChange(i, oldColor, newColor);
+       }
+    }
 
-    pixelMap.clear();
-    newMap.forEach((color, key) => pixelMap.set(key, color));
+    pixelMap.set(newMap);
     commitStroke(pixelMap);
     renderPixels();
     setStatus(t('status.flippedV'));
+    debouncedSaveWorkspace();
   });
 }

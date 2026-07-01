@@ -1,14 +1,14 @@
 import { GRID_WIDTH, GRID_HEIGHT } from '../core/state.js';
-import { parseColorToRgba, colorDistance } from '../core/color-utils.js';
+import { colorDistance, uint32ToRgba, parseColorToUint32 } from '../core/color-utils.js';
 
 export function floodFill(pixelMap, startX, startY, fillColor, tolerance = 0) {
-  const startKey = (startX << 16) | startY;
-  const startColor = pixelMap.get(startKey) || null;
+  const startIdx = startY * GRID_WIDTH + startX;
+  const startUint32 = pixelMap[startIdx];
 
-  if (startColor === fillColor) return new Map();
+  const fillUint32 = fillColor && fillColor !== 'transparent' ? parseColorToUint32(fillColor) : 0;
+  if (startUint32 === fillUint32) return new Map();
 
-  const startRgba = startColor ? parseColorToRgba(startColor) : { r: 0, g: 0, b: 0, a: 0 };
-  const fillRgba  = parseColorToRgba(fillColor);
+  const startRgba = uint32ToRgba(startUint32);
 
   const visited = new Uint8Array(GRID_WIDTH * GRID_HEIGHT);
   const changed = new Map();
@@ -17,7 +17,6 @@ export function floodFill(pixelMap, startX, startY, fillColor, tolerance = 0) {
 
   while (head < queue.length) {
     const [x, y] = queue[head++];
-    const k = (x << 16) | y;
     const idx = y * GRID_WIDTH + x;
 
     if (visited[idx]) continue;
@@ -25,13 +24,16 @@ export function floodFill(pixelMap, startX, startY, fillColor, tolerance = 0) {
 
     visited[idx] = 1;
 
-    const curColor = pixelMap.get(k) || null;
-    const curRgba  = curColor ? parseColorToRgba(curColor) : { r: 0, g: 0, b: 0, a: 0 };
-    const dist = colorDistance(curRgba.r, curRgba.g, curRgba.b, curRgba.a, startRgba.r, startRgba.g, startRgba.b, startRgba.a);
+    const curUint32 = pixelMap[idx];
+    if (tolerance === 0) {
+      if (curUint32 !== startUint32) continue;
+    } else {
+      const curRgba = uint32ToRgba(curUint32);
+      const dist = colorDistance(curRgba.r, curRgba.g, curRgba.b, curRgba.a, startRgba.r, startRgba.g, startRgba.b, startRgba.a);
+      if (dist > tolerance) continue;
+    }
 
-    if (dist > tolerance) continue;
-
-    changed.set(k, { x, y, oldColor: curColor, newColor: fillColor });
+    changed.set(idx, { x, y, oldColor: curUint32, newColor: fillUint32 });
 
     if (x + 1 < GRID_WIDTH && !visited[y * GRID_WIDTH + (x + 1)]) queue.push([x + 1, y]);
     if (x - 1 >= 0 && !visited[y * GRID_WIDTH + (x - 1)]) queue.push([x - 1, y]);

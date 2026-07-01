@@ -7,22 +7,73 @@ export default function CanvasPanel() {
 
   return (
     <div className="main-area" style={{ width: '100%', height: '100%' }}>
-      <div style={{ display: 'flex', alignItems: 'center', background: '#1c1c24', padding: '0 10px' }}>
-        <div id="status" data-i18n="status.init" style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Sẵn sàng</div>
-        <button 
-          id="stopTaskBtn" 
-          className="btn stop-btn" 
-          style={{ display: 'none', flexShrink: 0, marginLeft: '10px', padding: '2px 8px', fontSize: '12px', background: '#e06c75', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', zIndex: 100 }}
+      <div style={{ position: 'relative', display: 'flex', alignItems: 'center', background: 'transparent', padding: '0 10px', minHeight: '16px' }}>
+        <div id="status" data-i18n="status.init" style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', paddingRight: '40px' }}>Sẵn sàng</div>
+        <button
+          id="stopTaskBtn"
+          className="btn stop-btn"
+          style={{ display: 'none', position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', padding: '1px 6px', fontSize: '10px', background: '#e06c75', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', zIndex: 100, boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }}
           data-i18n="btn.stopTask"
         >
           Dừng
         </button>
       </div>
+      <div id="canvasTabsContainer" className="canvas-tabs-container"></div>
       <div className="canvas-wrap" style={{ position: 'relative', overflow: 'hidden' }}>
         <canvas id="pixelCanvas"></canvas>
-        <canvas id="gridCanvas" style={{ pointerEvents: 'none', position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 5 }}></canvas>
         <div id="gridOverlay" style={{ pointerEvents: 'none', position: 'absolute', top: '-1px', left: '-1px', transformOrigin: '0 0' }}>
           <div id="mirrorLine" style={{ display: 'none', position: 'absolute', left: '50%', top: 0, bottom: 0, background: 'rgba(255, 60, 60, 0.8)', zIndex: 10 }}></div>
+
+          {/* Attached Tool Bar (Header) */}
+          <div className="toolbar-container" style={{ pointerEvents: 'auto', position: 'absolute', bottom: '100%', left: '0', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 'calc(1px * var(--canvas-zoom, 1))', marginBottom: 'calc(2px * var(--canvas-zoom, 1))', background: 'transparent', padding: 'calc(1px * var(--canvas-zoom, 1))', boxSizing: 'border-box' }}>
+            <div style={{ position: 'relative', width: 'calc(12px * var(--canvas-zoom, 1))' }}>
+              <button id="gridSizeSelectBtn" className="btn" data-i18n="tooltip.gridSize" style={{ height: 'calc(4px * var(--canvas-zoom, 1))', padding: '0 calc(1px * var(--canvas-zoom, 1))', fontSize: 'calc(1.8px * var(--canvas-zoom, 1))', background: 'var(--color-surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'calc(0.5px * var(--canvas-zoom, 1))', width: '100%', borderRadius: 'calc(0.5px * var(--canvas-zoom, 1))', border: 'calc(0.2px * var(--canvas-zoom, 1)) solid var(--color-border)', color: 'var(--color-text-bright)' }}>
+                <span id="currentGridSizeText" style={{ whiteSpace: 'nowrap' }}>32x32</span>
+                <i data-lucide="chevron-down" style={{ width: 'calc(2px * var(--canvas-zoom, 1))', height: 'calc(2px * var(--canvas-zoom, 1))', flexShrink: 0 }}></i>
+              </button>
+
+              <div id="resizePopover" style={{ display: 'none', position: 'absolute', top: '100%', left: '0', marginTop: '6px', background: 'rgba(30, 30, 35, 0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '16px', width: '240px', boxShadow: '0 8px 24px rgba(0,0,0,0.4)', zIndex: 60, backdropFilter: 'blur(12px)', transition: 'all 0.2s ease' }}>
+
+                <div style={{ fontSize: '12px', fontWeight: 600, color: '#fff', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <i data-lucide="maximize" style={{ width: '14px', height: '14px', color: 'var(--color-primary)' }}></i>
+                  Kích thước Canvas
+                </div>
+
+                <div style={{ display: 'flex', gap: '10px', marginBottom: '12px' }}>
+                  <div style={{ flex: 1 }}>
+                    <label style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--color-text-muted)', marginBottom: '4px', display: 'block' }}>Width</label>
+                    <input type="number" id="resizeWidth" defaultValue="32" min="1" max="256" style={{ width: '100%', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.05)', color: '#fff', padding: '6px 8px', borderRadius: '4px', fontSize: '13px', outline: 'none', transition: 'border 0.2s' }} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <label style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--color-text-muted)', marginBottom: '4px', display: 'block' }}>Height</label>
+                    <input type="number" id="resizeHeight" defaultValue="32" min="1" max="256" style={{ width: '100%', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.05)', color: '#fff', padding: '6px 8px', borderRadius: '4px', fontSize: '13px', outline: 'none', transition: 'border 0.2s' }} />
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', padding: '6px 8px', background: 'rgba(0,0,0,0.15)', borderRadius: '4px' }}>
+                  <input type="checkbox" id="resizeLockRatio" defaultChecked style={{ accentColor: 'var(--color-primary)', cursor: 'pointer' }} />
+                  <label htmlFor="resizeLockRatio" style={{ fontSize: '11px', cursor: 'pointer', userSelect: 'none', color: '#ddd' }}>Khóa tỷ lệ (Lock Ratio)</label>
+                </div>
+
+                <div style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--color-text-muted)', marginBottom: '6px' }}>Presets (Vuông)</div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '4px', marginBottom: '16px' }}>
+                  <button className="btn resize-preset-btn" data-size="16" style={{ padding: '4px 0', fontSize: '11px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.05)' }}>16</button>
+                  <button className="btn resize-preset-btn" data-size="32" style={{ padding: '4px 0', fontSize: '11px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.05)' }}>32</button>
+                  <button className="btn resize-preset-btn" data-size="48" style={{ padding: '4px 0', fontSize: '11px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.05)' }}>48</button>
+                  <button className="btn resize-preset-btn" data-size="64" style={{ padding: '4px 0', fontSize: '11px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.05)' }}>64</button>
+                </div>
+
+                <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginBottom: '12px', textAlign: 'center', padding: '8px 0', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                  Canvas after resize: <span id="resizePreviewText" style={{ color: 'var(--color-primary)', fontWeight: 'bold', fontSize: '13px' }}>32 × 32</span>
+                </div>
+
+                <button id="resizeApplyBtn" className="btn btn-primary" style={{ width: '100%', padding: '8px 0', fontSize: '13px', fontWeight: 600, borderRadius: '6px', boxShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>Áp dụng (Apply)</button>
+              </div>
+            </div>
+            {/* <button id="trimBtn" className="btn btn-primary" data-i18n="tooltip.trimFull" title="Cắt viền (Trim)" style={{ height: '26px', width: '26px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0' }}>
+              <i data-lucide="crop" style={{ width: '14px', height: '14px' }}></i>
+            </button> */}
+          </div>
         </div>
         <div id="brush-cursor"></div>
       </div>

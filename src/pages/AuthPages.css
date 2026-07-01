@@ -1,0 +1,152 @@
+.auth-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--color-bg) 0%, #1e1e24 100%);
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.auth-card {
+  width: 380px;
+  max-width: 90vw;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  border-radius: 16px;
+  padding: 36px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.auth-card h2 {
+  margin: 0 0 8px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 24px;
+  text-align: center;
+  letter-spacing: -0.02em;
+}
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.auth-field label {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.auth-field input {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.auth-field input:focus {
+  outline: none;
+  border-color: var(--color-primary, #3b82f6);
+  background: rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.auth-error {
+  color: #ff6b6b;
+  font-size: 13px;
+  margin: 0;
+  background: rgba(255, 107, 107, 0.1);
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 107, 107, 0.2);
+}
+
+.auth-success {
+  color: #51cf66;
+  font-size: 13px;
+  margin: 0;
+  background: rgba(81, 207, 102, 0.1);
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(81, 207, 102, 0.2);
+}
+
+.auth-card .btn-primary {
+  padding: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 8px;
+  background: var(--color-primary, #3b82f6);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.1s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.auth-card .btn-primary:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.auth-card .btn-primary:active {
+  transform: translateY(0);
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 4px 0;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.auth-links {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+.auth-links a {
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.auth-links a:hover {
+  color: var(--color-primary-light, #60a5fa);
+}
+
+/* Ensure Google Button container looks decent */
+.auth-card > div:has(iframe) {
+  display: flex;
+  justify-content: center;
+}

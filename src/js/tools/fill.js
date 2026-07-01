@@ -5,25 +5,38 @@ import { asyncFloodFill, asyncProcessChunks } from '../shared/async-utils.js';
 import { writePixel } from '../shared/pixel-writer.js';
 import { t } from '../lang/i18n.js';
 import { startTask, completeTask } from '../core/task-manager.js';
+import { runWorkerTask } from '../workers/worker-manager.js';
+import { parseColorToUint32 } from '../core/color-utils.js';
+import { GRID_WIDTH, GRID_HEIGHT } from '../core/state.js';
 
 export async function useFill(cell, color) {
   const signal = startTask();
   setTaskUI(true);
   
   try {
-    setStatus(t('status.scanFill'));
-    const changed = await asyncFloodFill(pixelMap, cell.x, cell.y, color, 0, signal, (count) => {
-      setStatus(t('status.scanFillCount', count));
+    setStatus(t('status.scanFill') + ' (Worker)');
+    const fillUint32 = parseColorToUint32(color);
+    const pixelCopy = new Uint32Array(pixelMap);
+    
+    let changedIndices = await runWorkerTask(null, 'floodFill', {
+      pixelMap: pixelCopy,
+      startX: cell.x,
+      startY: cell.y,
+      fillUint32,
+      tolerance: 0,
+      width: GRID_WIDTH,
+      height: GRID_HEIGHT
     });
-
-    if (changed.size === 0) return;
+    
+    if (changedIndices.length === 0) return;
 
     setStatus(t('status.filling'));
     beginStroke();
     
-    const changedArray = Array.from(changed.values());
-    await asyncProcessChunks(changedArray, ({ x, y, newColor }) => {
-      writePixel(x, y, newColor, { noMirror: true });
+    await asyncProcessChunks(changedIndices, (idx) => {
+      const x = idx % GRID_WIDTH;
+      const y = Math.floor(idx / GRID_WIDTH);
+      writePixel(x, y, color, { noMirror: true });
     }, signal, (done, total) => {
       setStatus(t('status.fillingPct', Math.round(done / total * 100)));
       if (done % 50000 === 0) renderPixels();
@@ -31,7 +44,7 @@ export async function useFill(cell, color) {
 
     commitStroke(pixelMap);
     renderPixels();
-    setStatus(t('status.fillComplete') + ` (${changed.size} pixels)`);
+    setStatus(t('status.fillComplete') + ` (${changedIndices.length} pixels)`);
   } catch (err) {
     if (err.message === 'aborted') {
       commitStroke(pixelMap);

@@ -1,6 +1,7 @@
 import { resizeCanvas, fitToScreen } from './core/viewport.js';
 import { renderPixels } from './core/render.js';
 import { els, setStatus, setCurrentTool, initEls } from './core/state.js';
+import { getTabs, getActiveTabId } from './core/tab-manager.js';
 
 import { setupGradientMode } from './modes/gradient-mode.js';
 import { setupMirrorMode } from './modes/mirror-mode.js';
@@ -10,9 +11,11 @@ import { setupUndo, setupRedo } from './actions/undo-redo.js';
 import { setupZoomActions } from './actions/zoom.js';
 import { setupSwapColors } from './actions/swap-colors.js';
 import { setupSetBackground } from './actions/set-background.js';
-import { setupCompress } from './actions/compress.js';
+import { setupTrim } from './actions/trim.js';
 import { setupGridSizeSelect, setGridSize } from './actions/grid-size-select.js';
 import { setupToggleToolsPanel } from './actions/toggle-tools-panel.js';
+import { initTabs } from './core/tab-manager.js';
+import { loadWorkspace } from './core/storage.js';
 
 import { setupRotate } from './transforms/rotate.js';
 import { setupFlipH } from './transforms/flip-h.js';
@@ -23,6 +26,7 @@ import { exportPng } from './io/export/export-png.js';
 import { exportJpeg } from './io/export/export-jpeg.js';
 import { exportWebp } from './io/export/export-webp.js';
 import { exportJson } from './io/export/export-json.js';
+import { exportToDrive, showNotification } from './services/drive-ui.js';
 
 import { initCustomTooltip } from './ui/tooltip.js';
 import { initMobilePopups } from './ui/mobile-popups.js';
@@ -41,8 +45,7 @@ export function initEditor() {
 
   if (window.lucide) window.lucide.createIcons();
 
-  // Initialize Canvas with default 32x32 grid
-  setGridSize(32, 32);
+  // Initialize Canvas
   resizeCanvas();
   fitToScreen();
   renderPixels();
@@ -64,8 +67,6 @@ export function initEditor() {
   // Initial setup for things that never unmount (Header, Modals)
   setupUndo();
   setupRedo();
-  setupCompress();
-  setupGridSizeSelect();
   setupToggleToolsPanel();
   setupUploadModal();
 
@@ -76,6 +77,32 @@ export function initEditor() {
   if (openDownloadModalBtn && downloadModal) {
     openDownloadModalBtn.addEventListener('click', () => {
       downloadModal.style.display = 'flex';
+      
+      const canvasList = document.getElementById('downloadCanvasList');
+      if (canvasList) {
+        canvasList.innerHTML = '';
+        const tabs = getTabs();
+        const activeTabId = getActiveTabId();
+        
+        tabs.forEach(tab => {
+          const label = document.createElement('label');
+          label.className = 'canvas-checkbox-item';
+          
+          const checkbox = document.createElement('input');
+          checkbox.type = 'checkbox';
+          checkbox.value = tab.id;
+          if (tab.id === activeTabId) {
+            checkbox.checked = true;
+          }
+          
+          const span = document.createElement('span');
+          span.textContent = tab.name;
+          
+          label.appendChild(checkbox);
+          label.appendChild(span);
+          canvasList.appendChild(label);
+        });
+      }
     });
   }
 
@@ -94,20 +121,76 @@ export function initEditor() {
     });
   }
 
-  document.querySelectorAll(".dl-format-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const format = btn.dataset.format;
-      if (format === 'png') exportPng();
-      else if (format === 'jpeg') exportJpeg();
-      else if (format === 'webp') exportWebp();
-      else if (format === 'json') exportJson();
-      
-      // Close modal after selection
-      if (downloadModal) {
-        downloadModal.style.display = 'none';
-      }
+  // Handle format and destination selection (Radio-button behavior)
+  const formatBtns = document.querySelectorAll('.dl-format-btn');
+  formatBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      formatBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
     });
   });
+
+  const destBtns = document.querySelectorAll('.dl-dest-btn');
+  destBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      destBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  // Handle Execute Download Button
+  const executeDownloadBtn = document.getElementById('executeDownloadBtn');
+  if (executeDownloadBtn) {
+    executeDownloadBtn.addEventListener('click', async () => {
+      const selectedCheckboxes = document.querySelectorAll('#downloadCanvasList input[type="checkbox"]:checked');
+      if (selectedCheckboxes.length === 0) {
+        showNotification('Vui lòng chọn ít nhất 1 canvas để tải!', true);
+        return;
+      }
+
+      const activeFormatBtn = document.querySelector('.dl-format-btn.active');
+      const format = activeFormatBtn ? activeFormatBtn.dataset.format : 'png';
+      
+      const activeDestBtn = document.querySelector('.dl-dest-btn.active');
+      const dest = activeDestBtn ? activeDestBtn.dataset.dest : 'local';
+
+      const tabs = getTabs();
+      let successCount = 0;
+
+      // Update button state
+      const originalHtml = executeDownloadBtn.innerHTML;
+      executeDownloadBtn.disabled = true;
+      executeDownloadBtn.innerHTML = '<i data-lucide="loader-2" style="width:18px;height:18px;margin-right:6px"></i> Đang xử lý...';
+      if (window.lucide) window.lucide.createIcons();
+
+      try {
+        for (const cb of selectedCheckboxes) {
+          const tab = tabs.find(t => t.id === cb.value);
+          if (!tab) continue;
+
+          if (dest === 'local') {
+            if (format === 'png') exportPng(tab);
+            else if (format === 'jpeg') exportJpeg(tab);
+            else if (format === 'webp') exportWebp(tab);
+            else if (format === 'json') exportJson(tab);
+            successCount++;
+          } else if (dest === 'drive') {
+            await exportToDrive(tab, format);
+            successCount++;
+          }
+        }
+        
+        showNotification(`Đã tải thành công ${successCount} tệp!`);
+        downloadModal.style.display = 'none';
+      } catch (err) {
+        showNotification(err.message, true);
+      } finally {
+        executeDownloadBtn.disabled = false;
+        executeDownloadBtn.innerHTML = originalHtml;
+        if (window.lucide) window.lucide.createIcons();
+      }
+    });
+  }
 
   initCustomTooltip();
   initMobilePopups(); // Global document click handler inside
@@ -153,11 +236,20 @@ window.addEventListener('toolbar-mounted', () => {
   });
 });
 
-window.addEventListener('canvas-mounted', () => {
+window.addEventListener('canvas-mounted', async () => {
   initEls();
-  resizeCanvas();
-  fitToScreen();
-  renderPixels();
+  
+  setupTrim();
+  setupGridSizeSelect();
+
+  const savedData = await loadWorkspace();
+
+  if (!savedData || !savedData.tabs || savedData.tabs.length === 0) {
+    setGridSize(32, 32);
+  }
+  
+  initTabs(savedData);
+  
   setupCanvasEvents();
   setupZoomActions();
   initFloatingNav();

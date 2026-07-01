@@ -1,22 +1,40 @@
 import { GRID_WIDTH, GRID_HEIGHT, pixelMap, setStatus } from '../../core/state.js';
 import { t } from '../../lang/i18n.js';
 
-export function exportWebp() {
+export function getPixelCanvas(tab = null) {
   const canvas = document.createElement('canvas');
-  canvas.width = GRID_WIDTH;
-  canvas.height = GRID_HEIGHT;
+  const w = tab ? tab.grid.w : GRID_WIDTH;
+  const h = tab ? tab.grid.h : GRID_HEIGHT;
+  const pMap = tab ? tab.pixelMap : pixelMap;
+  
+  canvas.width = w;
+  canvas.height = h;
   const ctx = canvas.getContext('2d');
 
-  pixelMap.forEach((color, key) => {
-    const x = key >> 16;
-    const y = key & 0xFFFF;
-    ctx.fillStyle = color;
-    ctx.fillRect(x, y, 1, 1);
-  });
+  const imgData = new ImageData(w, h);
+  const data32 = new Uint32Array(imgData.data.buffer);
+  data32.set(pMap);
+  ctx.putImageData(imgData, 0, 0);
+
+  return canvas;
+}
+
+export function exportWebp(tab = null) {
+  const canvas = getPixelCanvas(tab);
+  const namePrefix = tab ? tab.name.replace(/\s+/g, '-') : 'pixel-art';
 
   const a = document.createElement('a');
-  a.download = 'pixel-art.webp';
-  a.href = canvas.toDataURL('image/webp', 0.95);
+  a.download = `${namePrefix}.webp`;
+  a.href = canvas.toDataURL('image/webp', 0.9);
   a.click();
   setStatus(t('status.dlWebp'));
+}
+
+export function generateWorkspaceWebpBlob(tab = null) {
+  return new Promise((resolve) => {
+    const canvas = getPixelCanvas(tab);
+    canvas.toBlob((blob) => {
+      resolve(blob);
+    }, 'image/webp', 0.9);
+  });
 }

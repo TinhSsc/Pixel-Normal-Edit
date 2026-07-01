@@ -1,7 +1,7 @@
 import { els, pixelMap, GRID_WIDTH, GRID_HEIGHT, previewPixels } from '../core/state.js';
 import { beginStroke, recordChange, commitStroke } from '../core/history.js';
 import { renderPixels } from '../core/render.js';
-import { parseColorToRgba } from '../core/color-utils.js';
+import { parseColorToRgba, parseColorToUint32 } from '../core/color-utils.js';
 
 // gradientMode and mirrorMode state
 let gradientModeActive = false;
@@ -10,6 +10,7 @@ let gradientDirection = 'vertical';
 
 export function setGradientModeActive(v) { gradientModeActive = v; }
 export function setMirrorModeActive(v)   { mirrorModeActive = v; }
+export function isMirrorModeActive()     { return mirrorModeActive; }
 export function setGradientDirection(v)  { gradientDirection = v; }
 
 export function writePixel(x, y, color, options = {}) {
@@ -44,22 +45,20 @@ export function writePixel(x, y, color, options = {}) {
     finalColor = interpolateColor(color, color, 1, options.alpha);
   }
 
-  const oldColor = pixelMap.get(key) || null;
-  if (oldColor === finalColor) return;
-
-  recordChange(key, oldColor, finalColor);
-
-  if (finalColor === null) {
-    pixelMap.delete(key);
-  } else {
-    pixelMap.set(key, finalColor);
-  }
-
+  const finalColorUint32 = (finalColor && finalColor !== 'transparent') ? parseColorToUint32(finalColor) : 0;
+  const idx = y * GRID_WIDTH + x;
+  
   // Mirror mode
   if (mirrorModeActive && !noMirror) {
     const mx = GRID_WIDTH - 1 - x;
     writePixel(mx, y, finalColor, { alpha, noMirror: true });
   }
+
+  const oldColorUint32 = pixelMap[idx];
+  if (oldColorUint32 === finalColorUint32) return;
+
+  recordChange(idx, oldColorUint32, finalColorUint32);
+  pixelMap[idx] = finalColorUint32;
 }
 
 function interpolateColor(color1, color2, weight, globalAlpha = 1) {

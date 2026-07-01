@@ -9,16 +9,17 @@ import { t } from '../lang/i18n.js';
 export async function useOutline(color, cell) {
   const thickness = parseInt(document.getElementById('outlineThickness')?.value || '1', 10);
   
-  const targetKey = (cell.x << 16) | cell.y;
-  const targetColor = pixelMap.get(targetKey) || null;
+  const targetIdx = cell.y * GRID_WIDTH + cell.x;
+  const targetColorUint32 = pixelMap[targetIdx];
 
   const signal = startTask();
   setTaskUI(true);
 
   try {
     setStatus(t('status.scanBg'));
+    // We pass targetColorUint32. We will also update asyncFindContiguousRegion to handle number.
     const bgRegion = await asyncFindContiguousRegion(
-      pixelMap, targetKey, targetColor, signal, 
+      pixelMap, cell.x, cell.y, targetColorUint32, signal, 
       (count) => setStatus(t('status.scanBgCount', count))
     );
 
@@ -26,15 +27,11 @@ export async function useOutline(color, cell) {
     const totalPixels = GRID_WIDTH * GRID_HEIGHT;
     setStatus(t('status.analyzeShape'));
     
-    // Process the full grid to find non-bg blocks
-    // Since GRID_WIDTH * GRID_HEIGHT is large (e.g. 1M), we can chunk this too if we want,
-    // but a simple loop over 1M items doing Set.add is quite fast (~10ms).
-    // For maximum safety against freezing, let's chunk it.
     let processedGrid = 0;
     const gridKeys = [];
     for (let x = 0; x < GRID_WIDTH; x++) {
       for (let y = 0; y < GRID_HEIGHT; y++) {
-        const k = (x << 16) | y;
+        const k = y * GRID_WIDTH + x;
         if (!bgRegion.has(k)) filledSet.add(k);
       }
     }
@@ -44,8 +41,8 @@ export async function useOutline(color, cell) {
     const filledArray = Array.from(filledSet);
 
     await asyncProcessChunks(filledArray, (key) => {
-      const x = key >> 16;
-      const y = key & 0xFFFF;
+      const x = key % GRID_WIDTH;
+      const y = Math.floor(key / GRID_WIDTH);
       for (let dy = -thickness; dy <= thickness; dy++) {
         for (let dx = -thickness; dx <= thickness; dx++) {
           if (dx === 0 && dy === 0) continue;
@@ -53,7 +50,7 @@ export async function useOutline(color, cell) {
 
           const nx = x + dx;
           const ny = y + dy;
-          const nk = (nx << 16) | ny;
+          const nk = ny * GRID_WIDTH + nx;
           if (
             nx >= 0 && ny >= 0 && nx < GRID_WIDTH && ny < GRID_HEIGHT &&
             bgRegion.has(nk)

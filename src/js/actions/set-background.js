@@ -1,6 +1,7 @@
 import { els, setStatus } from '../core/state.js';
 
 import { t } from '../lang/i18n.js';
+import { debouncedSaveWorkspace } from '../core/tab-manager.js';
 
 
 
@@ -51,6 +52,7 @@ export function setupSetBackground() {
     setStatus(t('status.bgOn'));
     // Reset so same file can be picked again
     fileInput.value = '';
+    debouncedSaveWorkspace();
   };
 
   els.setBgBtn.onclick = () => {
@@ -82,9 +84,8 @@ export function setupSetBackground() {
       canvas.classList.add('has-bg');
 
       setStatus(t('status.bgOn'));
-
     }
-
+    debouncedSaveWorkspace();
   };
 
 }
@@ -92,15 +93,14 @@ export function setupSetBackground() {
 
 
 export function setSourceImage(src) {
-
   bgImage = src;
-
   if (els.imagePreview) {
-
-    els.imagePreview.src = src;
-
-    els.imagePreview.style.display = 'block';
-
+    if (src) {
+      els.imagePreview.src = src;
+      els.imagePreview.style.display = 'block';
+    } else {
+      els.imagePreview.src = '';
+      els.imagePreview.style.display = 'none';
+    }
   }
-
 }

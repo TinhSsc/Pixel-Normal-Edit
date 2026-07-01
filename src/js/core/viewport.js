@@ -78,59 +78,27 @@ export function applyTransform(canvas) {
     gridOverlay.style.boxSizing = 'content-box';
     gridOverlay.style.top = `-1px`;
     gridOverlay.style.left = `-1px`;
-    gridOverlay.style.backgroundImage = 'none';
+    
+    // Set CSS variables so attached UI can scale with the canvas
+    gridOverlay.style.setProperty('--canvas-zoom', zoom);
+    gridOverlay.style.setProperty('--canvas-logical-width', `${GRID_WIDTH}px`);
+    
+    const showGridFlag = document.getElementById('showGrid')?.checked;
+    if (zoom > 4 && showGridFlag) {
+      gridOverlay.style.backgroundImage = `
+        linear-gradient(to right, var(--color-grid-line) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--color-grid-line) 1px, transparent 1px)
+      `;
+      gridOverlay.style.backgroundSize = `${zoom}px ${zoom}px`;
+      gridOverlay.style.backgroundPosition = `0 0`;
+    } else {
+      gridOverlay.style.backgroundImage = 'none';
+    }
     
     const mirrorLine = document.getElementById('mirrorLine');
     if (mirrorLine) {
       mirrorLine.style.width = `2px`;
       mirrorLine.style.transform = `translateX(-1px)`;
-    }
-  }
-
-  const gridCanvas = document.getElementById('gridCanvas');
-  const wrap = gridCanvas?.parentElement;
-  if (gridCanvas && wrap) {
-    const ww = wrap.clientWidth;
-    const wh = wrap.clientHeight;
-    const dpr = window.devicePixelRatio || 1;
-    const physW = Math.round(ww * dpr);
-    const physH = Math.round(wh * dpr);
-
-    if (gridCanvas.width !== physW || gridCanvas.height !== physH) {
-      gridCanvas.width = physW;
-      gridCanvas.height = physH;
-      gridCanvas.style.width = `${ww}px`;
-      gridCanvas.style.height = `${wh}px`;
-    }
-    const gctx = gridCanvas.getContext('2d');
-    gctx.clearRect(0, 0, physW, physH);
-
-    const showGridFlag = document.getElementById('showGrid')?.checked;
-    
-    if (zoom > 4 && showGridFlag) {
-      gctx.beginPath();
-      gctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-      gctx.lineWidth = 1;
-
-      const startX = Math.max(0, Math.floor(-panX / zoom));
-      const endX = Math.min(GRID_WIDTH, Math.ceil((ww - panX) / zoom));
-      
-      const startY = Math.max(0, Math.floor(-panY / zoom));
-      const endY = Math.min(GRID_HEIGHT, Math.ceil((wh - panY) / zoom));
-      
-      for (let x = startX; x <= endX; x++) {
-        const vx = Math.round((panX + x * zoom) * dpr) + 0.5;
-        gctx.moveTo(vx, Math.round((panY + startY * zoom) * dpr));
-        gctx.lineTo(vx, Math.round((panY + endY * zoom) * dpr));
-      }
-      
-      for (let y = startY; y <= endY; y++) {
-        const vy = Math.round((panY + y * zoom) * dpr) + 0.5;
-        gctx.moveTo(Math.round((panX + startX * zoom) * dpr), vy);
-        gctx.lineTo(Math.round((panX + endX * zoom) * dpr), vy);
-      }
-      
-      gctx.stroke();
     }
   }
 }

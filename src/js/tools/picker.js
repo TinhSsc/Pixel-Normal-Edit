@@ -1,23 +1,16 @@
-import { pixelMap, els, setStatus } from '../core/state.js';
+import { pixelMap, els, setStatus, GRID_WIDTH } from '../core/state.js';
 import { t } from '../lang/i18n.js';
+import { uint32ToRgba, rgbaToHex } from '../core/color-utils.js';
 
 export function usePicker(cell) {
-  const key = (cell.x << 16) | cell.y;
-  const color = pixelMap.get(key);
-  if (color && els.colorPicker) {
-    // Convert color to hex if needed
-    els.colorPicker.value = toHex(color);
-    setStatus(`${t('status.pickedColor')} ${color}`);
+  const idx = cell.y * GRID_WIDTH + cell.x;
+  const val = pixelMap[idx];
+  if (val !== 0 && els.colorPicker) {
+    const rgba = uint32ToRgba(val);
+    const hex = rgbaToHex(rgba.r, rgba.g, rgba.b, rgba.a);
+    // HTML5 color input only accepts #RRGGBB (6 hex digits)
+    const hex6 = hex.length > 7 ? hex.slice(0, 7) : hex;
+    els.colorPicker.value = hex6;
+    setStatus(`${t('status.pickedColor')} ${hex6}`);
   }
-}
-
-function toHex(color) {
-  if (!color || color.startsWith('#')) return color || '#000000';
-  const tmp = document.createElement('canvas');
-  tmp.width = tmp.height = 1;
-  const ctx = tmp.getContext('2d');
-  ctx.fillStyle = color;
-  ctx.fillRect(0, 0, 1, 1);
-  const d = ctx.getImageData(0, 0, 1, 1).data;
-  return '#' + [d[0], d[1], d[2]].map(v => v.toString(16).padStart(2, '0')).join('');
 }

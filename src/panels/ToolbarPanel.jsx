@@ -7,6 +7,7 @@ export default function ToolbarPanel() {
     const handleMouseEnter = (e) => {
       if (window.innerWidth <= 768) return;
       const wrapper = e.currentTarget;
+      clearTimeout(wrapper._hideTimer);
       const popup = wrapper.querySelector('.popup-bridge-bottom');
       if (popup) {
         popup.style.display = 'block';
@@ -16,12 +17,13 @@ export default function ToolbarPanel() {
 
         const updatePosition = () => {
           const rect = wrapper.getBoundingClientRect();
-          popup.style.top = (rect.bottom + 5) + 'px';
+          const popupHeight = popup.offsetHeight || 40;
+          popup.style.top = (rect.top + (rect.height / 2) - (popupHeight / 2)) + 'px';
           
-          let left = rect.left;
-          const popupRect = popup.getBoundingClientRect();
-          if (left + popupRect.width > window.innerWidth) {
-            left = window.innerWidth - popupRect.width - 10;
+          let left = rect.right + 10;
+          const popupWidth = popup.offsetWidth || 150;
+          if (left + popupWidth > window.innerWidth) {
+            left = rect.left - popupWidth - 10;
           }
           popup.style.left = left + 'px';
         };
@@ -41,29 +43,71 @@ export default function ToolbarPanel() {
       const wrapper = e.currentTarget;
       const popup = wrapper.querySelector('.popup-bridge-bottom');
       if (popup) {
-        popup.style.display = '';
-        popup.style.position = '';
-        popup.style.zIndex = '';
-        popup.style.top = '';
-        popup.style.left = '';
-        popup.style.right = '';
-        
-        if (wrapper._updatePosition && wrapper._scrollContainer) {
-          wrapper._scrollContainer.removeEventListener('scroll', wrapper._updatePosition);
+        // If the wrapper contains a focused input, don't hide it immediately
+        // Or if it was clicked, give it a delay
+        let delay = 0;
+        if (wrapper.dataset.clicked === 'true' || wrapper.contains(document.activeElement)) {
+          delay = 3000;
         }
+
+        wrapper._hideTimer = setTimeout(() => {
+          wrapper.dataset.clicked = 'false';
+          popup.style.display = '';
+          popup.style.position = '';
+          popup.style.zIndex = '';
+          popup.style.top = '';
+          popup.style.left = '';
+          popup.style.right = '';
+          
+          if (wrapper._updatePosition && wrapper._scrollContainer) {
+            wrapper._scrollContainer.removeEventListener('scroll', wrapper._updatePosition);
+          }
+        }, delay);
       }
+    };
+
+    const handleClick = (e) => {
+      if (window.innerWidth <= 768) return;
+      const wrapper = e.currentTarget;
+      wrapper.dataset.clicked = 'true';
+      clearTimeout(wrapper._hideTimer);
     };
 
     const wrappers = document.querySelectorAll('.toolbar .tool-with-popup-bottom');
     wrappers.forEach(w => {
       w.addEventListener('mouseenter', handleMouseEnter);
       w.addEventListener('mouseleave', handleMouseLeave);
+      w.addEventListener('click', handleClick);
     });
 
+    const handleClickOutside = (e) => {
+      wrappers.forEach(wrapper => {
+        if (wrapper.dataset.clicked === 'true' && !wrapper.contains(e.target)) {
+          wrapper.dataset.clicked = 'false';
+          const popup = wrapper.querySelector('.popup-bridge-bottom');
+          if (popup) {
+            popup.style.display = '';
+            popup.style.position = '';
+            popup.style.zIndex = '';
+            popup.style.top = '';
+            popup.style.left = '';
+            popup.style.right = '';
+            if (wrapper._updatePosition && wrapper._scrollContainer) {
+              wrapper._scrollContainer.removeEventListener('scroll', wrapper._updatePosition);
+            }
+          }
+        }
+      });
+    };
+
+    document.addEventListener('click', handleClickOutside);
+
     return () => {
+      document.removeEventListener('click', handleClickOutside);
       wrappers.forEach(w => {
         w.removeEventListener('mouseenter', handleMouseEnter);
         w.removeEventListener('mouseleave', handleMouseLeave);
+        w.removeEventListener('click', handleClick);
       });
     };
   }, []);

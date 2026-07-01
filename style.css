@@ -22,6 +22,7 @@
   --color-overlay-sm: rgba(15, 15, 20, 0.4);
   --color-nav-bg: rgba(42, 42, 51, 0.9);
   --color-primary-tint: rgba(91, 91, 240, 0.1);
+  --color-grid-line: rgba(255, 255, 255, 0.2);
 }
 
 :root[data-theme="light"] {
@@ -46,12 +47,14 @@
   --color-overlay-sm: rgba(0, 0, 0, 0.08);
   --color-nav-bg: rgba(255, 255, 255, 0.9);
   --color-primary-tint: rgba(37, 99, 235, 0.1);
+  --color-grid-line: rgba(0, 0, 0, 0.2);
 }
 
 /* Custom theme */
 :root[data-theme="custom"] {
   --color-bg: var(--custom-bg, #191920);
   --color-primary: var(--custom-primary, #5b5bf0);
+  --color-grid-line: var(--custom-grid-line, rgba(255, 255, 255, 0.2));
   --color-surface: color-mix(in srgb, var(--color-bg) 85%, white);
   --color-surface-alt: color-mix(in srgb, var(--color-bg) 92%, white);
   --color-border: color-mix(in srgb, var(--color-bg) 70%, white);
@@ -228,7 +231,7 @@ h1 {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
 }
 
@@ -284,13 +287,11 @@ input[type="color"] {
 }
 
 #status {
-  position: absolute;
-  top: 10px;
-  left: 15px;
   color: var(--color-text-muted);
-  font-size: 13px;
+  font-size: 8px;
   z-index: 10;
   font-weight: 500;
+  margin: 1px 0;
 }
 
 .canvas-wrap {
@@ -825,35 +826,73 @@ input[type="color"] {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: var(--color-overlay);
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  animation: fadeIn 0.25s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .modal-content {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: 8px;
+  border-radius: 16px;
   width: 550px;
   max-width: 90%;
-  padding: 24px;
+  padding: 30px;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  animation: modalSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes modalSlideUp {
+  from {
+    transform: translateY(30px) scale(0.95);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
 }
 
 .modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   border-bottom: 1px solid var(--color-border);
-  padding-bottom: 10px;
+  padding-bottom: 16px;
+}
+
+.modal-header h3 {
+  font-size: 20px !important;
+  font-weight: 600;
+  color: var(--color-text-bright);
 }
 
 .modal-tabs {
   display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
+  gap: 12px;
+  margin-bottom: 24px;
+  background: var(--color-bg);
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
 }
 
 .tab-btn {
@@ -861,7 +900,7 @@ input[type="color"] {
   background: transparent;
   color: var(--color-text-muted);
   border: none;
-  border-bottom: 2px solid transparent;
+  border-radius: 6px;
   padding: 10px;
   font-size: 14px;
   cursor: pointer;
@@ -870,12 +909,14 @@ input[type="color"] {
 }
 
 .tab-btn.active {
+  background: var(--color-surface);
   color: var(--color-primary);
-  border-bottom: 2px solid var(--color-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .tab-btn:hover:not(.active) {
   color: var(--color-text);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .tab-content {
@@ -884,21 +925,114 @@ input[type="color"] {
 
 .tab-content.active {
   display: block;
+  animation: fadeIn 0.3s ease-out;
 }
 
 .drag-drop-zone {
   border: 2px dashed var(--color-border);
-  border-radius: 8px;
-  padding: 40px 20px;
+  border-radius: 12px;
+  padding: 50px 20px;
   text-align: center;
   color: var(--color-text-muted);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   background: var(--color-bg);
+  position: relative;
+  overflow: hidden;
+}
+
+.drag-drop-zone::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--color-primary);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.drag-drop-zone:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.drag-drop-zone:hover::after {
+  opacity: 0.05;
+}
+
+.drag-drop-zone i {
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.drag-drop-zone:hover i {
+  transform: scale(1.2);
+}
+
+.download-options-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.download-btn {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 14px 20px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  color: var(--color-text-bright);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  gap: 12px;
+}
+
+.download-btn:hover {
+  background: var(--color-surface-hover, rgba(255, 255, 255, 0.05));
+  border-color: var(--color-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.download-btn.json-btn {
+  background: rgba(34, 197, 94, 0.1);
+  border-color: rgba(34, 197, 94, 0.3);
+  color: #4ade80;
+}
+
+.download-btn.json-btn:hover {
+  background: rgba(34, 197, 94, 0.2);
+  border-color: #4ade80;
+}
+
+.select-dropdown {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 14px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-bright);
+  border-radius: 8px;
+  appearance: none;
+  outline: none;
+  transition: border-color 0.2s ease;
+  cursor: pointer;
+}
+
+.select-dropdown:hover,
+.select-dropdown:focus {
+  border-color: var(--color-primary);
 }
 
 .drag-drop-zone:hover,
@@ -993,13 +1127,15 @@ input[type="color"] {
 }
 
 /* Animations and hover effects for Dockview tabs */
-.dv-default-tab, .dv-tab {
+.dv-default-tab,
+.dv-tab {
   transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1) !important;
   cursor: pointer !important;
   transform-origin: bottom center;
 }
 
-.dv-default-tab:hover, .dv-tab:hover {
+.dv-default-tab:hover,
+.dv-tab:hover {
   background-color: var(--color-surface-alt) !important;
   transform: translateY(-2px);
 }
@@ -1067,4 +1203,610 @@ input[type="color"] {
 
 .color-picker-wrapper .swap-colors-btn:active {
   transform: translateX(-4px) rotate(-180deg);
+}
+
+/* Canvas Tabs Styles */
+.canvas-tabs-container {
+  display: flex;
+  align-items: center;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: 4px 4px 0 4px;
+  overflow-x: auto;
+  gap: 2px;
+}
+
+.canvas-tabs-container {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.canvas-tabs-container::-webkit-scrollbar {
+  display: none;
+}
+
+.tab-list {
+  display: flex;
+  gap: 2px;
+}
+
+.canvas-tab {
+  display: flex;
+  align-items: center;
+  padding: 6px 12px;
+  background: var(--color-bg);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  cursor: pointer;
+  font-size: 13px;
+  min-width: 100px;
+  max-width: 200px;
+  user-select: none;
+  transition: all 0.2s;
+}
+
+.canvas-tab:hover {
+  background: #2a2a35;
+  color: var(--color-text-bright);
+}
+
+.canvas-tab.active {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+
+.tab-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+.tab-close-btn {
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 2px;
+  margin-left: 6px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.6;
+}
+
+.tab-close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  opacity: 1;
+}
+
+.new-tab-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 4px;
+  margin-bottom: 4px;
+}
+
+.new-tab-btn:hover {
+  background: var(--color-surface);
+  color: var(--color-text-bright);
+}
+
+
+/* Hide Dockview native header for canvas panel to merge tabs */
+.dv-group-view:has(#canvasTabsContainer) .dv-tabs-and-actions-container {
+  display: none !important;
+}
+
+
+/* Canvas Transition */
+.canvas-wrap {
+  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+  opacity: 1;
+  transform: scale(1);
+}
+
+.canvas-wrap.fade-out {
+  opacity: 0;
+  transform: scale(0.98);
+}
+
+/* Upload Modal Source Tabs */
+.source-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  background: var(--color-surface-alt);
+  padding: 4px;
+
+  .dv-default-tab:hover,
+  .dv-tab:hover {
+    background-color: var(--color-surface-alt) !important;
+    transform: translateY(-2px);
+  }
+}
+
+.dv-active-tab .dv-default-tab,
+.dv-active-tab .dv-tab,
+.dv-default-tab.dv-active-tab,
+.dv-tab.dv-active-tab {
+  transform: translateY(0);
+}
+
+/* Custom rounded corners for dockview panels */
+:root .dockview-theme-dark .dv-groupview,
+:root .dockview-theme-light .dv-groupview {
+  border-radius: 12px !important;
+  border: 1px solid var(--color-border) !important;
+  box-shadow: 0 4px 12px var(--color-shadow-md) !important;
+  background-color: transparent !important;
+}
+
+:root .dockview-theme-dark .dv-tabs-and-actions-container,
+:root .dockview-theme-light .dv-tabs-and-actions-container {
+  border-top-left-radius: 11px !important;
+  border-top-right-radius: 11px !important;
+}
+
+:root .dockview-theme-dark .dv-content,
+:root .dockview-theme-light .dv-content {
+  border-bottom-left-radius: 11px !important;
+  border-bottom-right-radius: 11px !important;
+}
+
+/* Remove default splitview sash background since we have margin gaps now */
+.dv-sash {
+  background: transparent !important;
+}
+
+/* Remove shadow from dv-scrollable */
+.dv-scrollable,
+.dv-scrollable::before,
+.dv-scrollable::after,
+.dv-left-drop-shadow,
+.dv-right-drop-shadow {
+  box-shadow: none !important;
+  background-image: none !important;
+}
+
+/* Variant 3: Dim & Slide Focus for Color Picker */
+.color-picker-wrapper {
+  transition: gap 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.color-picker-wrapper:hover {
+  gap: 12px;
+}
+
+.color-picker-wrapper .swap-colors-btn {
+  opacity: 0.5;
+  transition: opacity 0.2s, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.color-picker-wrapper:hover .swap-colors-btn {
+  opacity: 1;
+}
+
+.color-picker-wrapper .swap-colors-btn:active {
+  transform: translateX(-4px) rotate(-180deg);
+}
+
+/* Canvas Tabs Styles */
+.canvas-tabs-container {
+  display: flex;
+  align-items: center;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: 4px 4px 0 4px;
+  overflow-x: auto;
+  gap: 2px;
+}
+
+.canvas-tabs-container {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.canvas-tabs-container::-webkit-scrollbar {
+  display: none;
+}
+
+.tab-list {
+  display: flex;
+  gap: 2px;
+}
+
+.canvas-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--color-bg);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  cursor: pointer;
+  font-size: 13px;
+  min-width: 100px;
+  max-width: 200px;
+  user-select: none;
+  transition: all 0.2s;
+}
+
+.canvas-tab:hover {
+  background: #2a2a35;
+  color: var(--color-text-bright);
+}
+
+.canvas-tab.active {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+
+.tab-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+.tab-close-btn {
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 2px;
+  margin-left: 6px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.6;
+}
+
+.tab-close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  opacity: 1;
+}
+
+.new-tab-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 4px;
+  margin-bottom: 4px;
+}
+
+.new-tab-btn:hover {
+  background: var(--color-surface);
+  color: var(--color-text-bright);
+}
+
+
+/* Hide Dockview native header for canvas panel to merge tabs */
+.dv-group-view:has(#canvasTabsContainer) .dv-tabs-and-actions-container {
+  display: none !important;
+}
+
+
+/* Canvas Transition */
+.canvas-wrap {
+  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+  opacity: 1;
+  transform: scale(1);
+}
+
+.canvas-wrap.fade-out {
+  opacity: 0;
+  transform: scale(0.98);
+}
+
+/* Upload Modal Source Tabs */
+.source-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  background: var(--color-surface-alt);
+  padding: 4px;
+  border-radius: 8px;
+  width: fit-content;
+  border: 1px solid var(--color-border);
+}
+
+.source-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  line-height: 1;
+  transition: all 0.2s ease;
+}
+
+.source-btn:hover {
+  color: var(--color-text-bright);
+}
+
+.source-btn.active {
+  background: var(--color-surface);
+  color: var(--color-text-bright);
+  box-shadow: 0 1px 3px var(--color-shadow-md);
+}
+
+.source-btn svg,
+.source-btn i {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.tab-pane-transition {
+  animation: fadeInTab 0.2s ease-out;
+}
+
+@keyframes fadeInTab {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Download Modal UI */
+.select-btn {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  transition: all 0.2s;
+}
+
+.select-btn:hover {
+  border-color: var(--color-primary-light);
+  background: var(--color-surface-hover, rgba(255, 255, 255, 0.05));
+  color: var(--color-text-bright);
+}
+
+.select-btn.active {
+  background: var(--color-primary-tint);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  box-shadow: 0 0 0 1px var(--color-primary);
+}
+
+.canvas-checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.canvas-checkbox-item:hover {
+  border-color: var(--color-primary-light);
+}
+
+.canvas-checkbox-item input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--color-primary);
+}
+
+.canvas-checkbox-item span {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+/* Canvas Toolbar Container */
+.toolbar-container {
+  pointer-events: auto;
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: calc(1px * var(--canvas-zoom, 1));
+  margin-bottom: calc(0px * var(--canvas-zoom, 1));
+  background: transparent;
+  padding: calc(0px * var(--canvas-zoom, 1));
+  box-sizing: border-box;
+}
+
+.grid-size-wrapper {
+  position: relative;
+  width: calc(12px * var(--canvas-zoom, 1));
+}
+
+#gridSizeSelectBtn {
+  height: calc(var(--canvas-zoom, 1));
+  padding: 0 calc(var(--canvas-zoom, 1));
+  font-size: calc(var(--canvas-zoom, 1));
+  background: var(--color-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(0.5px * var(--canvas-zoom, 1));
+  width: 100%;
+  border-radius: calc(0.5px * var(--canvas-zoom, 1));
+  border: calc(0.2px * var(--canvas-zoom, 1)) solid var(--color-border);
+  color: var(--color-text-bright);
+}
+
+#currentGridSizeText {
+  white-space: nowrap;
+}
+
+#gridSizeSelectBtn i {
+  width: calc(2px * var(--canvas-zoom, 1)) !important;
+  height: calc(2px * var(--canvas-zoom, 1)) !important;
+  flex-shrink: 0;
+}
+
+#resizePopover {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 6px;
+  background: rgba(30, 30, 35, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 16px;
+  width: 240px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  z-index: 60;
+  backdrop-filter: blur(12px);
+  transition: all 0.2s ease;
+}
+
+.resize-popover-header {
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.resize-popover-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.resize-popover-col {
+  flex: 1;
+}
+
+.resize-popover-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-muted);
+  margin-bottom: 4px;
+  display: block;
+}
+
+.resize-popover-input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: #fff;
+  padding: 6px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  outline: none;
+  transition: border 0.2s;
+}
+
+.resize-popover-input:focus {
+  border-color: var(--color-primary);
+}
+
+.resize-popover-lock {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 6px 8px;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
+.resize-popover-lock label {
+  font-size: 11px;
+  cursor: pointer;
+  user-select: none;
+  color: #ddd;
+}
+
+.resize-popover-presets-title {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-muted);
+  margin-bottom: 6px;
+}
+
+.resize-popover-presets {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.resize-preset-btn {
+  padding: 4px 0 !important;
+  font-size: 11px !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.resize-preset-btn:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.resize-popover-preview {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  margin-bottom: 12px;
+  text-align: center;
+  padding: 8px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+#resizePreviewText {
+  color: var(--color-primary);
+  font-weight: bold;
+  font-size: 13px;
+}
+
+#resizeApplyBtn {
+  width: 100%;
+  padding: 8px 0;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }

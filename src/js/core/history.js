@@ -8,27 +8,24 @@ export function resetHistory() {
   currentStroke = null;
 }
 
+export function getHistoryState() {
+  return { undoStack, redoStack, currentStroke };
+}
+
+export function setHistoryState(state) {
+  undoStack = state.undoStack || [];
+  redoStack = state.redoStack || [];
+  currentStroke = state.currentStroke || null;
+}
+
 export function beginStroke() {
   currentStroke = { keys: [], oldColors: [], newColors: [] };
 }
 
-export function recordChange(arg1, arg2, arg3, arg4) {
+export function recordChange(idx, oldColor, newColor) {
   if (!currentStroke) return;
   
-  let key, oldColor, newColor;
-  if (arg4 !== undefined) {
-    // legacy (x, y, oldColor, newColor)
-    key = (arg1 << 16) | arg2;
-    oldColor = arg3;
-    newColor = arg4;
-  } else {
-    // new (key, oldColor, newColor)
-    key = arg1;
-    oldColor = arg2;
-    newColor = arg3;
-  }
-  
-  currentStroke.keys.push(key);
+  currentStroke.keys.push(idx);
   currentStroke.oldColors.push(oldColor);
   currentStroke.newColors.push(newColor);
 }
@@ -38,7 +35,14 @@ export function commitStroke(pixelMap) {
     currentStroke = null;
     return;
   }
-  undoStack.push(currentStroke);
+  
+  // Convert standard arrays to Typed Arrays to eliminate IndexedDB clone lag
+  undoStack.push({
+    keys: new Uint32Array(currentStroke.keys),
+    oldColors: new Uint32Array(currentStroke.oldColors),
+    newColors: new Uint32Array(currentStroke.newColors)
+  });
+  
   redoStack = [];
   currentStroke = null;
 }
@@ -49,13 +53,8 @@ export function undo(pixelMap, renderFn) {
   redoStack.push(stroke);
   
   for (let i = 0; i < stroke.keys.length; i++) {
-    const key = stroke.keys[i];
-    const oldColor = stroke.oldColors[i];
-    if (oldColor === null) {
-      pixelMap.delete(key);
-    } else {
-      pixelMap.set(key, oldColor);
-    }
+    const idx = stroke.keys[i];
+    pixelMap[idx] = stroke.oldColors[i];
   }
   
   renderFn();
@@ -68,13 +67,8 @@ export function redo(pixelMap, renderFn) {
   undoStack.push(stroke);
   
   for (let i = 0; i < stroke.keys.length; i++) {
-    const key = stroke.keys[i];
-    const newColor = stroke.newColors[i];
-    if (newColor === null) {
-      pixelMap.delete(key);
-    } else {
-      pixelMap.set(key, newColor);
-    }
+    const idx = stroke.keys[i];
+    pixelMap[idx] = stroke.newColors[i];
   }
   
   renderFn();

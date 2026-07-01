@@ -11,20 +11,38 @@ export function colorDistance(r1, g1, b1, a1 = 255, r2, g2, b2, a2 = 255) {
 
 const parseCache = new Map();
 
-const tmpCanvas = document.createElement('canvas');
-tmpCanvas.width = 1;
-tmpCanvas.height = 1;
-const tmpCtx = tmpCanvas.getContext('2d', { willReadFrequently: true });
-
 export function parseColorToRgba(color) {
   if (!color || color === 'transparent') return { r: 0, g: 0, b: 0, a: 0 };
   if (parseCache.has(color)) return parseCache.get(color);
 
-  tmpCtx.clearRect(0, 0, 1, 1);
-  tmpCtx.fillStyle = color;
-  tmpCtx.fillRect(0, 0, 1, 1);
-  const d = tmpCtx.getImageData(0, 0, 1, 1).data;
-  const result = { r: d[0], g: d[1], b: d[2], a: d[3] };
+  let result;
+  if (color.startsWith('#')) {
+    const hex = color.slice(1);
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    const a = hex.length >= 8 ? parseInt(hex.slice(6, 8), 16) : 255;
+    result = { r, g, b, a };
+  } else if (color.startsWith('rgb')) {
+    const m = color.match(/[\d.]+/g);
+    result = {
+      r: parseInt(m[0]),
+      g: parseInt(m[1]),
+      b: parseInt(m[2]),
+      a: m[3] !== undefined ? Math.round(parseFloat(m[3]) * 255) : 255
+    };
+  } else {
+    // fallback for named colors which are not heavily used dynamically
+    const tmpCanvas = document.createElement('canvas');
+    tmpCanvas.width = 1;
+    tmpCanvas.height = 1;
+    const tmpCtx = tmpCanvas.getContext('2d', { willReadFrequently: true });
+    tmpCtx.fillStyle = color;
+    tmpCtx.fillRect(0, 0, 1, 1);
+    const d = tmpCtx.getImageData(0, 0, 1, 1).data;
+    result = { r: d[0], g: d[1], b: d[2], a: d[3] };
+  }
+
   parseCache.set(color, result);
   return result;
 }
@@ -47,6 +65,23 @@ export function parseColorToUint32(color) {
   val = val >>> 0;
   uint32Cache.set(color, val);
   return val;
+}
+
+export function uint32ToRgba(uint32) {
+  if (uint32 === 0) return { r: 0, g: 0, b: 0, a: 0 };
+  let r, g, b, a;
+  if (isLittleEndian) {
+    r = uint32 & 0xFF;
+    g = (uint32 >> 8) & 0xFF;
+    b = (uint32 >> 16) & 0xFF;
+    a = (uint32 >>> 24) & 0xFF;
+  } else {
+    a = uint32 & 0xFF;
+    b = (uint32 >> 8) & 0xFF;
+    g = (uint32 >> 16) & 0xFF;
+    r = (uint32 >>> 24) & 0xFF;
+  }
+  return { r, g, b, a };
 }
 
 export function rgbaToHex(r, g, b, a = 255) {

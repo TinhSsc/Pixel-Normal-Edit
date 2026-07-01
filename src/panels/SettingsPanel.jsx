@@ -7,6 +7,7 @@ export default function SettingsPanel() {
     const handleMouseEnter = (e) => {
       if (window.innerWidth <= 768) return;
       const wrapper = e.currentTarget;
+      clearTimeout(wrapper._hideTimer);
       const popup = wrapper.querySelector('.popup-bridge-bottom');
       if (popup) {
         popup.style.display = 'block';
@@ -16,12 +17,12 @@ export default function SettingsPanel() {
 
         const updatePosition = () => {
           const rect = wrapper.getBoundingClientRect();
-          popup.style.top = (rect.bottom + 5) + 'px';
+          const popupHeight = popup.offsetHeight || 40;
+          popup.style.top = (rect.top + (rect.height / 2) - (popupHeight / 2)) + 'px';
           
-          let left = rect.left;
-          const popupRect = popup.getBoundingClientRect();
-          if (left + popupRect.width > window.innerWidth) {
-            left = window.innerWidth - popupRect.width - 10;
+          let left = rect.left - (popup.offsetWidth || 150) - 10;
+          if (left < 0) {
+            left = rect.right + 10;
           }
           popup.style.left = left + 'px';
         };
@@ -41,29 +42,46 @@ export default function SettingsPanel() {
       const wrapper = e.currentTarget;
       const popup = wrapper.querySelector('.popup-bridge-bottom');
       if (popup) {
-        popup.style.display = '';
-        popup.style.position = '';
-        popup.style.zIndex = '';
-        popup.style.top = '';
-        popup.style.left = '';
-        popup.style.right = '';
-        
-        if (wrapper._updatePosition && wrapper._scrollContainer) {
-          wrapper._scrollContainer.removeEventListener('scroll', wrapper._updatePosition);
+        let delay = 0;
+        if (wrapper.dataset.clicked === 'true' || wrapper.contains(document.activeElement)) {
+          delay = 3000;
         }
+
+        wrapper._hideTimer = setTimeout(() => {
+          wrapper.dataset.clicked = 'false';
+          popup.style.display = '';
+          popup.style.position = '';
+          popup.style.zIndex = '';
+          popup.style.top = '';
+          popup.style.left = '';
+          popup.style.right = '';
+          
+          if (wrapper._updatePosition && wrapper._scrollContainer) {
+            wrapper._scrollContainer.removeEventListener('scroll', wrapper._updatePosition);
+          }
+        }, delay);
       }
+    };
+
+    const handleClick = (e) => {
+      if (window.innerWidth <= 768) return;
+      const wrapper = e.currentTarget;
+      wrapper.dataset.clicked = 'true';
+      clearTimeout(wrapper._hideTimer);
     };
 
     const wrappers = document.querySelectorAll('.right-panel .tool-with-popup-bottom');
     wrappers.forEach(w => {
       w.addEventListener('mouseenter', handleMouseEnter);
       w.addEventListener('mouseleave', handleMouseLeave);
+      w.addEventListener('click', handleClick);
     });
 
     const themeSelect = document.getElementById('themeSelect');
     const customThemeSettings = document.getElementById('customThemeSettings');
     const customBgColor = document.getElementById('customBgColor');
     const customPrimaryColor = document.getElementById('customPrimaryColor');
+    const customGridLineColor = document.getElementById('customGridLineColor');
 
     // Injects a dynamic <style> tag to override Dockview CSS variables AFTER the library's own
     // styles are loaded. This is needed because !important has no effect on CSS custom properties,
@@ -117,10 +135,15 @@ export default function SettingsPanel() {
         customThemeSettings.style.display = 'block';
         document.documentElement.style.setProperty('--custom-bg', customBgColor.value);
         document.documentElement.style.setProperty('--custom-primary', customPrimaryColor.value);
+        
+        // Add 33 for 20% opacity for the grid line
+        const gridColor = customGridLineColor?.value || '#ffffff';
+        document.documentElement.style.setProperty('--custom-grid-line', gridColor + '33');
       } else {
         customThemeSettings.style.display = 'none';
         document.documentElement.style.removeProperty('--custom-bg');
         document.documentElement.style.removeProperty('--custom-primary');
+        document.documentElement.style.removeProperty('--custom-grid-line');
       }
       
       // Give the browser one frame to resolve the new CSS vars before reading them
@@ -129,6 +152,9 @@ export default function SettingsPanel() {
       localStorage.setItem('pixel-edit-theme', theme);
       localStorage.setItem('pixel-edit-custom-bg', customBgColor.value);
       localStorage.setItem('pixel-edit-custom-primary', customPrimaryColor.value);
+      if (customGridLineColor) {
+        localStorage.setItem('pixel-edit-custom-grid-line', customGridLineColor.value);
+      }
     };
 
     if (themeSelect) {
@@ -138,6 +164,9 @@ export default function SettingsPanel() {
         if (savedTheme === 'custom') {
           customBgColor.value = localStorage.getItem('pixel-edit-custom-bg') || '#191920';
           customPrimaryColor.value = localStorage.getItem('pixel-edit-custom-primary') || '#5b5bf0';
+          if (customGridLineColor) {
+            customGridLineColor.value = localStorage.getItem('pixel-edit-custom-grid-line') || '#ffffff';
+          }
         }
         updateTheme();
       } else {
@@ -148,9 +177,35 @@ export default function SettingsPanel() {
       themeSelect.addEventListener('change', updateTheme);
       customBgColor.addEventListener('input', updateTheme);
       customPrimaryColor.addEventListener('input', updateTheme);
+      if (customGridLineColor) {
+        customGridLineColor.addEventListener('input', updateTheme);
+      }
     }
 
+    const handleClickOutside = (e) => {
+      wrappers.forEach(wrapper => {
+        if (wrapper.dataset.clicked === 'true' && !wrapper.contains(e.target)) {
+          wrapper.dataset.clicked = 'false';
+          const popup = wrapper.querySelector('.popup-bridge-bottom');
+          if (popup) {
+            popup.style.display = '';
+            popup.style.position = '';
+            popup.style.zIndex = '';
+            popup.style.top = '';
+            popup.style.left = '';
+            popup.style.right = '';
+            if (wrapper._updatePosition && wrapper._scrollContainer) {
+              wrapper._scrollContainer.removeEventListener('scroll', wrapper._updatePosition);
+            }
+          }
+        }
+      });
+    };
+
+    document.addEventListener('click', handleClickOutside);
+
     return () => {
+      document.removeEventListener('click', handleClickOutside);
       if (themeSelect) {
         themeSelect.removeEventListener('change', updateTheme);
         customBgColor.removeEventListener('input', updateTheme);
@@ -159,6 +214,7 @@ export default function SettingsPanel() {
       wrappers.forEach(w => {
         w.removeEventListener('mouseenter', handleMouseEnter);
         w.removeEventListener('mouseleave', handleMouseLeave);
+        w.removeEventListener('click', handleClick);
       });
     };
   }, []);
@@ -198,31 +254,23 @@ export default function SettingsPanel() {
         </div>
       </div>
 
-      <div className="tool-group">
-        <div className="tool-group-title" onClick={(e) => e.target.closest('.tool-group').classList.toggle('collapsed')} style={{ cursor: 'pointer' }}>Giao diện (Theme)</div>
-        <div className="tool-grid" style={{ gap: '10px', display: 'block' }}>
-          <select id="themeSelect" className="btn" style={{ width: '100%', fontSize: '12px', padding: '4px', background: 'var(--color-bg)', border: '1px solid var(--color-border)', color: 'var(--color-text)', borderRadius: '4px', marginBottom: '10px' }}>
-            <option value="dark">Tối (Dark)</option>
-            <option value="light">Sáng (Light)</option>
-            <option value="custom">Tùy chỉnh (Custom)</option>
-          </select>
-          <div id="customThemeSettings" style={{ display: 'none', padding: '10px', background: 'var(--color-surface)', borderRadius: '4px', border: '1px solid var(--color-border)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <label style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>Nền (Bg)</label>
-              <input type="color" id="customBgColor" defaultValue="#191920" style={{ width: '24px', height: '24px', padding: 0, border: 'none', borderRadius: '4px', cursor: 'pointer' }} />
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <label style={{ fontSize: '11px', color: 'var(--color-text-muted)' }}>Nhấn (Primary)</label>
-              <input type="color" id="customPrimaryColor" defaultValue="#5b5bf0" style={{ width: '24px', height: '24px', padding: 0, border: 'none', borderRadius: '4px', cursor: 'pointer' }} />
-            </div>
-          </div>
-        </div>
-      </div>
+
 
       <div className="tool-group">
         <div className="tool-group-title" onClick={(e) => e.target.closest('.tool-group').classList.toggle('collapsed')} style={{ cursor: 'pointer' }} data-i18n="group.imageOps">Thao tác ảnh</div>
         <div className="tool-grid" style={{ gap: '10px' }}>
-          <button id="rotateBtn" className="tool-btn" data-i18n="transform.rotate"><i data-lucide="rotate-cw"></i></button>
+          <div className="tool-with-popup-bottom">
+            <button id="rotateBtn" className="tool-btn" data-i18n="transform.rotate"><i data-lucide="rotate-cw"></i></button>
+            <div className="popup-bridge-bottom">
+              <div className="tool-popup" style={{ width: 'max-content' }}>
+                <label style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }} data-i18n="label.rotateOptions">Tùy chọn xoay (khi không vuông)</label>
+                <select id="rotateModeSelect" className="btn" style={{ fontSize: '12px', padding: '4px', background: 'var(--color-bg)', border: '1px solid var(--color-border)', color: 'var(--color-text)', borderRadius: '4px' }}>
+                  <option value="size" data-i18n="option.rotateSize">Xoay luôn size pixel</option>
+                  <option value="pixel" data-i18n="option.rotatePixel">Chỉ xoay pixel thôi</option>
+                </select>
+              </div>
+            </div>
+          </div>
           <button id="flipHBtn" className="tool-btn" data-i18n="transform.flipH"><i data-lucide="flip-horizontal"></i></button>
           <button id="flipVBtn" className="tool-btn" data-i18n="transform.flipV"><i data-lucide="flip-vertical"></i></button>
         </div>

@@ -4,7 +4,7 @@ import { renderPixels } from '../../core/render.js';
 import { resetHistory } from '../../core/history.js';
 import { setSourceImage } from '../../actions/set-background.js';
 import { t } from '../../lang/i18n.js';
-
+import { parseColorToUint32 } from '../../core/color-utils.js';
 export function setupUploadModal() {
   const modal = document.getElementById('uploadModal');
   const openBtn = document.getElementById('openUploadModalBtn');
@@ -36,8 +36,9 @@ export function setupUploadModal() {
   // Tabs
   tabBtns.forEach(btn => {
     btn.addEventListener('click', () => {
-      tabBtns.forEach(b => b.classList.remove('active'));
-      tabContents.forEach(c => c.classList.remove('active'));
+      const container = btn.closest('.modal-content') || document;
+      container.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      container.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       btn.classList.add('active');
       document.getElementById(btn.dataset.tab)?.classList.add('active');
     });
@@ -79,7 +80,7 @@ export function setupUploadModal() {
   });
 }
 
-function handleImageFile(file, autoSize = true) {
+export function handleImageFile(file, autoSize = true) {
   const src = URL.createObjectURL(file);
   const img = new Image();
   img.onload = () => {
@@ -115,21 +116,14 @@ function proceedWithImage(img, src, autoSize) {
     setGridSizeParams(w, h, newData, newData32);
     import('../../actions/grid-size-select.js').then(({ syncGridSizeUI }) => syncGridSizeUI(w, h));
     
-    const newPixelMap = new Map();
+    const newPixelMap = new Uint32Array(newData32);
     const data = newData.data;
-    for (let y = 0; y < h; y++) {
-      for (let x = 0; x < w; x++) {
-        const i = (y * w + x) * 4;
-        const a = data[i + 3];
-        if (a > 10) {
-          const r = data[i];
-          const g = data[i + 1];
-          const b = data[i + 2];
-          const hex = '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1) + (a < 255 ? a.toString(16).padStart(2, '0') : '');
-          newPixelMap.set((x << 16) | y, hex);
-        }
-      }
+    for (let i = 0; i < newPixelMap.length; i++) {
+       if (data[i * 4 + 3] <= 10) {
+          newPixelMap[i] = 0;
+       }
     }
+    
     resetMaps(newPixelMap);
     resetHistory();
     resizeCanvas();
@@ -142,7 +136,7 @@ function proceedWithImage(img, src, autoSize) {
     import('../../lang/i18n.js').then(({ t }) => {
       const msg = t('status.imgLoaded');
       if (autoSize) {
-        setStatus(`${msg} (${pixelMap.size.toLocaleString()} pixels)`);
+        setStatus(`${msg} (${pixelMap.length.toLocaleString()} pixels)`);
       } else {
         setStatus(msg);
       }
@@ -158,7 +152,7 @@ function handleJsonFile(file) {
   reader.readAsText(file);
 }
 
-function handleJsonText(text) {
+export function handleJsonText(text) {
   try {
     const data = JSON.parse(text);
     if (!data.width || !data.height || !data.pixels) {
@@ -178,14 +172,17 @@ function handleJsonText(text) {
     setGridSizeParams(data.width, data.height, newData, newData32);
     import('../../actions/grid-size-select.js').then(({ syncGridSizeUI }) => syncGridSizeUI(data.width, data.height));
 
-    const newPixelMap = new Map();
+    const newPixelMap = new Uint32Array(data.width * data.height);
     for (const [k, v] of Object.entries(data.pixels)) {
+      let x, y;
       if (k.includes(',')) {
-        const [x, y] = k.split(',').map(Number);
-        newPixelMap.set((x << 16) | y, v);
+        [x, y] = k.split(',').map(Number);
       } else {
-        newPixelMap.set(parseInt(k, 10), v);
+        const keyInt = parseInt(k, 10);
+        x = keyInt >> 16;
+        y = keyInt & 0xFFFF;
       }
+      newPixelMap[y * data.width + x] = parseColorToUint32(v);
     }
     resetMaps(newPixelMap);
     resetHistory();
@@ -195,7 +192,7 @@ function handleJsonText(text) {
 
     import('../../lang/i18n.js').then(({ t }) => {
       import('../../core/state.js').then(({ setStatus, pixelMap }) => {
-        setStatus(`${t('status.jsonLoaded')} (${pixelMap.size.toLocaleString()} pixels)`);
+        setStatus(`${t('status.jsonLoaded')} (${pixelMap.length.toLocaleString()} pixels)`);
       });
     });
     document.getElementById('uploadModal').style.display = 'none';
