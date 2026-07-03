@@ -37,6 +37,8 @@
   --color-nav-bg: rgba(42, 42, 51, 0.9);
   --color-primary-tint: rgba(91, 91, 240, 0.1);
   --color-grid-line: rgba(255, 255, 255, 0.2);
+  --color-info: #60a5fa;
+  --color-sync: #818cf8;
 }
 
 :root[data-theme="light"] {
@@ -62,6 +64,8 @@
   --color-nav-bg: rgba(255, 255, 255, 0.9);
   --color-primary-tint: rgba(37, 99, 235, 0.1);
   --color-grid-line: rgba(0, 0, 0, 0.2);
+  --color-info: #3b82f6;
+  --color-sync: #6366f1;
 }
 
 :root .dockview-theme-dark .dv-tabs-and-actions-container,

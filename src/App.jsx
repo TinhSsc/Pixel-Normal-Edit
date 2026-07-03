@@ -1,3 +1,4 @@
+import { Icon, ICONS } from './components/icons';
 import { useEffect, useRef, useState } from 'react';
 
 import { initEditor } from './js/main.js';
@@ -323,7 +324,7 @@ function App() {
                 onClick={() => document.getElementById('globalSettingsModal').style.display = 'flex'}
                 title="Cài đặt"
               >
-                <i data-lucide="settings" style={{ width: '20px', height: '20px', color: 'var(--color-text-muted)' }}></i>
+                <Icon name={ICONS.SETTINGS} style={{ width: '20px', height: '20px', color: 'var(--color-text-muted)' }} />
               </button>
             </div>
 
@@ -336,7 +337,7 @@ function App() {
 
             <button id="toggleToolsBtn" className="btn btn-primary mobile-only" data-i18n="tooltip.toggleTools">
 
-              <i data-lucide="menu" style={{ width: '18px', height: '18px' }}></i>
+              <Icon name={ICONS.MENU} style={{ width: '18px', height: '18px' }} />
 
               <span data-i18n="text.showTools">Mở công cụ</span>
 
@@ -344,7 +345,7 @@ function App() {
 
             <button id="openUploadModalBtn" className="btn" data-i18n="tooltip.uploadFull">
 
-              <i data-lucide="upload" style={{ width: '18px', height: '18px' }}></i>
+              <Icon name={ICONS.UPLOAD} style={{ width: '18px', height: '18px' }} />
 
               <span data-i18n="btn.upload">Tải lên</span>
 
@@ -352,16 +353,16 @@ function App() {
 
 
             <button id="openDownloadModalBtn" className="btn btn-primary" style={{ background: 'var(--color-success)' }} data-i18n="tooltip.exportFull">
-              <i data-lucide="download" style={{ width: '18px', height: '18px' }}></i>
+              <Icon name={ICONS.DOWNLOAD} style={{ width: '18px', height: '18px' }} />
               <span data-i18n="btn.export">Tải xuống</span>
             </button>
 
-            <button className="btn desktop-only undo-btn-action" data-i18n="tooltip.undo"><i data-lucide="undo" style={{ width: '18px', height: '18px' }}></i></button>
+            <button className="btn desktop-only undo-btn-action" data-i18n="tooltip.undo"><Icon name={ICONS.UNDO} style={{ width: '18px', height: '18px' }} /></button>
 
-            <button className="btn desktop-only redo-btn-action" data-i18n="tooltip.redo"><i data-lucide="redo" style={{ width: '18px', height: '18px' }}></i></button>
+            <button className="btn desktop-only redo-btn-action" data-i18n="tooltip.redo"><Icon name={ICONS.REDO} style={{ width: '18px', height: '18px' }} /></button>
 
             <div id="driveHeaderStatus" title="Chưa kết nối Google Drive" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 4px', cursor: 'help', width: '32px', height: '32px', borderRadius: '8px', transition: 'background 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-surface-alt)'} onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
-              <i data-lucide="hard-drive" id="driveHeaderIcon" style={{ width: '18px', height: '18px', color: 'var(--color-text-muted)', transition: 'color 0.2s' }}></i>
+              <Icon name={ICONS.HARD_DRIVE} id="driveHeaderIcon" style={{ width: '18px', height: '18px', color: 'var(--color-text-muted)', transition: 'color 0.2s' }} />
             </div>
 
             <button id="loginBtn" className="btn" data-i18n="tooltip.login" title={currentUser ? currentUser.name || currentUser.email : ''} onClick={(e) => {
@@ -393,7 +394,7 @@ function App() {
               {currentUser && currentUser.picture ? (
                 <img src={currentUser.picture} alt="" style={{ width: '18px', height: '18px', borderRadius: '50%' }} />
               ) : (
-                <i data-lucide="user" style={{ width: '18px', height: '18px' }}></i>
+                <Icon name={ICONS.USER} style={{ width: '18px', height: '18px' }} />
               )}
 
             </button>
@@ -450,19 +451,19 @@ function App() {
         <div className="modal-content">
           <div className="modal-header">
             <h3 style={{ margin: 0, fontSize: '18px' }} data-i18n="modal.uploadTitle">Tải dữ liệu lên</h3>
-            <button id="closeUploadModalBtn" className="btn" style={{ background: 'transparent', border: 'none', padding: '4px' }}><i data-lucide="x"></i></button>
+            <button id="closeUploadModalBtn" className="btn" style={{ background: 'transparent', border: 'none', padding: '4px' }}><Icon name={ICONS.X} /></button>
           </div>
 
           <div className="modal-tabs">
             <button className="tab-btn active" data-tab="tab-image">
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                <i data-lucide="image" style={{ width: '18px', height: '18px' }}></i>
+                <Icon name={ICONS.IMAGE} style={{ width: '18px', height: '18px' }} />
                 <span data-i18n="modal.tabImage">Ảnh (PNG/JPG)</span>
               </div>
             </button>
             <button className="tab-btn" data-tab="tab-json">
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                <i data-lucide="file-json" style={{ width: '18px', height: '18px' }}></i>
+                <Icon name={ICONS.FILE_JSON} style={{ width: '18px', height: '18px' }} />
                 <span data-i18n="modal.tabJson">Dữ liệu (JSON)</span>
               </div>
             </button>
@@ -471,10 +472,10 @@ function App() {
           <div className="tab-content active" id="tab-image">
             <div className="source-tabs">
                <button className="source-btn active" data-source="local">
-                 <i data-lucide="monitor" style={{ width: '16px', height: '16px' }}></i> Máy tính
+                 <Icon name={ICONS.MONITOR} style={{ width: '16px', height: '16px' }} /> Máy tính
                </button>
                <button className="source-btn" data-source="drive">
-                 <i data-lucide="hard-drive" style={{ width: '16px', height: '16px' }}></i> Google Drive
+                 <Icon name={ICONS.HARD_DRIVE} style={{ width: '16px', height: '16px' }} /> Google Drive
                </button>
             </div>
             
@@ -485,7 +486,7 @@ function App() {
             
             <div id="source-local-content">
               <div id="imageDropZone" className="drag-drop-zone">
-                <i data-lucide="upload-cloud" style={{ width: '48px', height: '48px', color: 'var(--color-primary)', marginBottom: '16px' }}></i>
+                <Icon name={ICONS.UPLOAD_CLOUD} style={{ width: '48px', height: '48px', color: 'var(--color-primary)', marginBottom: '16px' }} />
                 <div style={{ fontSize: '16px', fontWeight: 500, color: 'var(--color-text-bright)', marginBottom: '8px' }} data-i18n="modal.dropImage">Kéo thả ảnh vào đây</div>
                 <div style={{ fontSize: '14px', color: 'var(--color-text-muted)' }}>hoặc nhấp để chọn file từ máy tính</div>
                 <input type="file" id="imageUploadModal" accept="image/*" style={{ display: 'none' }} />
@@ -495,7 +496,7 @@ function App() {
             <div id="source-drive-content" style={{ display: 'none', minHeight: '180px' }}>
               <div id="driveUploadList" style={{ width: '100%', height: '100%' }}>
                 <div style={{ textAlign: 'center', padding: '30px 20px', color: 'var(--color-text-muted)', background: 'var(--color-surface-alt)', borderRadius: '8px', border: '1px dashed var(--color-border)' }}>
-                   <i data-lucide="cloud" style={{ width: '36px', height: '36px', marginBottom: '12px', opacity: 0.5 }}></i>
+                   <Icon name={ICONS.CLOUD} style={{ width: '36px', height: '36px', marginBottom: '12px', opacity: 0.5 }} />
                    <div style={{ marginBottom: '12px' }}>Bạn cần đăng nhập Google Drive để chọn ảnh</div>
                    <button id="uploadDriveLoginBtn" className="btn btn-primary" style={{ padding: '8px 16px' }}>Kết nối Drive</button>
                 </div>
@@ -511,12 +512,12 @@ function App() {
             ></textarea>
             
             <button id="parseJsonTextBtn" className="btn btn-primary" style={{ width: '100%', marginBottom: '24px', padding: '12px', fontSize: '15px', fontWeight: 500 }}>
-              <i data-lucide="code" style={{ width: '18px', height: '18px' }}></i>
+              <Icon name={ICONS.CODE} style={{ width: '18px', height: '18px' }} />
               <span data-i18n="modal.parseJson">Nhập từ Text</span>
             </button>
 
             <div id="jsonDropZone" className="drag-drop-zone" style={{ padding: '30px 20px' }}>
-              <i data-lucide="file-json" style={{ width: '36px', height: '36px', color: 'var(--color-success)', marginBottom: '12px' }}></i>
+              <Icon name={ICONS.FILE_JSON} style={{ width: '36px', height: '36px', color: 'var(--color-success)', marginBottom: '12px' }} />
               <div style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-bright)' }} data-i18n="modal.dropJson">Hoặc kéo thả file .json vào đây</div>
               <input type="file" id="jsonUploadModal" accept=".json, .txt, application/json, text/plain" style={{ display: 'none' }} />
             </div>
@@ -529,7 +530,7 @@ function App() {
         <div className="modal-content" style={{ maxWidth: '500px' }}>
           <div className="modal-header">
             <h3 style={{ margin: 0, fontSize: '18px' }} data-i18n="modal.downloadTitle">Tải xuống</h3>
-            <button id="closeDownloadModalBtn" className="btn" style={{ background: 'transparent', border: 'none', padding: '4px' }}><i data-lucide="x"></i></button>
+            <button id="closeDownloadModalBtn" className="btn" style={{ background: 'transparent', border: 'none', padding: '4px' }}><Icon name={ICONS.X} /></button>
           </div>
           <div style={{ padding: '20px' }}>
             
@@ -546,19 +547,19 @@ function App() {
               <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '10px' }}>2. Định dạng xuất</label>
               <div className="download-options-grid format-selector" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
                 <button className="dl-format-btn select-btn active" data-format="png" style={{ flexDirection: 'column', padding: '12px 8px', alignItems: 'center' }}>
-                  <i data-lucide="image" style={{ width: '24px', height: '24px', marginBottom: '4px' }}></i>
+                  <Icon name={ICONS.IMAGE} style={{ width: '24px', height: '24px', marginBottom: '4px' }} />
                   <span style={{ fontSize: '13px', fontWeight: 600 }}>PNG</span>
                 </button>
                 <button className="dl-format-btn select-btn" data-format="jpeg" style={{ flexDirection: 'column', padding: '12px 8px', alignItems: 'center' }}>
-                  <i data-lucide="image" style={{ width: '24px', height: '24px', marginBottom: '4px' }}></i>
+                  <Icon name={ICONS.IMAGE} style={{ width: '24px', height: '24px', marginBottom: '4px' }} />
                   <span style={{ fontSize: '13px', fontWeight: 600 }}>JPG</span>
                 </button>
                 <button className="dl-format-btn select-btn" data-format="webp" style={{ flexDirection: 'column', padding: '12px 8px', alignItems: 'center' }}>
-                  <i data-lucide="image" style={{ width: '24px', height: '24px', marginBottom: '4px' }}></i>
+                  <Icon name={ICONS.IMAGE} style={{ width: '24px', height: '24px', marginBottom: '4px' }} />
                   <span style={{ fontSize: '13px', fontWeight: 600 }}>WEBP</span>
                 </button>
                 <button className="dl-format-btn select-btn" data-format="json" style={{ flexDirection: 'column', padding: '12px 8px', alignItems: 'center' }}>
-                  <i data-lucide="file-json" style={{ width: '24px', height: '24px', marginBottom: '4px' }}></i>
+                  <Icon name={ICONS.FILE_JSON} style={{ width: '24px', height: '24px', marginBottom: '4px' }} />
                   <span style={{ fontSize: '13px', fontWeight: 600 }}>JSON</span>
                 </button>
               </div>
@@ -569,11 +570,11 @@ function App() {
               <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '10px' }}>3. Nơi lưu trữ</label>
               <div className="download-options-grid dest-selector" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                 <button className="dl-dest-btn select-btn active" data-dest="local" style={{ padding: '12px', justifyContent: 'center' }}>
-                  <i data-lucide="monitor-down" style={{ width: '20px', height: '20px' }}></i>
+                  <Icon name={ICONS.MONITOR_DOWN} style={{ width: '20px', height: '20px' }} />
                   <span style={{ fontWeight: 600, fontSize: '14px' }}>Lưu vào máy</span>
                 </button>
                 <button className="dl-dest-btn select-btn" data-dest="drive" style={{ padding: '12px', justifyContent: 'center' }}>
-                  <i data-lucide="hard-drive-upload" style={{ width: '20px', height: '20px' }}></i>
+                  <Icon name={ICONS.HARD_DRIVE_UPLOAD} style={{ width: '20px', height: '20px' }} />
                   <span style={{ fontWeight: 600, fontSize: '14px' }}>Google Drive</span>
                 </button>
               </div>
@@ -582,7 +583,7 @@ function App() {
             {/* Bước 4: Action */}
             <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '16px', borderTop: '1px solid var(--color-border)' }}>
                <button id="executeDownloadBtn" className="btn btn-primary" style={{ padding: '10px 24px', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                 <i data-lucide="download" style={{ width: '18px', height: '18px' }}></i>
+                 <Icon name={ICONS.DOWNLOAD} style={{ width: '18px', height: '18px' }} />
                  <span style={{ fontWeight: 600 }}>Tiến hành tải xuống</span>
                </button>
             </div>
@@ -601,28 +602,28 @@ function App() {
           <div className="modal-header">
             <h3 style={{ margin: 0, fontSize: '18px' }}>Thay đổi kích thước</h3>
             <button className="btn" style={{ background: 'transparent', border: 'none', padding: '4px' }} onClick={() => document.getElementById('gridResizeModal').style.display = 'none'}>
-              <i data-lucide="x"></i>
+              <Icon name={ICONS.X} />
             </button>
           </div>
           <div style={{ padding: '20px' }}>
             <p style={{ fontSize: '14px', color: 'var(--color-text)', marginBottom: '16px' }}>Bạn muốn xử lý ảnh hiện tại như thế nào khi chuyển sang <span id="newGridSizeLabel" style={{ fontWeight: 'bold' }}></span>?</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <button id="resizeKeepBtn" className="btn select-btn" style={{ padding: '12px', justifyContent: 'flex-start', alignItems: 'center', gap: '12px', height: 'auto' }}>
-                <i data-lucide="crop" style={{ width: '20px', height: '20px', color: 'var(--color-text-bright)' }}></i>
+                <Icon name={ICONS.CROP} style={{ width: '20px', height: '20px', color: 'var(--color-text-bright)' }} />
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', textAlign: 'left' }}>
                   <span style={{ fontWeight: 600, color: 'var(--color-text-bright)' }}>Giữ nguyên ảnh</span>
                   <span style={{ fontSize: '12px', color: 'var(--color-text-muted)', lineHeight: 1.4 }}>Mở rộng hoặc cắt bớt không gian, không làm biến dạng ảnh</span>
                 </div>
               </button>
               <button id="resizeScaleBtn" className="btn select-btn" style={{ padding: '12px', justifyContent: 'flex-start', alignItems: 'center', gap: '12px', height: 'auto' }}>
-                <i data-lucide="maximize" style={{ width: '20px', height: '20px', color: 'var(--color-text-bright)' }}></i>
+                <Icon name={ICONS.MAXIMIZE} style={{ width: '20px', height: '20px', color: 'var(--color-text-bright)' }} />
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', textAlign: 'left' }}>
                   <span style={{ fontWeight: 600, color: 'var(--color-text-bright)' }}>Thu phóng ảnh</span>
                   <span style={{ fontSize: '12px', color: 'var(--color-text-muted)', lineHeight: 1.4 }}>Co giãn toàn bộ hình ảnh cho vừa khít với kích thước mới</span>
                 </div>
               </button>
               <button id="resizeClearBtn" className="btn select-btn" style={{ padding: '12px', justifyContent: 'flex-start', alignItems: 'center', gap: '12px', height: 'auto' }}>
-                <i data-lucide="trash-2" style={{ width: '20px', height: '20px', color: 'var(--color-danger)' }}></i>
+                <Icon name={ICONS.TRASH_2} style={{ width: '20px', height: '20px', color: 'var(--color-danger)' }} />
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', textAlign: 'left' }}>
                   <span style={{ fontWeight: 600, color: 'var(--color-danger)' }}>Xoá mất ảnh</span>
                   <span style={{ fontSize: '12px', color: 'var(--color-text-muted)', lineHeight: 1.4 }}>Tạo một trang giấy trắng hoàn toàn mới</span>
@@ -639,20 +640,20 @@ function App() {
           <div className="modal-header">
             <h3 style={{ margin: 0, fontSize: '18px' }} data-i18n="modal.settingsTitle">Cài đặt chung</h3>
             <button className="btn" style={{ background: 'transparent', border: 'none', padding: '4px' }} onClick={() => document.getElementById('globalSettingsModal').style.display = 'none'}>
-              <i data-lucide="x"></i>
+              <Icon name={ICONS.X} />
             </button>
           </div>
           
           <div className="modal-tabs">
             <button className="tab-btn active" data-tab="tab-appearance">
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                <i data-lucide="palette" style={{ width: '18px', height: '18px' }}></i>
+                <Icon name={ICONS.PALETTE} style={{ width: '18px', height: '18px' }} />
                 <span data-i18n="modal.tabAppearance">Giao diện</span>
               </div>
             </button>
             <button className="tab-btn" data-tab="tab-account">
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                <i data-lucide="user" style={{ width: '18px', height: '18px' }}></i>
+                <Icon name={ICONS.USER} style={{ width: '18px', height: '18px' }} />
                 <span data-i18n="modal.tabAccount">Tài khoản</span>
               </div>
             </button>
@@ -669,7 +670,7 @@ function App() {
                       <option value="light" data-i18n="theme.light">Sáng (Light)</option>
                       <option value="custom" data-i18n="theme.custom">Tùy chỉnh (Custom)</option>
                     </select>
-                    <i data-lucide="chevron-down" style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: 'var(--color-text-muted)', pointerEvents: 'none' }}></i>
+                    <Icon name={ICONS.CHEVRON_DOWN} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: 'var(--color-text-muted)', pointerEvents: 'none' }} />
                   </div>
 
                   <div id="customThemeSettings" style={{ display: 'none', padding: '16px', background: 'var(--color-surface)', borderRadius: '8px', border: '1px dashed var(--color-border)', marginTop: '8px' }}>
@@ -697,7 +698,7 @@ function App() {
                   <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', color: 'var(--color-text)' }}>Google Drive</h4>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--color-surface-alt)', borderRadius: '8px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <i data-lucide="cloud" style={{ color: 'var(--color-text-muted)' }}></i>
+                      <Icon name={ICONS.CLOUD} style={{ color: 'var(--color-text-muted)' }} />
                       <span id="driveStatusText" style={{ fontSize: '13px', color: 'var(--color-text-muted)' }} data-i18n="status.driveDisconnected">Chưa kết nối</span>
                     </div>
                     <button id="driveLoginBtn" className="btn btn-primary" style={{ padding: '6px 12px', fontSize: '13px' }} data-i18n="drive.login">Đăng nhập Drive</button>

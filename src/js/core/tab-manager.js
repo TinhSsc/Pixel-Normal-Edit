@@ -28,15 +28,22 @@ export function clearPendingSave() {
 export function debouncedSaveWorkspace() {
   if (saveTimeout) clearTimeout(saveTimeout);
   saveTimeout = setTimeout(async () => {
+    const currentTab = tabs.find(t => t.id === activeTabId);
+    const btn = currentTab ? document.getElementById('autobackup_btn_' + currentTab.id) : null;
+    
+    // State: "Đang lưu" (saving locally)
+    if (btn) {
+      btn.innerHTML = `<i data-lucide="loader" class="spin" style="width: 14px; height: 14px; color: var(--color-info);"></i>`; // text-blue-500
+      if (window.lucide) window.lucide.createIcons({ root: btn });
+    }
+    
     saveCurrentTabState();
     saveWorkspace(tabs, activeTabId);
     
-    const currentTab = tabs.find(t => t.id === activeTabId);
     if (currentTab && currentTab.autoBackupDrive && getDriveToken()) {
-      const btn = document.getElementById('autobackup_btn_' + currentTab.id);
+      // State: "Đang sao lưu" (syncing to cloud)
       if (btn) {
-        btn.classList.add('syncing');
-        btn.innerHTML = `<i data-lucide="loader-2" style="width: 14px; height: 14px; color: var(--color-primary);"></i>`;
+        btn.innerHTML = `<i data-lucide="refresh-cw" class="spin" style="width: 14px; height: 14px; color: var(--color-sync);"></i>`; // text-indigo-500
         if (window.lucide) window.lucide.createIcons({ root: btn });
       }
       try {
@@ -48,10 +55,18 @@ export function debouncedSaveWorkspace() {
         console.error("Auto backup failed:", err);
       } finally {
         if (btn) {
-          btn.classList.remove('syncing');
-          btn.innerHTML = `<i data-lucide="check-circle-2" style="width: 14px; height: 14px; color: var(--color-success);"></i>`;
+          // State: "Đã lưu xong" (cloud-check)
+          btn.innerHTML = `<i data-lucide="cloud-check" style="width: 14px; height: 14px; color: var(--color-success);"></i>`; // text-emerald-500
           if (window.lucide) window.lucide.createIcons({ root: btn });
         }
+      }
+    } else {
+      // Not auto-backing up, just revert back to "Lưu vào cloud" (or cloud-check briefly?)
+      if (btn) {
+        setTimeout(() => {
+          btn.innerHTML = `<i data-lucide="${currentTab && currentTab.autoBackupDrive ? 'cloud-check' : 'cloud-upload'}" style="width: 14px; height: 14px; color: ${currentTab && currentTab.autoBackupDrive ? 'var(--color-success)' : 'var(--color-text-muted)'};"></i>`;
+          if (window.lucide) window.lucide.createIcons({ root: btn });
+        }, 500); // brief flash to show it was saved locally
       }
     }
   }, 500);
@@ -317,7 +332,7 @@ function renderTabsUI() {
     toggleAutoBackupBtn.id = 'autobackup_btn_' + tab.id;
     toggleAutoBackupBtn.className = `tab-autobackup-btn ${tab.autoBackupDrive ? 'active' : ''}`;
     toggleAutoBackupBtn.title = tab.autoBackupDrive ? 'Tắt tự động lưu lên Drive' : 'Bật tự động lưu lên Drive';
-    toggleAutoBackupBtn.innerHTML = `<i data-lucide="${tab.autoBackupDrive ? 'check-circle-2' : 'cloud'}" style="width: 14px; height: 14px; color: ${tab.autoBackupDrive ? 'var(--color-success)' : 'var(--color-text-muted)'};"></i>`;
+    toggleAutoBackupBtn.innerHTML = `<i data-lucide="${tab.autoBackupDrive ? 'cloud-check' : 'cloud-upload'}" style="width: 14px; height: 14px; color: ${tab.autoBackupDrive ? 'var(--color-success)' : 'var(--color-text-muted)'};"></i>`;
     toggleAutoBackupBtn.style.cssText = 'background: transparent; border: none; padding: 2px; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 4px;';
     toggleAutoBackupBtn.addEventListener('click', (e) => {
       e.stopPropagation();

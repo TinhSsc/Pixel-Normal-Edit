@@ -1,3 +1,4 @@
+import { Icon, ICONS } from '../components/icons';
 import React, { useEffect } from 'react';
 
 export default function SettingsPanel() {
@@ -227,7 +228,7 @@ export default function SettingsPanel() {
           <div className="tool-with-popup-bottom">
             <label data-i18n="tooltip.gradientMode" className="tool-btn" id="gradientModeLabel" style={{ cursor: 'pointer', margin: 0 }}>
               <input type="checkbox" id="gradientMode" style={{ display: 'none' }} />
-              <i data-lucide="blend"></i>
+              <Icon name={ICONS.BLEND} />
             </label>
             <div className="popup-bridge-bottom">
               <div className="tool-popup">
@@ -244,12 +245,12 @@ export default function SettingsPanel() {
 
           <label data-i18n="tooltip.showGrid" className="tool-btn active" id="showGridLabel" style={{ cursor: 'pointer', margin: 0 }}>
             <input type="checkbox" id="showGrid" style={{ display: 'none' }} defaultChecked />
-            <i data-lucide="grid"></i>
+            <Icon name={ICONS.GRID} />
           </label>
 
           <label data-i18n="tooltip.mirrorMode" className="tool-btn" id="mirrorModeLabel" style={{ cursor: 'pointer', margin: 0 }}>
             <input type="checkbox" id="mirrorMode" style={{ display: 'none' }} />
-            <i data-lucide="split-square-vertical"></i>
+            <Icon name={ICONS.SPLIT_SQUARE_VERTICAL} />
           </label>
         </div>
       </div>
@@ -260,7 +261,7 @@ export default function SettingsPanel() {
         <div className="tool-group-title" onClick={(e) => e.target.closest('.tool-group').classList.toggle('collapsed')} style={{ cursor: 'pointer' }} data-i18n="group.imageOps">Thao tác ảnh</div>
         <div className="tool-grid" style={{ gap: '10px' }}>
           <div className="tool-with-popup-bottom">
-            <button id="rotateBtn" className="tool-btn" data-i18n="transform.rotate"><i data-lucide="rotate-cw"></i></button>
+            <button id="rotateBtn" className="tool-btn" data-i18n="transform.rotate"><Icon name={ICONS.ROTATE_CW} /></button>
             <div className="popup-bridge-bottom">
               <div className="tool-popup" style={{ width: 'max-content' }}>
                 <label style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }} data-i18n="label.rotateOptions">Tùy chọn xoay (khi không vuông)</label>
@@ -271,8 +272,8 @@ export default function SettingsPanel() {
               </div>
             </div>
           </div>
-          <button id="flipHBtn" className="tool-btn" data-i18n="transform.flipH"><i data-lucide="flip-horizontal"></i></button>
-          <button id="flipVBtn" className="tool-btn" data-i18n="transform.flipV"><i data-lucide="flip-vertical"></i></button>
+          <button id="flipHBtn" className="tool-btn" data-i18n="transform.flipH"><Icon name={ICONS.FLIP_HORIZONTAL} /></button>
+          <button id="flipVBtn" className="tool-btn" data-i18n="transform.flipV"><Icon name={ICONS.FLIP_VERTICAL} /></button>
         </div>
       </div>
 
@@ -280,7 +281,7 @@ export default function SettingsPanel() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', borderBottom: '1px solid #444', paddingBottom: '5px' }}>
           <h3 style={{ margin: 0, border: 'none', padding: 0 }} data-i18n="label.sourceImage">Ảnh gốc</h3>
           <button id="setBgBtn" className="btn" style={{ padding: '4px 8px', fontSize: '11px' }} data-i18n="tooltip.setBg">
-            <i data-lucide="image-plus" style={{ width: '14px', height: '14px' }}></i>
+            <Icon name={ICONS.IMAGE_PLUS} style={{ width: '14px', height: '14px' }} />
             <span data-i18n="label.bg">Nền</span>
           </button>
         </div>

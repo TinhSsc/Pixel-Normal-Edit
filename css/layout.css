@@ -676,35 +676,201 @@
   box-shadow: 0 0 0 1px var(--color-primary);
 }
 
-.grid-size-wrapper {
-  position: relative;
-  width: calc(12px * var(--canvas-zoom, 1));
+
+#resizePopover {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 6px;
+  background: rgba(30, 30, 35, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 16px;
+  width: 240px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  z-index: 60;
+  backdrop-filter: blur(12px);
+  transition: all 0.2s ease;
 }
 
-#gridSizeSelectBtn {
-  height: calc(var(--canvas-zoom, 1));
-  padding: 0 calc(var(--canvas-zoom, 1));
-  font-size: calc(var(--canvas-zoom, 1));
-  background: var(--color-surface);
+.resize-popover-header {
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 12px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: calc(0.5px * var(--canvas-zoom, 1));
-  width: 100%;
-  border-radius: calc(0.5px * var(--canvas-zoom, 1));
-  border: calc(0.2px * var(--canvas-zoom, 1)) solid var(--color-border);
-  color: var(--color-text-bright);
+  gap: 6px;
 }
 
-#currentGridSizeText {
+.resize-popover-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.resize-popover-col {
+  flex: 1;
+}
+
+.resize-popover-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-muted);
+  margin-bottom: 4px;
+  display: block;
+}
+
+.resize-popover-lock {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 6px 8px;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
+.resize-popover-lock label {
+  font-size: 11px;
+  cursor: pointer;
+  user-select: none;
+  color: #ddd;
+}
+
+.resize-popover-presets-title {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-muted);
+  margin-bottom: 6px;
+}
+
+.resize-popover-presets {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.resize-preset-btn {
+  padding: 4px 0 !important;
+  font-size: 11px !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.resize-preset-btn:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.resize-popover-preview {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  margin-bottom: 12px;
+  text-align: center;
+  padding: 8px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+#resizePreviewText {
+  color: var(--color-primary);
+  font-weight: bold;
+  font-size: 13px;
+}
+
+#resizeApplyBtn {
+  width: 100%;
+  padding: 8px 0;
+  font-size: 13px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0;
+  transform: translateY(5px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 4px 12px var(--color-shadow-lg);
   white-space: nowrap;
 }
 
-#gridSizeSelectBtn i {
-  width: calc(2px * var(--canvas-zoom, 1)) !important;
-  height: calc(2px * var(--canvas-zoom, 1)) !important;
-  flex-shrink: 0;
+#custom-tooltip.show,
+#custom-tooltip.visible {
+  opacity: 1;
+  transform: translateY(0);
 }
+
+/* Brush Cursor Preview */
+#brush-cursor {
+  position: absolute;
+  pointer-events: none;
+  z-index: 900;
+  background: rgba(255, 85, 85, 0.2);
+  display: none;
+}
+
+.source-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  line-height: 1;
+  transition: all 0.2s ease;
+}
+
+.source-btn:hover {
+  color: var(--color-text-bright);
+}
+
+.source-btn.active {
+  background: var(--color-surface);
+  color: var(--color-text-bright);
+  box-shadow: 0 1px 3px var(--color-shadow-md);
+}
+
+.source-btn svg,
+.source-btn i {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* Download Modal UI */
+.select-btn {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  transition: all 0.2s;
+}
+
+.select-btn:hover {
+  border-color: var(--color-primary-light);
+  background: var(--color-surface-hover, rgba(255, 255, 255, 0.05));
+  color: var(--color-text-bright);
+}
+
+.select-btn.active {
+  background: var(--color-primary-tint);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  box-shadow: 0 0 0 1px var(--color-primary);
+}
+
 
 #resizePopover {
   position: absolute;
@@ -816,4 +982,25 @@
   font-weight: 600;
   border-radius: 6px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.toast-container {
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  display: flex;
+  align-items: center;
+  background: transparent;
+  color: var(--color-text-bright);
+  font-size: 13px;
+  z-index: 9999;
+  transform: translateX(-150%);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+}
+
+.toast-container.show {
+  transform: translateX(0);
+  opacity: 1;
 }

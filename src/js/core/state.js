@@ -36,15 +36,31 @@ export function initEls() {
   ctx = canvas ? canvas.getContext("2d") : null;
 }
 
+let statusTimeout = null;
+
 export function setStatus(msg, isError = false) {
   if (!els.status) return;
   els.status.textContent = msg;
-  els.status.style.color = isError ? "#d33" : "#aaa";
+  els.status.style.color = isError ? "#ff4d4f" : "var(--color-text-bright)";
+  
+  const container = document.getElementById('toastContainer');
+  if (container) container.classList.add('show');
+  
+  if (statusTimeout) clearTimeout(statusTimeout);
+  statusTimeout = setTimeout(() => {
+    if (els.stopTaskBtn && els.stopTaskBtn.style.display === 'block') return;
+    if (container) container.classList.remove('show');
+  }, 3000);
 }
 
 export function setTaskUI(isRunning) {
   if (els.stopTaskBtn) {
     els.stopTaskBtn.style.display = isRunning ? 'block' : 'none';
+  }
+  const container = document.getElementById('toastContainer');
+  if (container) {
+    if (isRunning) container.classList.add('show');
+    else if (!statusTimeout) container.classList.remove('show');
   }
 }
 

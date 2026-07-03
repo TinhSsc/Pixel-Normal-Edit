@@ -1,3 +1,4 @@
+import { Icon, ICONS } from '../components/icons';
 import React, { useEffect } from 'react';
 
 export default function ToolbarPanel() {
@@ -119,7 +120,7 @@ export default function ToolbarPanel() {
           <input type="color" id="colorPicker" className="color-input primary-color" defaultValue="#000000" data-i18n="tooltip.primaryColor" />
           <input type="color" id="colorPicker2" className="color-input secondary-color" defaultValue="#ffffff" data-i18n="tooltip.secondaryColor" />
           <button id="swapColorsBtn" className="swap-colors-btn" data-i18n="tooltip.swapColors">
-            <i data-lucide="arrow-left-right"></i>
+            <Icon name={ICONS.ARROW_LEFT_RIGHT} />
           </button>
         </div>
       </div>
@@ -128,7 +129,7 @@ export default function ToolbarPanel() {
         <div className="tool-group-title" onClick={(e) => e.target.closest('.tool-group').classList.toggle('collapsed')} style={{ cursor: 'pointer' }} data-i18n="group.draw">Công cụ vẽ</div>
         <div className="tool-grid">
           <div className="tool-with-popup-bottom">
-            <button className="tool-btn active" data-tool="pencil" data-i18n="tool.pencil"><i data-lucide="pencil"></i></button>
+            <button className="tool-btn active" data-tool="pencil" data-i18n="tool.pencil"><Icon name={ICONS.PENCIL} /></button>
             <div className="popup-bridge-bottom">
               <div className="tool-popup">
                 <label data-i18n="tooltip.pencilSize"><span data-i18n="label.pencilSize">Cỡ bút</span></label>
@@ -137,7 +138,7 @@ export default function ToolbarPanel() {
             </div>
           </div>
           <div className="tool-with-popup-bottom">
-            <button className="tool-btn" data-tool="eraser" data-i18n="tool.eraser"><i data-lucide="eraser"></i></button>
+            <button className="tool-btn" data-tool="eraser" data-i18n="tool.eraser"><Icon name={ICONS.ERASER} /></button>
             <div className="popup-bridge-bottom">
               <div className="tool-popup">
                 <label data-i18n="tooltip.eraserSize"><span data-i18n="label.eraserSize">Cỡ tẩy</span></label>
@@ -145,17 +146,17 @@ export default function ToolbarPanel() {
               </div>
             </div>
           </div>
-          <button className="tool-btn" data-tool="picker" data-i18n="tool.picker"><i data-lucide="pipette"></i></button>
+          <button className="tool-btn" data-tool="picker" data-i18n="tool.picker"><Icon name={ICONS.PIPETTE} /></button>
         </div>
       </div>
 
       <div className="tool-group">
         <div className="tool-group-title" onClick={(e) => e.target.closest('.tool-group').classList.toggle('collapsed')} style={{ cursor: 'pointer' }} data-i18n="group.fillBg">Đổ màu &amp; Nền</div>
         <div className="tool-grid">
-          <button className="tool-btn" data-tool="fill" data-i18n="tool.fill"><i data-lucide="paint-bucket"></i></button>
-          <button className="tool-btn" data-tool="magic-eraser" data-i18n="tool.magicEraser"><i data-lucide="wand-2"></i></button>
+          <button className="tool-btn" data-tool="fill" data-i18n="tool.fill"><Icon name={ICONS.PAINT_BUCKET} /></button>
+          <button className="tool-btn" data-tool="magic-eraser" data-i18n="tool.magicEraser"><Icon name={ICONS.WAND_2} /></button>
           <div className="tool-with-popup-bottom">
-            <button className="tool-btn" data-tool="outline" data-i18n="tool.outline"><i data-lucide="highlighter"></i></button>
+            <button className="tool-btn" data-tool="outline" data-i18n="tool.outline"><Icon name={ICONS.HIGHLIGHTER} /></button>
             <div className="popup-bridge-bottom">
               <div className="tool-popup">
                 <label data-i18n="label.outlineThick">Độ dày viền</label>
@@ -170,7 +171,7 @@ export default function ToolbarPanel() {
         <div className="tool-group-title" onClick={(e) => e.target.closest('.tool-group').classList.toggle('collapsed')} style={{ cursor: 'pointer' }} data-i18n="group.shape">Hình khối</div>
         <div className="tool-grid">
           <div className="tool-with-popup-bottom">
-            <button className="tool-btn" data-tool="line" data-i18n="tool.line"><i data-lucide="slash"></i></button>
+            <button className="tool-btn" data-tool="line" data-i18n="tool.line"><Icon name={ICONS.SLASH} /></button>
             <div className="popup-bridge-bottom">
               <div className="tool-popup">
                 <label data-i18n="label.shapeThick">Độ dày nét</label>
@@ -179,7 +180,7 @@ export default function ToolbarPanel() {
             </div>
           </div>
           <div className="tool-with-popup-bottom">
-            <button className="tool-btn" data-tool="rect" data-i18n="tool.rect"><i data-lucide="square"></i></button>
+            <button className="tool-btn" data-tool="rect" data-i18n="tool.rect"><Icon name={ICONS.SQUARE} /></button>
             <div className="popup-bridge-bottom">
               <div className="tool-popup">
                 <label data-i18n="label.outlineThick">Độ dày viền</label>
@@ -188,7 +189,7 @@ export default function ToolbarPanel() {
             </div>
           </div>
           <div className="tool-with-popup-bottom">
-            <button className="tool-btn" data-tool="circle" data-i18n="tool.circle"><i data-lucide="circle"></i></button>
+            <button className="tool-btn" data-tool="circle" data-i18n="tool.circle"><Icon name={ICONS.CIRCLE} /></button>
             <div className="popup-bridge-bottom">
               <div className="tool-popup">
                 <label data-i18n="label.outlineThick">Độ dày viền</label>

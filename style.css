@@ -8,3 +8,6 @@
 @import url('./css/panels.css');
 @import url('./css/tabs.css');
 @import url('./css/modals.css');
+.spin { animation: spin 1.5s linear infinite; } 
+@keyframes spin { 100% { transform: rotate(360deg); } }  
+ 
