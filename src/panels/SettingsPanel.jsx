@@ -1,82 +1,13 @@
 import { Icon, ICONS } from '../components/icons';
 import React, { useEffect } from 'react';
+import { bindPopups } from '../js/core/popup-manager.js';
 
 export default function SettingsPanel() {
   useEffect(() => {
     window.dispatchEvent(new CustomEvent('settings-mounted'));
 
-    const handleMouseEnter = (e) => {
-      if (window.innerWidth <= 768) return;
-      const wrapper = e.currentTarget;
-      clearTimeout(wrapper._hideTimer);
-      const popup = wrapper.querySelector('.popup-bridge-bottom');
-      if (popup) {
-        popup.style.display = 'block';
-        popup.style.position = 'fixed';
-        popup.style.zIndex = '9999';
-        popup.style.right = 'auto';
+    const unbindPopups = bindPopups('.right-panel', 'right');
 
-        const updatePosition = () => {
-          const rect = wrapper.getBoundingClientRect();
-          const popupHeight = popup.offsetHeight || 40;
-          popup.style.top = (rect.top + (rect.height / 2) - (popupHeight / 2)) + 'px';
-          
-          let left = rect.left - (popup.offsetWidth || 150) - 10;
-          if (left < 0) {
-            left = rect.right + 10;
-          }
-          popup.style.left = left + 'px';
-        };
-
-        updatePosition();
-        wrapper._updatePosition = updatePosition;
-        const container = wrapper.closest('.toolbar, .right-panel');
-        if (container) {
-          container.addEventListener('scroll', updatePosition, { passive: true });
-          wrapper._scrollContainer = container;
-        }
-      }
-    };
-
-    const handleMouseLeave = (e) => {
-      if (window.innerWidth <= 768) return;
-      const wrapper = e.currentTarget;
-      const popup = wrapper.querySelector('.popup-bridge-bottom');
-      if (popup) {
-        let delay = 0;
-        if (wrapper.dataset.clicked === 'true' || wrapper.contains(document.activeElement)) {
-          delay = 3000;
-        }
-
-        wrapper._hideTimer = setTimeout(() => {
-          wrapper.dataset.clicked = 'false';
-          popup.style.display = '';
-          popup.style.position = '';
-          popup.style.zIndex = '';
-          popup.style.top = '';
-          popup.style.left = '';
-          popup.style.right = '';
-          
-          if (wrapper._updatePosition && wrapper._scrollContainer) {
-            wrapper._scrollContainer.removeEventListener('scroll', wrapper._updatePosition);
-          }
-        }, delay);
-      }
-    };
-
-    const handleClick = (e) => {
-      if (window.innerWidth <= 768) return;
-      const wrapper = e.currentTarget;
-      wrapper.dataset.clicked = 'true';
-      clearTimeout(wrapper._hideTimer);
-    };
-
-    const wrappers = document.querySelectorAll('.right-panel .tool-with-popup-bottom');
-    wrappers.forEach(w => {
-      w.addEventListener('mouseenter', handleMouseEnter);
-      w.addEventListener('mouseleave', handleMouseLeave);
-      w.addEventListener('click', handleClick);
-    });
 
     const themeSelect = document.getElementById('themeSelect');
     const customThemeSettings = document.getElementById('customThemeSettings');
@@ -131,12 +62,12 @@ export default function SettingsPanel() {
       if (!themeSelect) return;
       const theme = themeSelect.value;
       document.documentElement.setAttribute('data-theme', theme);
-      
+
       if (theme === 'custom') {
         customThemeSettings.style.display = 'block';
         document.documentElement.style.setProperty('--custom-bg', customBgColor.value);
         document.documentElement.style.setProperty('--custom-primary', customPrimaryColor.value);
-        
+
         // Add 33 for 20% opacity for the grid line
         const gridColor = customGridLineColor?.value || '#ffffff';
         document.documentElement.style.setProperty('--custom-grid-line', gridColor + '33');
@@ -146,10 +77,10 @@ export default function SettingsPanel() {
         document.documentElement.style.removeProperty('--custom-primary');
         document.documentElement.style.removeProperty('--custom-grid-line');
       }
-      
+
       // Give the browser one frame to resolve the new CSS vars before reading them
       requestAnimationFrame(applyDvOverride);
-      
+
       localStorage.setItem('pixel-edit-theme', theme);
       localStorage.setItem('pixel-edit-custom-bg', customBgColor.value);
       localStorage.setItem('pixel-edit-custom-primary', customPrimaryColor.value);
@@ -183,40 +114,39 @@ export default function SettingsPanel() {
       }
     }
 
-    const handleClickOutside = (e) => {
-      wrappers.forEach(wrapper => {
-        if (wrapper.dataset.clicked === 'true' && !wrapper.contains(e.target)) {
-          wrapper.dataset.clicked = 'false';
-          const popup = wrapper.querySelector('.popup-bridge-bottom');
-          if (popup) {
-            popup.style.display = '';
-            popup.style.position = '';
-            popup.style.zIndex = '';
-            popup.style.top = '';
-            popup.style.left = '';
-            popup.style.right = '';
-            if (wrapper._updatePosition && wrapper._scrollContainer) {
-              wrapper._scrollContainer.removeEventListener('scroll', wrapper._updatePosition);
-            }
-          }
-        }
-      });
+    const showBtnNamesToggle = document.getElementById('showBtnNamesToggle');
+    const updateShowNames = () => {
+      if (!showBtnNamesToggle) return;
+      const isChecked = showBtnNamesToggle.checked;
+      localStorage.setItem('pixel-edit-show-btn-names', isChecked);
+      if (isChecked) {
+        document.documentElement.classList.add('show-btn-names');
+      } else {
+        document.documentElement.classList.remove('show-btn-names');
+      }
     };
 
-    document.addEventListener('click', handleClickOutside);
+    if (showBtnNamesToggle) {
+      const savedShowNames = localStorage.getItem('pixel-edit-show-btn-names') === 'true';
+      showBtnNamesToggle.checked = savedShowNames;
+      if (savedShowNames) {
+        document.documentElement.classList.add('show-btn-names');
+      } else {
+        document.documentElement.classList.remove('show-btn-names');
+      }
+      showBtnNamesToggle.addEventListener('change', updateShowNames);
+    }
 
     return () => {
-      document.removeEventListener('click', handleClickOutside);
+      unbindPopups();
       if (themeSelect) {
         themeSelect.removeEventListener('change', updateTheme);
         customBgColor.removeEventListener('input', updateTheme);
         customPrimaryColor.removeEventListener('input', updateTheme);
       }
-      wrappers.forEach(w => {
-        w.removeEventListener('mouseenter', handleMouseEnter);
-        w.removeEventListener('mouseleave', handleMouseLeave);
-        w.removeEventListener('click', handleClick);
-      });
+      if (showBtnNamesToggle) {
+        showBtnNamesToggle.removeEventListener('change', updateShowNames);
+      }
     };
   }, []);
 
@@ -280,10 +210,18 @@ export default function SettingsPanel() {
       <div className="panel-section" style={{ marginTop: 'auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', borderBottom: '1px solid #444', paddingBottom: '5px' }}>
           <h3 style={{ margin: 0, border: 'none', padding: 0 }} data-i18n="label.sourceImage">Ảnh gốc</h3>
-          <button id="setBgBtn" className="btn" style={{ padding: '4px 8px', fontSize: '11px' }} data-i18n="tooltip.setBg">
-            <Icon name={ICONS.IMAGE_PLUS} style={{ width: '14px', height: '14px' }} />
-            <span data-i18n="label.bg">Nền</span>
-          </button>
+          <div style={{ display: 'flex', gap: '6px' }}>
+            <button id="setBgBtn" className="btn" style={{ padding: '4px 8px', fontSize: '11px' }} data-i18n="tooltip.setBg">
+              <Icon name={ICONS.IMAGE_PLUS} style={{ width: '14px', height: '14px' }} />
+              <span data-i18n="label.bg">Nền</span>
+            </button>
+            <button id="replaceBgBtn" className="btn" style={{ padding: '4px 8px', fontSize: '11px', display: 'none' }} data-i18n="tooltip.replaceBg">
+              <Icon name={ICONS.IMAGE} style={{ width: '14px', height: '14px' }} />
+            </button>
+            <button id="flattenBgBtn" className="btn" style={{ padding: '4px 8px', fontSize: '11px', display: 'none' }} data-i18n="tooltip.flattenBg">
+              <Icon name={ICONS.BLEND} style={{ width: '14px', height: '14px' }} />
+            </button>
+          </div>
         </div>
         <img id="imagePreview" style={{ display: 'none' }} alt="" />
       </div>

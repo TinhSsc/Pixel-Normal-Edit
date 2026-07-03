@@ -4,7 +4,7 @@ import { renderPixels } from './render.js';
 import { resizeCanvas, fitToScreen } from './viewport.js';
 import { t } from '../lang/i18n.js';
 import { syncGridSizeUI } from '../actions/grid-size-select.js';
-import { setSourceImage } from '../actions/set-background.js';
+import { setSourceImage, updateBgButtonsUI } from '../actions/set-background.js';
 import { saveWorkspace } from './storage.js';
 import { generateWorkspacePngBlob } from '../io/export/export-png.js';
 import { uploadToDrive, getDriveToken, ensureDriveLogin } from '../services/drive-api.js';
@@ -219,6 +219,7 @@ function loadTabState(tab) {
       canvas.style.removeProperty('--bg-url');
     }
   }
+  updateBgButtonsUI();
 }
 
 export function switchTab(id) {

@@ -21,6 +21,8 @@ export function initEls() {
   els.showGridLabel      = document.getElementById("showGridLabel");
   els.exportFormatBtns   = document.querySelectorAll(".dl-format-btn");
   els.setBgBtn           = document.getElementById("setBgBtn");
+  els.replaceBgBtn       = document.getElementById("replaceBgBtn");
+  els.flattenBgBtn       = document.getElementById("flattenBgBtn");
   els.zoomInBtn          = document.getElementById("zoomInBtn");
   els.zoomOutBtn         = document.getElementById("zoomOutBtn");
   els.zoomResetBtn       = document.getElementById("zoomResetBtn");

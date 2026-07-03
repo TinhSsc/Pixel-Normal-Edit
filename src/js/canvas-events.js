@@ -45,6 +45,12 @@ function updateBrushCursor(e, cell) {
     return;
   }
 
+  const globalSettingsModal = document.getElementById('globalSettingsModal');
+  if (globalSettingsModal && globalSettingsModal.style.display === 'flex') {
+    cursor.style.display = 'none';
+    return;
+  }
+
   if (!cell || ['pan', 'picker', 'fill', 'outline', 'magic-eraser'].includes(currentTool)) {
     cursor.style.display = 'none';
     return;

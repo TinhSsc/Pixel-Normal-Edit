@@ -6,9 +6,10 @@
   flex-direction: column;
   gap: 15px;
   align-items: stretch;
-  overflow: visible;
+  overflow-y: auto;
   z-index: 1000;
   position: relative;
+  height: 100%;
 }
 
 .tool-group {
@@ -85,6 +86,66 @@
   background: var(--color-primary);
   border-color: var(--color-primary);
   color: var(--color-text-bright);
+}
+
+/* Tùy chọn hiển thị tên công cụ (Chữ nằm ngoài khung icon) */
+.show-btn-names .tool-btn,
+.show-btn-names .action-btn {
+  background: transparent !important;
+  border-color: transparent !important;
+  color: var(--color-text-muted);
+  height: auto;
+  min-height: auto;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.show-btn-names .tool-btn:hover,
+.show-btn-names .action-btn:hover {
+  color: var(--color-text-bright);
+}
+
+.show-btn-names .tool-btn.active,
+.show-btn-names .action-btn.active {
+  color: var(--color-primary);
+}
+
+.show-btn-names .tool-btn svg,
+.show-btn-names .action-btn svg {
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  width: 42px;
+  height: 42px;
+  padding: 10px;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.show-btn-names .tool-btn:hover svg,
+.show-btn-names .action-btn:hover svg {
+  background: var(--color-border-hover);
+}
+
+.show-btn-names .tool-btn.active svg,
+.show-btn-names .action-btn.active svg {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-bg); /* Dark icon on primary background */
+}
+
+.show-btn-names .tool-btn::after,
+.show-btn-names .action-btn::after {
+  content: attr(data-tooltip);
+  font-size: 10px;
+  line-height: 1.15;
+  text-align: center;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-width: 50px;
 }
 
 .tool-group label {

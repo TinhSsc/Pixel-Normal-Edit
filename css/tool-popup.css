@@ -1,0 +1,150 @@
+/* Tool Popup module — style riêng, không sửa css cũ */
+
+.tool-popup-expand-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 2px;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+
+.tool-popup-expand-btn:hover {
+  color: var(--color-text-bright);
+}
+
+.tool-popup-expand-btn i {
+  width: 14px;
+  height: 14px;
+}
+
+.tool-variant-list {
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--color-border);
+}
+
+.tool-variant-list.show {
+  display: flex;
+}
+
+.tool-variant-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.tool-variant-item:hover {
+  background: var(--color-border);
+}
+
+.tool-variant-item.active {
+  background: var(--color-border-hover, var(--color-border));
+}
+
+.tool-variant-item i {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.tool-variant-item span {
+  flex: 1;
+}
+
+.tool-variant-pin-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+}
+
+.tool-variant-pin-btn i {
+  width: 12px;
+  height: 12px;
+}
+
+.tool-variant-pin-btn.pinned {
+  color: #ffb100;
+}
+
+.tool-quick-pin-bar {
+  display: none;
+  gap: 6px;
+}
+
+.tool-quick-pin-btn {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text-bright);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tool-quick-pin-btn:hover {
+  background: var(--color-border-hover);
+}
+
+.tool-quick-pin-btn.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-bg);
+}
+
+.tool-quick-pin-btn i {
+  width: 16px;
+  height: 16px;
+}
+
+/* Nested Tabs in Settings Modal */
+.nested-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.nested-tab-btn {
+  padding: 8px 16px;
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.nested-tab-btn:hover {
+  color: var(--color-text-bright);
+}
+
+.nested-tab-btn.active {
+  color: var(--color-primary);
+  border-bottom: 2px solid var(--color-primary);
+}
+
+.nested-tab-content {
+  display: none;
+}
+
+.nested-tab-content.active {
+  display: block;
+}

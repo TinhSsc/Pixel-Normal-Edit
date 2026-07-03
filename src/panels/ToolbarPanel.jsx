@@ -1,115 +1,15 @@
 import { Icon, ICONS } from '../components/icons';
 import React, { useEffect } from 'react';
+import { bindPopups } from '../js/core/popup-manager.js';
 
 export default function ToolbarPanel() {
   useEffect(() => {
     window.dispatchEvent(new CustomEvent('toolbar-mounted'));
 
-    const handleMouseEnter = (e) => {
-      if (window.innerWidth <= 768) return;
-      const wrapper = e.currentTarget;
-      clearTimeout(wrapper._hideTimer);
-      const popup = wrapper.querySelector('.popup-bridge-bottom');
-      if (popup) {
-        popup.style.display = 'block';
-        popup.style.position = 'fixed';
-        popup.style.zIndex = '9999';
-        popup.style.right = 'auto';
-
-        const updatePosition = () => {
-          const rect = wrapper.getBoundingClientRect();
-          const popupHeight = popup.offsetHeight || 40;
-          popup.style.top = (rect.top + (rect.height / 2) - (popupHeight / 2)) + 'px';
-          
-          let left = rect.right + 10;
-          const popupWidth = popup.offsetWidth || 150;
-          if (left + popupWidth > window.innerWidth) {
-            left = rect.left - popupWidth - 10;
-          }
-          popup.style.left = left + 'px';
-        };
-
-        updatePosition();
-        wrapper._updatePosition = updatePosition;
-        const container = wrapper.closest('.toolbar, .right-panel');
-        if (container) {
-          container.addEventListener('scroll', updatePosition, { passive: true });
-          wrapper._scrollContainer = container;
-        }
-      }
-    };
-
-    const handleMouseLeave = (e) => {
-      if (window.innerWidth <= 768) return;
-      const wrapper = e.currentTarget;
-      const popup = wrapper.querySelector('.popup-bridge-bottom');
-      if (popup) {
-        // If the wrapper contains a focused input, don't hide it immediately
-        // Or if it was clicked, give it a delay
-        let delay = 0;
-        if (wrapper.dataset.clicked === 'true' || wrapper.contains(document.activeElement)) {
-          delay = 3000;
-        }
-
-        wrapper._hideTimer = setTimeout(() => {
-          wrapper.dataset.clicked = 'false';
-          popup.style.display = '';
-          popup.style.position = '';
-          popup.style.zIndex = '';
-          popup.style.top = '';
-          popup.style.left = '';
-          popup.style.right = '';
-          
-          if (wrapper._updatePosition && wrapper._scrollContainer) {
-            wrapper._scrollContainer.removeEventListener('scroll', wrapper._updatePosition);
-          }
-        }, delay);
-      }
-    };
-
-    const handleClick = (e) => {
-      if (window.innerWidth <= 768) return;
-      const wrapper = e.currentTarget;
-      wrapper.dataset.clicked = 'true';
-      clearTimeout(wrapper._hideTimer);
-    };
-
-    const wrappers = document.querySelectorAll('.toolbar .tool-with-popup-bottom');
-    wrappers.forEach(w => {
-      w.addEventListener('mouseenter', handleMouseEnter);
-      w.addEventListener('mouseleave', handleMouseLeave);
-      w.addEventListener('click', handleClick);
-    });
-
-    const handleClickOutside = (e) => {
-      wrappers.forEach(wrapper => {
-        if (wrapper.dataset.clicked === 'true' && !wrapper.contains(e.target)) {
-          wrapper.dataset.clicked = 'false';
-          const popup = wrapper.querySelector('.popup-bridge-bottom');
-          if (popup) {
-            popup.style.display = '';
-            popup.style.position = '';
-            popup.style.zIndex = '';
-            popup.style.top = '';
-            popup.style.left = '';
-            popup.style.right = '';
-            if (wrapper._updatePosition && wrapper._scrollContainer) {
-              wrapper._scrollContainer.removeEventListener('scroll', wrapper._updatePosition);
-            }
-          }
-        }
-      });
-    };
-
-    document.addEventListener('click', handleClickOutside);
+    const unbindPopups = bindPopups('.toolbar', 'left');
 
     return () => {
-      document.removeEventListener('click', handleClickOutside);
-      wrappers.forEach(w => {
-        w.removeEventListener('mouseenter', handleMouseEnter);
-        w.removeEventListener('mouseleave', handleMouseLeave);
-        w.removeEventListener('click', handleClick);
-      });
+      unbindPopups();
     };
   }, []);
 
@@ -128,7 +28,7 @@ export default function ToolbarPanel() {
       <div className="tool-group">
         <div className="tool-group-title" onClick={(e) => e.target.closest('.tool-group').classList.toggle('collapsed')} style={{ cursor: 'pointer' }} data-i18n="group.draw">Công cụ vẽ</div>
         <div className="tool-grid">
-          <div className="tool-with-popup-bottom">
+          <div className="tool-with-popup-bottom" data-variants="pencil">
             <button className="tool-btn active" data-tool="pencil" data-i18n="tool.pencil"><Icon name={ICONS.PENCIL} /></button>
             <div className="popup-bridge-bottom">
               <div className="tool-popup">

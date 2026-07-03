@@ -192,7 +192,6 @@
   right: 0;
   position: absolute;
   top: 100%;
-  padding-top: 10px;
   display: none;
   z-index: 100;
 }

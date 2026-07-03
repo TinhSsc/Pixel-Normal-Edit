@@ -33,6 +33,7 @@ import { initMobilePopups } from './ui/mobile-popups.js';
 import { initFloatingNav } from './ui/floating-nav.js';
 
 import { setupCanvasEvents } from './canvas-events.js';
+import { initToolPopup } from './tool-popup/index.js';
 import { updateDOM, toggleLang, t } from './lang/i18n.js';
 
 let initialized = false;
@@ -283,6 +284,8 @@ window.addEventListener('toolbar-mounted', () => {
       if (!isOpen) wrapper.classList.add('show-popup');
     });
   });
+
+  initToolPopup();
 });
 
 window.addEventListener('canvas-mounted', async () => {

@@ -660,6 +660,12 @@ function App() {
                 <span data-i18n="modal.tabAppearance">Giao diện</span>
               </div>
             </button>
+            <button className="tab-btn" data-tab="tab-draw-tools">
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                <Icon name={ICONS.PEN_TOOL} style={{ width: '18px', height: '18px' }} />
+                <span data-i18n="modal.tabDrawTools">Công cụ vẽ</span>
+              </div>
+            </button>
             <button className="tab-btn" data-tab="tab-account">
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                 <Icon name={ICONS.USER} style={{ width: '18px', height: '18px' }} />
@@ -698,6 +704,14 @@ function App() {
                   </div>
                 </div>
               </div>
+
+              <div style={{ background: 'var(--color-bg)', padding: '20px', borderRadius: '12px', border: '1px solid var(--color-border)', marginTop: '12px' }}>
+                <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--color-text-bright)' }} data-i18n="settings.display">Hiển thị</div>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: 'var(--color-text-bright)', cursor: 'pointer' }}>
+                  <input type="checkbox" id="showBtnNamesToggle" style={{ width: '16px', height: '16px', accentColor: 'var(--color-primary)' }} />
+                  <span data-i18n="settings.showBtnNames">Hiển thị tên công cụ dưới biểu tượng</span>
+                </label>
+              </div>
             </div>
 
             <div className="tab-content" id="tab-account">
@@ -713,6 +727,17 @@ function App() {
                     <button id="driveLoginBtn" className="btn btn-primary" style={{ padding: '6px 12px', fontSize: '13px' }} data-i18n="drive.login">Đăng nhập Drive</button>
                     <button id="driveLogoutBtn" className="btn" style={{ padding: '6px 12px', fontSize: '13px', display: 'none' }} data-i18n="drive.logout">Đăng xuất</button>
                   </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="tab-content" id="tab-draw-tools">
+              <div style={{ background: 'var(--color-bg)', padding: '20px', borderRadius: '12px', border: '1px solid var(--color-border)' }}>
+                <div className="nested-tabs">
+                  <button className="nested-tab-btn active" data-subtab="subtab-pencil">Bút vẽ (Pen)</button>
+                </div>
+                <div className="nested-tab-content active" id="subtab-pencil">
+                  <div id="variants-container-pencil"></div>
                 </div>
               </div>
             </div>
