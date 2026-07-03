@@ -3,6 +3,7 @@ const SCOPES = 'https://www.googleapis.com/auth/drive.file';
 
 let tokenClient = null;
 let accessToken = null;
+let appFolderId = null;
 
 export function initGoogleDrive() {
   if (typeof google === 'undefined') {
@@ -21,10 +22,15 @@ export function initGoogleDrive() {
     callback: (tokenResponse) => {
       if (tokenResponse && tokenResponse.access_token) {
         accessToken = tokenResponse.access_token;
+        localStorage.setItem('drive_was_logged_in', 'true');
         window.dispatchEvent(new CustomEvent('drive-connected', { detail: { accessToken } }));
       }
     },
   });
+
+  if (localStorage.getItem('drive_was_logged_in') === 'true') {
+    tokenClient.requestAccessToken({ prompt: '' });
+  }
 }
 
 export function loginToDrive() {
@@ -46,13 +52,63 @@ export function logoutDrive() {
     if (typeof google !== 'undefined') {
       google.accounts.oauth2.revoke(accessToken, () => {
         accessToken = null;
+        localStorage.removeItem('drive_was_logged_in');
         window.dispatchEvent(new CustomEvent('drive-disconnected'));
       });
     } else {
       accessToken = null;
+      localStorage.removeItem('drive_was_logged_in');
       window.dispatchEvent(new CustomEvent('drive-disconnected'));
     }
   }
+}
+
+export function ensureDriveLogin(onReady) {
+  if (getDriveToken()) {
+    return onReady();
+  }
+  
+  const handler = () => {
+    window.removeEventListener('drive-connected', handler);
+    onReady();
+  };
+  
+  window.addEventListener('drive-connected', handler);
+  loginToDrive();
+}
+
+async function getOrCreateAppFolder() {
+  if (appFolderId) return appFolderId;
+  
+  const query = encodeURIComponent("mimeType='application/vnd.google-apps.folder' and name='Pixel Normal Edit' and trashed=false");
+  const searchRes = await fetch(`https://www.googleapis.com/drive/v3/files?q=${query}&fields=files(id,name)`, {
+    headers: { Authorization: `Bearer ${accessToken}` }
+  });
+  
+  const searchData = await searchRes.json();
+  if (searchData.files && searchData.files.length > 0) {
+    appFolderId = searchData.files[0].id;
+    return appFolderId;
+  }
+  
+  // Create folder
+  const metadata = {
+    name: 'Pixel Normal Edit',
+    mimeType: 'application/vnd.google-apps.folder'
+  };
+  
+  const createRes = await fetch('https://www.googleapis.com/drive/v3/files', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(metadata)
+  });
+  
+  const createData = await createRes.json();
+  appFolderId = createData.id;
+  return appFolderId;
 }
 
 export async function uploadToDrive(fileName, fileBlob, fileId = null) {
@@ -62,6 +118,11 @@ export async function uploadToDrive(fileName, fileBlob, fileId = null) {
     name: fileName,
     mimeType: 'image/png',
   };
+  
+  if (!fileId) {
+    const folderId = await getOrCreateAppFolder();
+    metadata.parents = [folderId];
+  }
   
   const form = new FormData();
   form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));

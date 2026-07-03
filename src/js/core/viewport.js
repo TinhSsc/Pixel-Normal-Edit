@@ -127,3 +127,17 @@ export function getCellPx(clientX, clientY) {
   if (x < 0 || y < 0 || x >= GRID_WIDTH || y >= GRID_HEIGHT) return null;
   return { x, y };
 }
+
+export function getCellPxClamped(clientX, clientY) {
+  const canvas = document.getElementById("pixelCanvas");
+  if (!canvas) return null;
+  const rect = canvas.getBoundingClientRect();
+  const cellW = rect.width / GRID_WIDTH;
+  const cellH = rect.height / GRID_HEIGHT;
+  const x = Math.floor((clientX - rect.left) / cellW);
+  const y = Math.floor((clientY - rect.top) / cellH);
+  return {
+    x: Math.min(Math.max(x, 0), GRID_WIDTH - 1),
+    y: Math.min(Math.max(y, 0), GRID_HEIGHT - 1),
+  };
+}

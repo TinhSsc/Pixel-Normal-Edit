@@ -1,5 +1,5 @@
 import { els, currentTool, GRID_WIDTH, GRID_HEIGHT, pixelMap, setPreviewPixels, setStatus } from './core/state.js';
-import { getCellPx, applyTransform, getZoom, getPan, setPan, setZoom, getMinZoom, getMaxZoom } from './core/viewport.js';
+import { getCellPx, getCellPxClamped, applyTransform, getZoom, getPan, setPan, setZoom, getMinZoom, getMaxZoom } from './core/viewport.js';
 import { isTaskRunning, abortCurrentTask } from './core/task-manager.js';
 import { t } from './lang/i18n.js';
 import { renderPixels } from './core/render.js';
@@ -172,7 +172,7 @@ function onPointerMove(e) {
     return;
   }
 
-  const cell = getCellPx(e.clientX, e.clientY);
+  let cell = getCellPx(e.clientX, e.clientY);
   
   if (!cell) {
     if (e.target.closest('.canvas-wrap') && !e.target.closest('.toolbar-container')) {
@@ -182,9 +182,13 @@ function onPointerMove(e) {
         lastParticleTime = now;
       }
     }
-    if (isDrawing) lastCell = null;
-    updateBrushCursor(e, null);
-    return;
+    
+    if (isDrawing) {
+      cell = getCellPxClamped(e.clientX, e.clientY);
+    } else {
+      updateBrushCursor(e, null);
+      return;
+    }
   }
 
   updateBrushCursor(e, cell);
@@ -211,9 +215,9 @@ function onPointerUp(e) {
 
   isDrawing = false;
 
-  const cell = getCellPx(e.clientX, e.clientY);
+  const cell = getCellPx(e.clientX, e.clientY) || getCellPxClamped(e.clientX, e.clientY);
   const color = getColor(e.button);
-  dispatchTool(currentTool, 'up', cell || lastCell || {x: 0, y: 0}, color, e, lastCell);
+  dispatchTool(currentTool, 'up', cell, color, e, lastCell);
 
 
   setPreviewPixels(null);

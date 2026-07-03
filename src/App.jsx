@@ -53,10 +53,19 @@ function App() {
   const [currentUser, setCurrentUserState] = useState(getCurrentUser());
 
   useEffect(() => {
-    const handleHashChange = () => setRoute(getRoute());
+    const handleHashChange = () => {
+      const newRoute = getRoute();
+      setRoute(newRoute);
+    };
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
+
+  useEffect(() => {
+    if (!currentUser && !AUTH_ROUTES.includes(route)) {
+      navigate('login');
+    }
+  }, [route, currentUser]);
 
   useEffect(() => {
     // Re-initialize icons when switching routes or rendering

@@ -202,6 +202,48 @@ window.addEventListener('toolbar-mounted', () => {
   initEls();
   setupSwapColors();
   
+  const saveToolbarState = () => {
+    const state = {
+      color1: els.colorPicker?.value,
+      color2: els.colorPicker2?.value,
+      pencilSize: document.getElementById('pencilSize')?.value,
+      eraserSize: document.getElementById('eraserSize')?.value,
+      outlineThickness: document.getElementById('outlineThickness')?.value,
+      shapeThickness: document.querySelector('.shape-thickness')?.value,
+      currentTool: document.querySelector('.tool-btn.active')?.dataset?.tool || 'pencil'
+    };
+    localStorage.setItem('pixel_toolbar_state', JSON.stringify(state));
+  };
+
+  const loadToolbarState = () => {
+    try {
+      const state = JSON.parse(localStorage.getItem('pixel_toolbar_state') || '{}');
+      if (state.color1 && els.colorPicker) els.colorPicker.value = state.color1;
+      if (state.color2 && els.colorPicker2) els.colorPicker2.value = state.color2;
+      if (state.pencilSize) {
+        const p = document.getElementById('pencilSize');
+        if (p) p.value = state.pencilSize;
+      }
+      if (state.eraserSize) {
+        const e = document.getElementById('eraserSize');
+        if (e) e.value = state.eraserSize;
+      }
+      if (state.outlineThickness) {
+        const o = document.getElementById('outlineThickness');
+        if (o) o.value = state.outlineThickness;
+      }
+      if (state.shapeThickness) {
+        document.querySelectorAll('.shape-thickness').forEach(el => el.value = state.shapeThickness);
+      }
+      if (state.currentTool) {
+        const btn = document.querySelector(`.tool-btn[data-tool="${state.currentTool}"]`);
+        if (btn) btn.click();
+      }
+    } catch(e) {}
+  };
+
+  loadToolbarState();
+
   if (els.toolBtns) {
     els.toolBtns.forEach(btn => {
       btn.addEventListener("click", () => {
@@ -209,6 +251,7 @@ window.addEventListener('toolbar-mounted', () => {
         btn.classList.add("active");
         setCurrentTool(btn.dataset.tool);
         setStatus(`${t("status.toolSelected")} ${btn.getAttribute("data-tooltip") || btn.title}`);
+        saveToolbarState();
       });
     });
   }
@@ -217,7 +260,13 @@ window.addEventListener('toolbar-mounted', () => {
   shapeThicknessInputs.forEach(input => {
     input.addEventListener("input", (e) => {
       shapeThicknessInputs.forEach(other => other.value = e.target.value);
+      saveToolbarState();
     });
+  });
+
+  ['colorPicker', 'colorPicker2', 'pencilSize', 'eraserSize', 'outlineThickness'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('change', saveToolbarState);
   });
 
   // Re-run mobile popups for toolbar items

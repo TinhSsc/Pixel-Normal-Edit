@@ -56,7 +56,9 @@ export async function saveWorkspace(tabs, activeTabId) {
       groupMap: Array.from(tab.groupMap.entries()),
       history: tab.history,
       grid: { w: tab.grid.w, h: tab.grid.h },
-      bg: tab.bg
+      bg: tab.bg,
+      driveFileId: tab.driveFileId,
+      autoBackupDrive: tab.autoBackupDrive
     }));
 
     await set('workspace', {
@@ -93,7 +95,9 @@ export async function loadWorkspace() {
         groupMap: new Map(tab.groupMap),
         history: tab.history,
         grid: { w: tab.grid.w, h: tab.grid.h, imgData: null, data32: null }, // Reconstructed later
-        bg: tab.bg
+        bg: tab.bg,
+        driveFileId: tab.driveFileId || null,
+        autoBackupDrive: tab.autoBackupDrive || false
       };
     });
 

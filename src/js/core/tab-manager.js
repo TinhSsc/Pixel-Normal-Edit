@@ -7,7 +7,7 @@ import { syncGridSizeUI } from '../actions/grid-size-select.js';
 import { setSourceImage } from '../actions/set-background.js';
 import { saveWorkspace } from './storage.js';
 import { generateWorkspacePngBlob } from '../io/export/export-png.js';
-import { uploadToDrive, getDriveToken } from '../services/drive-api.js';
+import { uploadToDrive, getDriveToken, ensureDriveLogin } from '../services/drive-api.js';
 
 let tabs = [];
 let activeTabId = null;
@@ -21,55 +21,89 @@ function generateId() {
 }
 
 let saveTimeout = null;
+let maxWaitTimeout = null;
+
 export function clearPendingSave() {
   if (saveTimeout) clearTimeout(saveTimeout);
+  if (maxWaitTimeout) clearTimeout(maxWaitTimeout);
+}
+
+let isUploading = false;
+let pendingUpload = false;
+
+async function syncToDrive(tab, btn) {
+  if (isUploading) {
+    pendingUpload = true;
+    return;
+  }
+  isUploading = true;
+  try {
+    if (btn) {
+      btn.innerHTML = `<i data-lucide="refresh-cw" class="spin" style="width: 14px; height: 14px; color: var(--color-sync);"></i>`;
+      if (window.lucide) window.lucide.createIcons({ root: btn });
+    }
+    const blob = await generateWorkspacePngBlob(tab);
+    const fileName = `${tab.name || 'pixel-art'}.png`;
+    const fileId = await uploadToDrive(fileName, blob, tab.driveFileId);
+    if (!tab.driveFileId) tab.driveFileId = fileId;
+  } catch (err) {
+    console.error("Auto backup failed:", err);
+  } finally {
+    isUploading = false;
+    if (btn) {
+      btn.innerHTML = `<i data-lucide="cloud-check" style="width: 14px; height: 14px; color: var(--color-success);"></i>`;
+      if (window.lucide) window.lucide.createIcons({ root: btn });
+    }
+    if (pendingUpload) {
+      pendingUpload = false;
+      syncToDrive(tab, btn);
+    }
+  }
+}
+
+async function performSave() {
+  const currentTab = tabs.find(t => t.id === activeTabId);
+  const btn = currentTab ? document.getElementById('autobackup_btn_' + currentTab.id) : null;
+  
+  // Hiệu ứng lưu local
+  if (btn && (!currentTab.autoBackupDrive || !getDriveToken())) {
+    btn.innerHTML = `<i data-lucide="loader" class="spin" style="width: 14px; height: 14px; color: var(--color-info);"></i>`;
+    if (window.lucide) window.lucide.createIcons({ root: btn });
+    
+    setTimeout(() => {
+      btn.innerHTML = `<i data-lucide="cloud-upload" style="width: 14px; height: 14px; color: var(--color-text-muted);"></i>`;
+      if (window.lucide) window.lucide.createIcons({ root: btn });
+    }, 1000);
+  }
+  
+  saveCurrentTabState();
+  saveWorkspace(tabs, activeTabId);
+  
+  if (currentTab && currentTab.autoBackupDrive && getDriveToken()) {
+    syncToDrive(currentTab, btn);
+  }
 }
 
 export function debouncedSaveWorkspace() {
   if (saveTimeout) clearTimeout(saveTimeout);
-  saveTimeout = setTimeout(async () => {
-    const currentTab = tabs.find(t => t.id === activeTabId);
-    const btn = currentTab ? document.getElementById('autobackup_btn_' + currentTab.id) : null;
-    
-    // State: "Đang lưu" (saving locally)
-    if (btn) {
-      btn.innerHTML = `<i data-lucide="loader" class="spin" style="width: 14px; height: 14px; color: var(--color-info);"></i>`; // text-blue-500
-      if (window.lucide) window.lucide.createIcons({ root: btn });
+  
+  // Debounce 5s
+  saveTimeout = setTimeout(() => {
+    if (maxWaitTimeout) {
+      clearTimeout(maxWaitTimeout);
+      maxWaitTimeout = null;
     }
-    
-    saveCurrentTabState();
-    saveWorkspace(tabs, activeTabId);
-    
-    if (currentTab && currentTab.autoBackupDrive && getDriveToken()) {
-      // State: "Đang sao lưu" (syncing to cloud)
-      if (btn) {
-        btn.innerHTML = `<i data-lucide="refresh-cw" class="spin" style="width: 14px; height: 14px; color: var(--color-sync);"></i>`; // text-indigo-500
-        if (window.lucide) window.lucide.createIcons({ root: btn });
-      }
-      try {
-        const blob = await generateWorkspacePngBlob(currentTab);
-        const fileName = `${currentTab.name || 'pixel-art'}.png`;
-        const fileId = await uploadToDrive(fileName, blob, currentTab.driveFileId);
-        if (!currentTab.driveFileId) currentTab.driveFileId = fileId;
-      } catch (err) {
-        console.error("Auto backup failed:", err);
-      } finally {
-        if (btn) {
-          // State: "Đã lưu xong" (cloud-check)
-          btn.innerHTML = `<i data-lucide="cloud-check" style="width: 14px; height: 14px; color: var(--color-success);"></i>`; // text-emerald-500
-          if (window.lucide) window.lucide.createIcons({ root: btn });
-        }
-      }
-    } else {
-      // Not auto-backing up, just revert back to "Lưu vào cloud" (or cloud-check briefly?)
-      if (btn) {
-        setTimeout(() => {
-          btn.innerHTML = `<i data-lucide="${currentTab && currentTab.autoBackupDrive ? 'cloud-check' : 'cloud-upload'}" style="width: 14px; height: 14px; color: ${currentTab && currentTab.autoBackupDrive ? 'var(--color-success)' : 'var(--color-text-muted)'};"></i>`;
-          if (window.lucide) window.lucide.createIcons({ root: btn });
-        }, 500); // brief flash to show it was saved locally
-      }
-    }
-  }, 500);
+    performSave();
+  }, 5000);
+
+  // MaxWait 30s
+  if (!maxWaitTimeout) {
+    maxWaitTimeout = setTimeout(() => {
+      if (saveTimeout) clearTimeout(saveTimeout);
+      maxWaitTimeout = null;
+      performSave();
+    }, 30000);
+  }
 }
 
 export function initTabs(savedData = null) {
@@ -338,7 +372,11 @@ function renderTabsUI() {
       e.stopPropagation();
       
       if (!tab.autoBackupDrive && !getDriveToken()) {
-        alert(t('alert.loginDriveRequired') || 'Vui lòng đăng nhập Google Drive (nhấn nút Lưu lên Drive ở panel) để bật tính năng tự động lưu!');
+        ensureDriveLogin(() => {
+          tab.autoBackupDrive = true;
+          renderTabsUI();
+          debouncedSaveWorkspace();
+        });
         return;
       }
       

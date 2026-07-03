@@ -38,8 +38,6 @@ export function setupDriveUI() {
   const driveLoginBtn = document.getElementById('driveLoginBtn');
   const driveLogoutBtn = document.getElementById('driveLogoutBtn');
   const driveStatusText = document.getElementById('driveStatusText');
-  const saveToDriveBtn = document.getElementById('saveToDriveBtn');
-  const loadFromDriveBtn = document.getElementById('loadFromDriveBtn');
   const driveFileModal = document.getElementById('driveFileModal');
   const driveFileList = document.getElementById('driveFileList');
 
