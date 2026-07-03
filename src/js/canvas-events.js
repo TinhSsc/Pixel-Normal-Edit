@@ -1,5 +1,5 @@
 import { els, currentTool, GRID_WIDTH, GRID_HEIGHT, pixelMap, setPreviewPixels, setStatus } from './core/state.js';
-import { getCellPx, applyTransform, getZoom, getPan, setPan, setZoom } from './core/viewport.js';
+import { getCellPx, applyTransform, getZoom, getPan, setPan, setZoom, getMinZoom, getMaxZoom } from './core/viewport.js';
 import { isTaskRunning, abortCurrentTask } from './core/task-manager.js';
 import { t } from './lang/i18n.js';
 import { renderPixels } from './core/render.js';
@@ -38,6 +38,12 @@ function hexToRgba(hex, alpha) {
 function updateBrushCursor(e, cell) {
   const cursor = document.getElementById('brush-cursor');
   if (!cursor) return;
+
+  const resizePopover = document.getElementById('resizePopover');
+  if (resizePopover && resizePopover.style.display === 'block') {
+    cursor.style.display = 'none';
+    return;
+  }
 
   if (!cell || ['pan', 'picker', 'fill', 'outline', 'magic-eraser'].includes(currentTool)) {
     cursor.style.display = 'none';
@@ -136,6 +142,7 @@ function onPointerDown(e) {
   if (e.button === 1 || currentTool === 'pan') {
     e.preventDefault(); // Prevent auto-scroll on middle click
     panStart = { x: e.clientX, y: e.clientY, px: getPan().x, py: getPan().y };
+    updateBrushCursor(e, null);
     return;
   }
 
@@ -194,7 +201,12 @@ function onPointerMove(e) {
 }
 
 function onPointerUp(e) {
-  if (panStart) { panStart = null; return; }
+  if (panStart) { 
+    panStart = null; 
+    const cell = getCellPx(e.clientX, e.clientY);
+    updateBrushCursor(e, cell);
+    return; 
+  }
   if (!isDrawing) return;
 
   isDrawing = false;
@@ -216,7 +228,7 @@ function onWheel(e) {
   const canvas = document.getElementById('pixelCanvas');
   const zoom = getZoom();
   const delta = e.deltaY < 0 ? 1.1 : 0.9;
-  const newZoom = Math.min(64, Math.max(0.1, zoom * delta));
+  const newZoom = Math.min(getMaxZoom(), Math.max(getMinZoom(), zoom * delta));
 
   const rect = canvas.getBoundingClientRect();
   const pan = getPan();
@@ -237,6 +249,7 @@ function onWheel(e) {
   // inline zoom update
   setZoom(newZoom);
   applyTransform(canvas);
+  updateBrushCursor(e, null);
 }
 
 function dispatchTool(tool, event, cell, color, e, prevCell) {

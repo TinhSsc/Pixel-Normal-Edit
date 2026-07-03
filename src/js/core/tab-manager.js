@@ -33,6 +33,12 @@ export function debouncedSaveWorkspace() {
     
     const currentTab = tabs.find(t => t.id === activeTabId);
     if (currentTab && currentTab.autoBackupDrive && getDriveToken()) {
+      const btn = document.getElementById('autobackup_btn_' + currentTab.id);
+      if (btn) {
+        btn.classList.add('syncing');
+        btn.innerHTML = `<i data-lucide="loader-2" style="width: 14px; height: 14px; color: var(--color-primary);"></i>`;
+        if (window.lucide) window.lucide.createIcons({ root: btn });
+      }
       try {
         const blob = await generateWorkspacePngBlob(currentTab);
         const fileName = `${currentTab.name || 'pixel-art'}.png`;
@@ -40,6 +46,12 @@ export function debouncedSaveWorkspace() {
         if (!currentTab.driveFileId) currentTab.driveFileId = fileId;
       } catch (err) {
         console.error("Auto backup failed:", err);
+      } finally {
+        if (btn) {
+          btn.classList.remove('syncing');
+          btn.innerHTML = `<i data-lucide="check-circle-2" style="width: 14px; height: 14px; color: var(--color-success);"></i>`;
+          if (window.lucide) window.lucide.createIcons({ root: btn });
+        }
       }
     }
   }, 500);
@@ -119,7 +131,7 @@ export function initTabs(savedData = null) {
   renderPixels();
 }
 
-function saveCurrentTabState() {
+export function saveCurrentTabState() {
   const tab = tabs.find(t => t.id === activeTabId);
   if (!tab) return;
   
@@ -302,12 +314,19 @@ function renderTabsUI() {
     });
     
     const toggleAutoBackupBtn = document.createElement('button');
+    toggleAutoBackupBtn.id = 'autobackup_btn_' + tab.id;
     toggleAutoBackupBtn.className = `tab-autobackup-btn ${tab.autoBackupDrive ? 'active' : ''}`;
     toggleAutoBackupBtn.title = tab.autoBackupDrive ? 'Tắt tự động lưu lên Drive' : 'Bật tự động lưu lên Drive';
     toggleAutoBackupBtn.innerHTML = `<i data-lucide="${tab.autoBackupDrive ? 'check-circle-2' : 'cloud'}" style="width: 14px; height: 14px; color: ${tab.autoBackupDrive ? 'var(--color-success)' : 'var(--color-text-muted)'};"></i>`;
     toggleAutoBackupBtn.style.cssText = 'background: transparent; border: none; padding: 2px; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 4px;';
     toggleAutoBackupBtn.addEventListener('click', (e) => {
       e.stopPropagation();
+      
+      if (!tab.autoBackupDrive && !getDriveToken()) {
+        alert(t('alert.loginDriveRequired') || 'Vui lòng đăng nhập Google Drive (nhấn nút Lưu lên Drive ở panel) để bật tính năng tự động lưu!');
+        return;
+      }
+      
       tab.autoBackupDrive = !tab.autoBackupDrive;
       renderTabsUI();
       if (tab.autoBackupDrive) debouncedSaveWorkspace();

@@ -6,7 +6,7 @@ import { resizeCanvas, fitToScreen } from '../core/viewport.js';
 import { renderPixels, setForceFullRender } from '../core/render.js';
 import { resetHistory } from '../core/history.js';
 import { setStatus } from '../core/state.js';
-import { debouncedSaveWorkspace } from '../core/tab-manager.js';
+import { debouncedSaveWorkspace, saveCurrentTabState } from '../core/tab-manager.js';
 
 import { pixelMap } from '../core/state.js';
 
@@ -45,7 +45,7 @@ export function setGridSize(w, h, mode = 'clear') {
   if (mode === 'clear') {
     resetMaps();
   } else {
-    resetMaps(newData32, new Map());
+    resetMaps(new Uint32Array(newData32), new Map());
   }
 
   setForceFullRender(true);
@@ -58,6 +58,7 @@ export function setGridSize(w, h, mode = 'clear') {
   setStatus(`Grid size set to ${w}x${h}`);
   
   resetHistory();
+  saveCurrentTabState();
   debouncedSaveWorkspace();
 }
 

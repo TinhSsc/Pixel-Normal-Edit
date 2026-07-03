@@ -50,6 +50,7 @@ export function setTaskUI(isRunning) {
 
 export let GRID_WIDTH = 32;
 export let GRID_HEIGHT = 32;
+export let gridGeneration = 0;
 
 export const offscreenCanvas = document.createElement('canvas');
 export const offscreenCtx = offscreenCanvas.getContext('2d', { willReadFrequently: true });
@@ -67,6 +68,7 @@ export function setGridSizeParams(w, h, imageData, data32) {
   GRID_HEIGHT = h;
   offscreenImageData = imageData;
   offscreenData32 = data32;
+  gridGeneration++;
 }
 
 export function resetMaps(newPixelMap = null, newGroupMap = new Map()) {

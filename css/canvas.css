@@ -1,0 +1,99 @@
+
+.canvas-wrap {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+#pixelCanvas {
+  image-rendering: pixelated;
+  background-color: var(--color-surface);
+  box-shadow: 0 8px 24px var(--color-shadow);
+  cursor: crosshair;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+}
+
+#pixelCanvas.has-bg {
+}
+
+
+/* Canvas Transition */
+.canvas-wrap {
+  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+  opacity: 1;
+  transform: scale(1);
+}
+
+.canvas-wrap.fade-out {
+  opacity: 0;
+  transform: scale(0.98);
+}
+
+
+/* Canvas Transition */
+.canvas-wrap {
+  transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+  opacity: 1;
+  transform: scale(1);
+}
+
+.canvas-wrap.fade-out {
+  opacity: 0;
+  transform: scale(0.98);
+}
+
+.canvas-checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.canvas-checkbox-item:hover {
+  border-color: var(--color-primary-light);
+}
+
+.canvas-checkbox-item span {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+/* Checkerboard background for the pixel canvas */
+#pixelCanvas {
+  background-image: conic-gradient(
+    var(--color-canvas-checker) 90deg,
+    transparent 90deg 180deg,
+    var(--color-canvas-checker) 180deg 270deg,
+    transparent 270deg
+  );
+  background-size: calc(var(--checker-size, 2px) * var(--canvas-zoom, 1)) calc(var(--checker-size, 2px) * var(--canvas-zoom, 1));
+  background-position: 0 0;
+}
+
+#pixelCanvas.has-bg {
+  background-image:
+    linear-gradient(var(--color-overlay), var(--color-overlay)),
+    var(--bg-url),
+    conic-gradient(
+      var(--color-canvas-checker) 90deg,
+      transparent 90deg 180deg,
+      var(--color-canvas-checker) 180deg 270deg,
+      transparent 270deg
+    );
+  background-size: 100% 100%, 100% 100%, calc(var(--checker-size, 2px) * var(--canvas-zoom, 1)) calc(var(--checker-size, 2px) * var(--canvas-zoom, 1));
+  background-position: 0 0, 0 0, 0 0;
+}

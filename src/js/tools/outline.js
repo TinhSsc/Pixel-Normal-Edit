@@ -1,4 +1,4 @@
-import { pixelMap, GRID_WIDTH, GRID_HEIGHT, setStatus, setTaskUI } from '../core/state.js';
+import { pixelMap, GRID_WIDTH, GRID_HEIGHT, setStatus, setTaskUI, gridGeneration } from '../core/state.js';
 import { beginStroke, commitStroke } from '../core/history.js';
 import { renderPixels } from '../core/render.js';
 import { writePixel } from '../shared/pixel-writer.js';
@@ -14,6 +14,7 @@ export async function useOutline(color, cell) {
 
   const signal = startTask();
   setTaskUI(true);
+  const myGeneration = gridGeneration;
 
   try {
     setStatus(t('status.scanBg'));
@@ -22,6 +23,8 @@ export async function useOutline(color, cell) {
       pixelMap, cell.x, cell.y, targetColorUint32, signal, 
       (count) => setStatus(t('status.scanBgCount', count))
     );
+
+    if (myGeneration !== gridGeneration) return;
 
     const filledSet = new Set();
     const totalPixels = GRID_WIDTH * GRID_HEIGHT;
@@ -62,6 +65,8 @@ export async function useOutline(color, cell) {
     }, signal, (done, total) => {
       setStatus(t('status.calcOutlinePct', Math.round(done / total * 100)));
     }, 10000);
+
+    if (myGeneration !== gridGeneration) return;
 
     beginStroke();
     

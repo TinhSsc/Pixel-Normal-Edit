@@ -91,3 +91,10 @@ export function rgbaToHex(r, g, b, a = 255) {
   }
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
 }
+
+export function parseUint32ToHex(uint32) {
+  const { r, g, b } = uint32ToRgba(uint32);
+  // input type="color" requires exactly 7 characters (#RRGGBB), ignoring alpha
+  const toHex = v => v.toString(16).padStart(2, '0');
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+}

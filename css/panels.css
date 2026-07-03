@@ -1,0 +1,157 @@
+
+.right-panel {
+  background: var(--color-surface);
+  border-radius: 0 0 11px 11px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  position: relative;
+}
+
+.panel-section h3 {
+  font-size: 14px;
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 5px;
+}
+
+.dv-tab-close-btn {
+  display: none !important;
+}
+
+.dv-split-view,
+.dv-split-view-container,
+.dv-view,
+.dv-panel,
+.dv-groupview,
+.dv-content,
+.dv-component-container {
+  overflow: visible !important;
+  contain: none !important;
+}
+
+/* ===== Dockview Theme Override — bridges to our CSS variables ===== */
+/* Must use high specificity + !important to beat Dockview's own stylesheet */
+:root .dockview-theme-dark,
+:root .dockview-theme-light {
+  /* Tab bar & header background */
+  --dv-tabs-and-actions-container-background-color: var(--color-surface) !important;
+  --dv-activegroup-visiblepanel-tab-background-color: var(--color-bg) !important;
+  --dv-activegroup-hiddenpanel-tab-background-color: var(--color-surface) !important;
+  --dv-inactivegroup-visiblepanel-tab-background-color: var(--color-bg) !important;
+  --dv-inactivegroup-hiddenpanel-tab-background-color: var(--color-surface) !important;
+
+  /* Tab text color */
+  --dv-activegroup-visiblepanel-tab-color: var(--color-text-bright) !important;
+  --dv-activegroup-hiddenpanel-tab-color: var(--color-text-muted) !important;
+  --dv-inactivegroup-visiblepanel-tab-color: var(--color-text-muted) !important;
+  --dv-inactivegroup-hiddenpanel-tab-color: var(--color-text-muted) !important;
+
+  /* Panel content background */
+  --dv-group-view-background-color: var(--color-bg) !important;
+
+  /* Separator between panels */
+  --dv-separator-border: var(--color-border) !important;
+  --dv-tab-divider-color: transparent !important;
+
+  /* Sash (resize handle) */
+  --dv-active-sash-color: var(--color-primary) !important;
+
+  /* Pane header */
+  --dv-paneview-header-border-color: var(--color-border) !important;
+
+  /* Tab styling (bo góc và khoảng cách) */
+  --dv-tab-border-radius: 10px 10px 0 0 !important;
+  --dv-tab-margin: 0 2px 0 0 !important;
+}
+
+/* Animations and hover effects for Dockview tabs */
+.dv-default-tab,
+.dv-tab {
+  transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1) !important;
+  cursor: pointer !important;
+  transform-origin: bottom center;
+}
+
+.dv-default-tab:hover,
+.dv-tab:hover {
+  background-color: var(--color-surface-alt) !important;
+  transform: translateY(-2px);
+}
+
+.dv-active-tab .dv-default-tab,
+.dv-active-tab .dv-tab,
+.dv-default-tab.dv-active-tab,
+.dv-tab.dv-active-tab {
+  transform: translateY(0);
+}
+
+/* Custom rounded corners for dockview panels */
+:root .dockview-theme-dark .dv-groupview,
+:root .dockview-theme-light .dv-groupview {
+  border-radius: 12px !important;
+  border: 1px solid var(--color-border) !important;
+  box-shadow: 0 4px 12px var(--color-shadow-md) !important;
+  background-color: transparent !important;
+}
+
+/* Remove default splitview sash background since we have margin gaps now */
+.dv-sash {
+  background: transparent !important;
+}
+
+/* Remove shadow from dv-scrollable */
+.dv-scrollable,
+.dv-scrollable::before,
+.dv-scrollable::after,
+.dv-left-drop-shadow,
+.dv-right-drop-shadow {
+  box-shadow: none !important;
+  background-image: none !important;
+}
+
+
+/* Hide Dockview native header for canvas panel to merge tabs */
+.dv-group-view:has(#canvasTabsContainer) .dv-tabs-and-actions-container {
+  display: none !important;
+}
+
+.dv-active-tab .dv-default-tab,
+.dv-active-tab .dv-tab,
+.dv-default-tab.dv-active-tab,
+.dv-tab.dv-active-tab {
+  transform: translateY(0);
+}
+
+/* Custom rounded corners for dockview panels */
+:root .dockview-theme-dark .dv-groupview,
+:root .dockview-theme-light .dv-groupview {
+  border-radius: 12px !important;
+  border: 1px solid var(--color-border) !important;
+  box-shadow: 0 4px 12px var(--color-shadow-md) !important;
+  background-color: transparent !important;
+}
+
+/* Remove default splitview sash background since we have margin gaps now */
+.dv-sash {
+  background: transparent !important;
+}
+
+/* Remove shadow from dv-scrollable */
+.dv-scrollable,
+.dv-scrollable::before,
+.dv-scrollable::after,
+.dv-left-drop-shadow,
+.dv-right-drop-shadow {
+  box-shadow: none !important;
+  background-image: none !important;
+}
+
+
+/* Hide Dockview native header for canvas panel to merge tabs */
+.dv-group-view:has(#canvasTabsContainer) .dv-tabs-and-actions-container {
+  display: none !important;
+}

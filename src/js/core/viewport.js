@@ -10,6 +10,16 @@ export function getPan() { return { x: panX, y: panY }; }
 export function setZoom(z) { zoom = z; }
 export function setPan(x, y) { panX = Math.round(x); panY = Math.round(y); }
 
+export function getMinZoom() {
+  const MIN_SCREEN_SIZE = 32;
+  return Math.max(0.01, MIN_SCREEN_SIZE / Math.max(GRID_WIDTH, GRID_HEIGHT));
+}
+
+export function getMaxZoom() {
+  const MAX_SCREEN_SIZE = 8192;
+  return Math.max(64, MAX_SCREEN_SIZE / Math.max(GRID_WIDTH, GRID_HEIGHT));
+}
+
 export function resizeCanvas() {
   const canvas = document.getElementById("pixelCanvas");
   if (!canvas) return;
@@ -40,13 +50,13 @@ export function zoomIn() {
   const wrap = canvas?.parentElement;
   if (!canvas || !wrap) return;
   const oldZoom = zoom;
-  zoom = Math.min(zoom * 1.25, 64);
-  
+  zoom = Math.min(zoom * 1.25, getMaxZoom());
+
   const cx = wrap.clientWidth / 2;
   const cy = wrap.clientHeight / 2;
   panX = Math.round(cx - (cx - panX) * (zoom / oldZoom));
   panY = Math.round(cy - (cy - panY) * (zoom / oldZoom));
-  
+
   applyTransform(canvas);
 }
 
@@ -55,20 +65,23 @@ export function zoomOut() {
   const wrap = canvas?.parentElement;
   if (!canvas || !wrap) return;
   const oldZoom = zoom;
-  zoom = Math.max(zoom / 1.25, 0.1);
-  
+  zoom = Math.max(zoom / 1.25, getMinZoom());
+
   const cx = wrap.clientWidth / 2;
   const cy = wrap.clientHeight / 2;
   panX = Math.round(cx - (cx - panX) * (zoom / oldZoom));
   panY = Math.round(cy - (cy - panY) * (zoom / oldZoom));
-  
+
   applyTransform(canvas);
 }
 
 export function applyTransform(canvas) {
   if (!canvas) return;
-  canvas.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
-  
+  canvas.style.width = `${GRID_WIDTH * zoom}px`;
+  canvas.style.height = `${GRID_HEIGHT * zoom}px`;
+  canvas.style.transform = `translate(${panX}px, ${panY}px)`;
+  canvas.style.setProperty('--canvas-zoom', zoom);
+
   const gridOverlay = document.getElementById('gridOverlay');
   if (gridOverlay) {
     gridOverlay.style.transform = `translate(${panX}px, ${panY}px)`;
@@ -78,11 +91,11 @@ export function applyTransform(canvas) {
     gridOverlay.style.boxSizing = 'content-box';
     gridOverlay.style.top = `-1px`;
     gridOverlay.style.left = `-1px`;
-    
+
     // Set CSS variables so attached UI can scale with the canvas
     gridOverlay.style.setProperty('--canvas-zoom', zoom);
     gridOverlay.style.setProperty('--canvas-logical-width', `${GRID_WIDTH}px`);
-    
+
     const showGridFlag = document.getElementById('showGrid')?.checked;
     if (zoom > 4 && showGridFlag) {
       gridOverlay.style.backgroundImage = `
@@ -94,7 +107,7 @@ export function applyTransform(canvas) {
     } else {
       gridOverlay.style.backgroundImage = 'none';
     }
-    
+
     const mirrorLine = document.getElementById('mirrorLine');
     if (mirrorLine) {
       mirrorLine.style.width = `2px`;

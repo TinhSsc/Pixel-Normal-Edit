@@ -1,0 +1,89 @@
+
+:root,
+:root[data-theme="dark"] {
+  /* Design Tokens - Sizing Scale */
+  --size-1: 1px;
+  --size-2: 2px;
+  --size-4: 4px;
+  --size-8: 8px;
+  --size-12: 12px;
+  --size-16: 16px;
+  --size-20: 20px;
+  --size-24: 24px;
+  --size-32: 32px;
+  --size-40: 40px;
+  --size-48: 48px;
+  --size-56: 56px;
+  --size-64: 64px;
+
+  --color-bg: #191920;
+  --color-surface: #2a2a33;
+  --color-surface-alt: #202028;
+  --color-border: #3e3e4a;
+  --color-border-hover: #4a4a58;
+  --color-primary: #5b5bf0;
+  --color-primary-hover: #0e0eff;
+  --color-primary-light: #8888ff;
+  --color-success: #28a745;
+  --color-text: #e4e4ed;
+  --color-text-muted: #9292a3;
+  --color-text-bright: #f0f0f8;
+  --color-canvas-checker: #32323e;
+  --color-shadow: rgba(15, 15, 20, 0.6);
+  --color-shadow-md: rgba(15, 15, 20, 0.5);
+  --color-shadow-lg: rgba(15, 15, 20, 0.8);
+  --color-overlay: rgba(15, 15, 20, 0.8);
+  --color-overlay-sm: rgba(15, 15, 20, 0.4);
+  --color-nav-bg: rgba(42, 42, 51, 0.9);
+  --color-primary-tint: rgba(91, 91, 240, 0.1);
+  --color-grid-line: rgba(255, 255, 255, 0.2);
+}
+
+:root[data-theme="light"] {
+  /* The Digital Workbench - Light Mode */
+  --color-bg: #e2e4ea;
+  --color-surface: #ffffff;
+  --color-surface-alt: #f0f2f5;
+  --color-border: #d0d3db;
+  --color-border-hover: #b0b4c0;
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-light: #60a5fa;
+  --color-success: #16a34a;
+  --color-text: #1e293b;
+  --color-text-muted: #64748b;
+  --color-text-bright: #0f172a;
+  --color-canvas-checker: #d0d3db;
+  --color-shadow: rgba(0, 0, 0, 0.1);
+  --color-shadow-md: rgba(0, 0, 0, 0.12);
+  --color-shadow-lg: rgba(0, 0, 0, 0.2);
+  --color-overlay: rgba(0, 0, 0, 0.5);
+  --color-overlay-sm: rgba(0, 0, 0, 0.08);
+  --color-nav-bg: rgba(255, 255, 255, 0.9);
+  --color-primary-tint: rgba(37, 99, 235, 0.1);
+  --color-grid-line: rgba(0, 0, 0, 0.2);
+}
+
+:root .dockview-theme-dark .dv-tabs-and-actions-container,
+:root .dockview-theme-light .dv-tabs-and-actions-container {
+  border-top-left-radius: 11px !important;
+  border-top-right-radius: 11px !important;
+}
+
+:root .dockview-theme-dark .dv-content,
+:root .dockview-theme-light .dv-content {
+  border-bottom-left-radius: 11px !important;
+  border-bottom-right-radius: 11px !important;
+}
+
+:root .dockview-theme-dark .dv-tabs-and-actions-container,
+:root .dockview-theme-light .dv-tabs-and-actions-container {
+  border-top-left-radius: 11px !important;
+  border-top-right-radius: 11px !important;
+}
+
+:root .dockview-theme-dark .dv-content,
+:root .dockview-theme-light .dv-content {
+  border-bottom-left-radius: 11px !important;
+  border-bottom-right-radius: 11px !important;
+}

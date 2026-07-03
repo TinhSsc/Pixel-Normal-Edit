@@ -25,11 +25,11 @@ export default function CanvasPanel() {
           <div id="mirrorLine" style={{ display: 'none', position: 'absolute', left: '50%', top: 0, bottom: 0, background: 'rgba(255, 60, 60, 0.8)', zIndex: 10 }}></div>
 
           {/* Attached Tool Bar (Header) */}
-          <div className="toolbar-container" style={{ pointerEvents: 'auto', position: 'absolute', bottom: '100%', left: '0', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 'calc(1px * var(--canvas-zoom, 1))', marginBottom: 'calc(2px * var(--canvas-zoom, 1))', background: 'transparent', padding: 'calc(1px * var(--canvas-zoom, 1))', boxSizing: 'border-box' }}>
-            <div style={{ position: 'relative', width: 'calc(12px * var(--canvas-zoom, 1))' }}>
-              <button id="gridSizeSelectBtn" className="btn" data-i18n="tooltip.gridSize" style={{ height: 'calc(4px * var(--canvas-zoom, 1))', padding: '0 calc(1px * var(--canvas-zoom, 1))', fontSize: 'calc(1.8px * var(--canvas-zoom, 1))', background: 'var(--color-surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'calc(0.5px * var(--canvas-zoom, 1))', width: '100%', borderRadius: 'calc(0.5px * var(--canvas-zoom, 1))', border: 'calc(0.2px * var(--canvas-zoom, 1)) solid var(--color-border)', color: 'var(--color-text-bright)' }}>
-                <span id="currentGridSizeText" style={{ whiteSpace: 'nowrap' }}>32x32</span>
-                <i data-lucide="chevron-down" style={{ width: 'calc(2px * var(--canvas-zoom, 1))', height: 'calc(2px * var(--canvas-zoom, 1))', flexShrink: 0 }}></i>
+          <div className="toolbar-container">
+            <div className="grid-size-wrapper">
+              <button id="gridSizeSelectBtn" className="btn" data-i18n="tooltip.gridSize">
+                <span id="currentGridSizeText">32x32</span>
+                <i data-lucide="chevron-down"></i>
               </button>
 
               <div id="resizePopover" style={{ display: 'none', position: 'absolute', top: '100%', left: '0', marginTop: '6px', background: 'rgba(30, 30, 35, 0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '16px', width: '240px', boxShadow: '0 8px 24px rgba(0,0,0,0.4)', zIndex: 60, backdropFilter: 'blur(12px)', transition: 'all 0.2s ease' }}>

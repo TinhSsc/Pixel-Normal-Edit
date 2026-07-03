@@ -7,11 +7,12 @@ import { t } from '../lang/i18n.js';
 import { startTask, completeTask } from '../core/task-manager.js';
 import { runWorkerTask } from '../workers/worker-manager.js';
 import { parseColorToUint32 } from '../core/color-utils.js';
-import { GRID_WIDTH, GRID_HEIGHT } from '../core/state.js';
+import { GRID_WIDTH, GRID_HEIGHT, gridGeneration } from '../core/state.js';
 
 export async function useFill(cell, color) {
   const signal = startTask();
   setTaskUI(true);
+  const myGeneration = gridGeneration;
   
   try {
     setStatus(t('status.scanFill') + ' (Worker)');
@@ -27,6 +28,8 @@ export async function useFill(cell, color) {
       width: GRID_WIDTH,
       height: GRID_HEIGHT
     });
+    
+    if (myGeneration !== gridGeneration) return;
     
     if (changedIndices.length === 0) return;
 
