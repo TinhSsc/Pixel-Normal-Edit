@@ -29,31 +29,31 @@ export default function LoginPage({ onLoggedIn, onNavigate }) {
   return (
     <div className="auth-page">
       <form className="auth-card" onSubmit={handleSubmit}>
-        <h2>Đăng nhập</h2>
+        <h2 data-i18n="auth.title">Đăng nhập</h2>
 
         <div className="auth-field">
-          <label>Email</label>
+          <label data-i18n="auth.email">Email</label>
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         </div>
 
         <div className="auth-field">
-          <label>Mật khẩu</label>
+          <label data-i18n="auth.password">Mật khẩu</label>
           <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
         </div>
 
         {error && <p className="auth-error">{error}</p>}
 
         <button type="submit" className="btn btn-primary" style={{ justifyContent: 'center' }}>
-          Đăng nhập
+          <span data-i18n="auth.loginBtn">Đăng nhập</span>
         </button>
 
-        <div className="auth-divider">hoặc</div>
+        <div className="auth-divider" data-i18n="auth.or">hoặc</div>
 
         <GoogleButton onCredential={handleGoogle} />
 
         <div className="auth-links">
-          <a onClick={() => onNavigate('forgot-password')}>Quên mật khẩu?</a>
-          <a onClick={() => onNavigate('register')}>Tạo tài khoản</a>
+          <a onClick={() => onNavigate('forgot-password')} data-i18n="auth.forgotPassword">Quên mật khẩu?</a>
+          <a onClick={() => onNavigate('register')} data-i18n="auth.createAccount">Tạo tài khoản</a>
         </div>
       </form>
     </div>

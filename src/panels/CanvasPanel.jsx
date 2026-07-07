@@ -50,26 +50,26 @@ export default function CanvasPanel() {
 
                 <div style={{ fontSize: '12px', fontWeight: 600, color: '#fff', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <Icon name={ICONS.MAXIMIZE} style={{ width: '14px', height: '14px', color: 'var(--color-primary)' }} />
-                  Kích thước Canvas
+                  <span data-i18n="resizePopover.canvasSize">Kích thước Canvas</span>
                 </div>
 
                 <div style={{ display: 'flex', gap: '10px', marginBottom: '12px' }}>
                   <div style={{ flex: 1 }}>
-                    <label style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--color-text-muted)', marginBottom: '4px', display: 'block' }}>Width</label>
+                    <label style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--color-text-muted)', marginBottom: '4px', display: 'block' }} data-i18n="resizePopover.width">Width</label>
                     <input type="number" id="resizeWidth" defaultValue="32" min="1" max="256" style={{ width: '100%', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.05)', color: '#fff', padding: '6px 8px', borderRadius: '4px', fontSize: '13px', outline: 'none', transition: 'border 0.2s' }} />
                   </div>
                   <div style={{ flex: 1 }}>
-                    <label style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--color-text-muted)', marginBottom: '4px', display: 'block' }}>Height</label>
+                    <label style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--color-text-muted)', marginBottom: '4px', display: 'block' }} data-i18n="resizePopover.height">Height</label>
                     <input type="number" id="resizeHeight" defaultValue="32" min="1" max="256" style={{ width: '100%', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.05)', color: '#fff', padding: '6px 8px', borderRadius: '4px', fontSize: '13px', outline: 'none', transition: 'border 0.2s' }} />
                   </div>
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', padding: '6px 8px', background: 'rgba(0,0,0,0.15)', borderRadius: '4px' }}>
                   <input type="checkbox" id="resizeLockRatio" defaultChecked style={{ accentColor: 'var(--color-primary)', cursor: 'pointer' }} />
-                  <label htmlFor="resizeLockRatio" style={{ fontSize: '11px', cursor: 'pointer', userSelect: 'none', color: '#ddd' }}>Khóa tỷ lệ (Lock Ratio)</label>
+                  <label htmlFor="resizeLockRatio" style={{ fontSize: '11px', cursor: 'pointer', userSelect: 'none', color: '#ddd' }} data-i18n="resizePopover.lockRatio">Khóa tỷ lệ (Lock Ratio)</label>
                 </div>
 
-                <div style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--color-text-muted)', marginBottom: '6px' }}>Presets (Vuông)</div>
+                <div style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--color-text-muted)', marginBottom: '6px' }} data-i18n="resizePopover.presets">Presets (Vuông)</div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '4px', marginBottom: '16px' }}>
                   <button className="btn resize-preset-btn" data-size="16" style={{ padding: '4px 0', fontSize: '11px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.05)' }}>16</button>
                   <button className="btn resize-preset-btn" data-size="32" style={{ padding: '4px 0', fontSize: '11px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.05)' }}>32</button>
@@ -78,10 +78,10 @@ export default function CanvasPanel() {
                 </div>
 
                 <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginBottom: '12px', textAlign: 'center', padding: '8px 0', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-                  Canvas after resize: <span id="resizePreviewText" style={{ color: 'var(--color-primary)', fontWeight: 'bold', fontSize: '13px' }}>32 × 32</span>
+                  <span data-i18n="resizePopover.afterResize">Canvas after resize:</span> <span id="resizePreviewText" style={{ color: 'var(--color-primary)', fontWeight: 'bold', fontSize: '13px' }}>32 × 32</span>
                 </div>
 
-                <button id="resizeApplyBtn" className="btn btn-primary" style={{ width: '100%', padding: '8px 0', fontSize: '13px', fontWeight: 600, borderRadius: '6px', boxShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>Áp dụng (Apply)</button>
+                <button id="resizeApplyBtn" className="btn btn-primary" style={{ width: '100%', padding: '8px 0', fontSize: '13px', fontWeight: 600, borderRadius: '6px', boxShadow: '0 2px 8px rgba(0,0,0,0.2)' }} data-i18n="resizePopover.apply">Áp dụng (Apply)</button>
               </div>
             </div>
           </div>

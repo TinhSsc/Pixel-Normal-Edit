@@ -485,10 +485,10 @@ function App() {
           <div className="tab-content active" id="tab-image">
             <div className="source-tabs">
                <button className="source-btn active" data-source="local">
-                 <Icon name={ICONS.MONITOR} style={{ width: '16px', height: '16px' }} /> Máy tính
+                 <Icon name={ICONS.MONITOR} style={{ width: '16px', height: '16px' }} /> <span data-i18n="modal.tabComputer">Máy tính</span>
                </button>
                <button className="source-btn" data-source="drive">
-                 <Icon name={ICONS.HARD_DRIVE} style={{ width: '16px', height: '16px' }} /> Google Drive
+                 <Icon name={ICONS.HARD_DRIVE} style={{ width: '16px', height: '16px' }} /> <span data-i18n="modal.tabDrive">Google Drive</span>
                </button>
             </div>
             
@@ -501,7 +501,7 @@ function App() {
               <div id="imageDropZone" className="drag-drop-zone">
                 <Icon name={ICONS.UPLOAD_CLOUD} style={{ width: '48px', height: '48px', color: 'var(--color-primary)', marginBottom: '16px' }} />
                 <div style={{ fontSize: '16px', fontWeight: 500, color: 'var(--color-text-bright)', marginBottom: '8px' }} data-i18n="modal.dropImage">Kéo thả ảnh vào đây</div>
-                <div style={{ fontSize: '14px', color: 'var(--color-text-muted)' }}>hoặc nhấp để chọn file từ máy tính</div>
+                <div style={{ fontSize: '14px', color: 'var(--color-text-muted)' }} data-i18n="modal.clickToSelect">hoặc nhấp để chọn file từ máy tính</div>
                 <input type="file" id="imageUploadModal" accept="image/*" style={{ display: 'none' }} />
               </div>
             </div>
@@ -549,7 +549,7 @@ function App() {
             
             {/* Bước 1: Chọn Canvas */}
             <div className="download-section" style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '10px' }}>1. Chọn tệp (Canvas)</label>
+              <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '10px' }} data-i18n="download.step1">1. Chọn tệp (Canvas)</label>
               <div id="downloadCanvasList" className="download-canvas-list" style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '150px', overflowY: 'auto', background: 'var(--color-surface-alt)', padding: '10px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
                 {/* Checkboxes will be injected here via JS */}
               </div>
@@ -557,7 +557,7 @@ function App() {
             
             {/* Bước 2: Chọn Định dạng */}
             <div className="download-section" style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '10px' }}>2. Định dạng xuất</label>
+              <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '10px' }} data-i18n="download.step2">2. Định dạng xuất</label>
               <div className="download-options-grid format-selector" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
                 <button className="dl-format-btn select-btn active" data-format="png" style={{ flexDirection: 'column', padding: '12px 8px', alignItems: 'center' }}>
                   <Icon name={ICONS.IMAGE} style={{ width: '24px', height: '24px', marginBottom: '4px' }} />
@@ -580,15 +580,15 @@ function App() {
 
             {/* Bước 3: Nơi lưu */}
             <div className="download-section" style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '10px' }}>3. Nơi lưu trữ</label>
+              <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '10px' }} data-i18n="download.step3">3. Nơi lưu trữ</label>
               <div className="download-options-grid dest-selector" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                 <button className="dl-dest-btn select-btn active" data-dest="local" style={{ padding: '12px', justifyContent: 'center' }}>
                   <Icon name={ICONS.MONITOR_DOWN} style={{ width: '20px', height: '20px' }} />
-                  <span style={{ fontWeight: 600, fontSize: '14px' }}>Lưu vào máy</span>
+                  <span style={{ fontWeight: 600, fontSize: '14px' }} data-i18n="download.local">Lưu vào máy</span>
                 </button>
                 <button className="dl-dest-btn select-btn" data-dest="drive" style={{ padding: '12px', justifyContent: 'center' }}>
                   <Icon name={ICONS.HARD_DRIVE_UPLOAD} style={{ width: '20px', height: '20px' }} />
-                  <span style={{ fontWeight: 600, fontSize: '14px' }}>Google Drive</span>
+                  <span style={{ fontWeight: 600, fontSize: '14px' }} data-i18n="download.drive">Google Drive</span>
                 </button>
               </div>
             </div>
@@ -597,7 +597,7 @@ function App() {
             <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '16px', borderTop: '1px solid var(--color-border)' }}>
                <button id="executeDownloadBtn" className="btn btn-primary" style={{ padding: '10px 24px', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                  <Icon name={ICONS.DOWNLOAD} style={{ width: '18px', height: '18px' }} />
-                 <span style={{ fontWeight: 600 }}>Tiến hành tải xuống</span>
+                 <span style={{ fontWeight: 600 }} data-i18n="download.execute">Tiến hành tải xuống</span>
                </button>
             </div>
 
@@ -613,33 +613,33 @@ function App() {
       <div id="gridResizeModal" className="modal-overlay" style={{ display: 'none', zIndex: 999999 }}>
         <div className="modal-content" style={{ maxWidth: '400px' }}>
           <div className="modal-header">
-            <h3 style={{ margin: 0, fontSize: '18px' }}>Thay đổi kích thước</h3>
+            <h3 style={{ margin: 0, fontSize: '18px' }} data-i18n="resizePopover.title">Thay đổi kích thước</h3>
             <button className="btn" style={{ background: 'transparent', border: 'none', padding: '4px' }} onClick={() => document.getElementById('gridResizeModal').style.display = 'none'}>
               <Icon name={ICONS.X} />
             </button>
           </div>
           <div style={{ padding: '20px' }}>
-            <p style={{ fontSize: '14px', color: 'var(--color-text)', marginBottom: '16px' }}>Bạn muốn xử lý ảnh hiện tại như thế nào khi chuyển sang <span id="newGridSizeLabel" style={{ fontWeight: 'bold' }}></span>?</p>
+            <p style={{ fontSize: '14px', color: 'var(--color-text)', marginBottom: '16px' }}><span data-i18n="resizeModal.questionPrefix">Bạn muốn xử lý ảnh hiện tại như thế nào khi chuyển sang </span><span id="newGridSizeLabel" style={{ fontWeight: 'bold' }}></span>?</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <button id="resizeKeepBtn" className="btn select-btn" style={{ padding: '12px', justifyContent: 'flex-start', alignItems: 'center', gap: '12px', height: 'auto' }}>
                 <Icon name={ICONS.CROP} style={{ width: '20px', height: '20px', color: 'var(--color-text-bright)' }} />
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', textAlign: 'left' }}>
-                  <span style={{ fontWeight: 600, color: 'var(--color-text-bright)' }}>Giữ nguyên ảnh</span>
-                  <span style={{ fontSize: '12px', color: 'var(--color-text-muted)', lineHeight: 1.4 }}>Mở rộng hoặc cắt bớt không gian, không làm biến dạng ảnh</span>
+                  <span style={{ fontWeight: 600, color: 'var(--color-text-bright)' }} data-i18n="resizeModal.keepTitle">Giữ nguyên ảnh</span>
+                  <span style={{ fontSize: '12px', color: 'var(--color-text-muted)', lineHeight: 1.4 }} data-i18n="resizeModal.keepDesc">Mở rộng hoặc cắt bớt không gian, không làm biến dạng ảnh</span>
                 </div>
               </button>
               <button id="resizeScaleBtn" className="btn select-btn" style={{ padding: '12px', justifyContent: 'flex-start', alignItems: 'center', gap: '12px', height: 'auto' }}>
                 <Icon name={ICONS.MAXIMIZE} style={{ width: '20px', height: '20px', color: 'var(--color-text-bright)' }} />
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', textAlign: 'left' }}>
-                  <span style={{ fontWeight: 600, color: 'var(--color-text-bright)' }}>Thu phóng ảnh</span>
-                  <span style={{ fontSize: '12px', color: 'var(--color-text-muted)', lineHeight: 1.4 }}>Co giãn toàn bộ hình ảnh cho vừa khít với kích thước mới</span>
+                  <span style={{ fontWeight: 600, color: 'var(--color-text-bright)' }} data-i18n="resizeModal.scaleTitle">Thu phóng ảnh</span>
+                  <span style={{ fontSize: '12px', color: 'var(--color-text-muted)', lineHeight: 1.4 }} data-i18n="resizeModal.scaleDesc">Co giãn toàn bộ hình ảnh cho vừa khít với kích thước mới</span>
                 </div>
               </button>
               <button id="resizeClearBtn" className="btn select-btn" style={{ padding: '12px', justifyContent: 'flex-start', alignItems: 'center', gap: '12px', height: 'auto' }}>
                 <Icon name={ICONS.TRASH_2} style={{ width: '20px', height: '20px', color: 'var(--color-danger)' }} />
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', textAlign: 'left' }}>
-                  <span style={{ fontWeight: 600, color: 'var(--color-danger)' }}>Xoá mất ảnh</span>
-                  <span style={{ fontSize: '12px', color: 'var(--color-text-muted)', lineHeight: 1.4 }}>Tạo một trang giấy trắng hoàn toàn mới</span>
+                  <span style={{ fontWeight: 600, color: 'var(--color-danger)' }} data-i18n="resizeModal.clearTitle">Xoá mất ảnh</span>
+                  <span style={{ fontSize: '12px', color: 'var(--color-text-muted)', lineHeight: 1.4 }} data-i18n="resizeModal.clearDesc">Tạo một trang giấy trắng hoàn toàn mới</span>
                 </div>
               </button>
             </div>

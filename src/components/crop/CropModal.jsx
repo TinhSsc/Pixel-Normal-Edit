@@ -224,10 +224,10 @@ export default function CropModal() {
     <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 999999, backgroundColor: 'rgba(0,0,0,0.85)', display: 'flex', flexDirection: 'column' }}>
       {/* Header / Toolbar */}
       <div style={{ height: '56px', backgroundColor: '#1e1e22', borderBottom: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px' }}>
-        <h3 style={{ margin: 0, color: '#fff', fontSize: '16px' }}>Cắt ảnh (Crop)</h3>
+        <h3 style={{ margin: 0, color: '#fff', fontSize: '16px' }} data-i18n="crop.title">Cắt ảnh (Crop)</h3>
         
         <div style={{ display: 'flex', gap: '8px' }}>
-          <button className={`btn select-btn ${aspect === null ? 'active' : ''}`} onClick={() => setRatio(null)}>Free</button>
+          <button className={`btn select-btn ${aspect === null ? 'active' : ''}`} onClick={() => setRatio(null)}><span data-i18n="crop.ratioFree">Free</span></button>
           <button className={`btn select-btn ${aspect === 1 ? 'active' : ''}`} onClick={() => setRatio(1)}>1:1</button>
           <button className={`btn select-btn ${aspect === 4/3 ? 'active' : ''}`} onClick={() => setRatio(4/3)}>4:3</button>
           <button className={`btn select-btn ${aspect === 16/9 ? 'active' : ''}`} onClick={() => setRatio(16/9)}>16:9</button>
@@ -236,8 +236,8 @@ export default function CropModal() {
         </div>
 
         <div style={{ display: 'flex', gap: '8px' }}>
-          <button className="btn" onClick={closeModal} style={{ backgroundColor: 'transparent', border: '1px solid #555' }}>Hủy</button>
-          <button className="btn btn-primary" onClick={applyCrop} style={{ backgroundColor: '#5b5bf0', color: '#fff' }}>Áp dụng</button>
+          <button className="crop-btn" onClick={closeModal} data-i18n="crop.cancel" style={{ backgroundColor: 'transparent', border: '1px solid #555' }}>Hủy</button>
+          <button className="crop-btn primary" onClick={applyCrop} data-i18n="crop.apply" style={{ backgroundColor: '#5b5bf0', color: '#fff' }}>Áp dụng</button>
         </div>
       </div>
 

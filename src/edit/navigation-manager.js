@@ -14,7 +14,7 @@ export const navigationConfig = {
       id: 'hand',
       type: 'tool',
       icon: ICONS.HAND,
-      tooltipKey: 'tool.hand',
+      tooltipKey: 'tool.pan',
       defaultTitle: 'Bàn tay (Pan)',
       hasPopup: false
     },

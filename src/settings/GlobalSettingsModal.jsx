@@ -96,7 +96,7 @@ export default function GlobalSettingsModal() {
 
           <div className="tab-content" id="tab-account">
             <div style={{ background: 'var(--color-bg)', padding: '20px', borderRadius: '12px', border: '1px solid var(--color-border)' }}>
-              <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--color-text-bright)' }}>Lưu trữ & Đồng bộ</div>
+              <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--color-text-bright)' }} data-i18n="group.backupSync">Lưu trữ & Đồng bộ</div>
               <div className="setting-group" style={{ marginBottom: '0' }}>
                 <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', color: 'var(--color-text)' }}>Google Drive</h4>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--color-surface-alt)', borderRadius: '8px' }}>
@@ -110,9 +110,9 @@ export default function GlobalSettingsModal() {
               </div>
             </div>
             <div style={{ background: 'var(--color-bg)', padding: '20px', borderRadius: '12px', border: '1px solid var(--color-border)', marginTop: '16px' }}>
-              <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--color-danger)' }}>Khắc phục sự cố</div>
+              <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--color-danger)' }} data-i18n="troubleshoot.title">Khắc phục sự cố</div>
               <div className="setting-group" style={{ marginBottom: '0' }}>
-                <p style={{ fontSize: '13px', color: 'var(--color-text-muted)', marginBottom: '12px', lineHeight: '1.5' }}>
+                <p style={{ fontSize: '13px', color: 'var(--color-text-muted)', marginBottom: '12px', lineHeight: '1.5' }} data-i18n="troubleshoot.desc">
                   Nếu ứng dụng bị lỗi hoặc kẹt, bạn có thể xóa toàn bộ dữ liệu cục bộ để khôi phục lại trạng thái ban đầu.
                 </p>
                 <button className="btn" style={{ padding: '8px 16px', fontSize: '13px', background: 'rgba(239, 68, 68, 0.1)', color: 'var(--color-danger)', border: '1px solid var(--color-danger)' }} onClick={() => {
@@ -120,7 +120,7 @@ export default function GlobalSettingsModal() {
                     localStorage.clear();
                     window.location.reload();
                   }
-                }}>
+                }} data-i18n="troubleshoot.reset">
                   Khôi phục dữ liệu gốc (Reset)
                 </button>
               </div>

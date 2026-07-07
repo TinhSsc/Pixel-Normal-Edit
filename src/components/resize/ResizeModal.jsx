@@ -149,7 +149,7 @@ export default function ResizeModal() {
     <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 999999, backgroundColor: 'rgba(0,0,0,0.85)', display: 'flex', flexDirection: 'column' }}>
       {/* Header / Toolbar */}
       <div style={{ height: '56px', backgroundColor: '#1e1e22', borderBottom: '1px solid #333', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px' }}>
-        <h3 style={{ margin: 0, color: '#fff', fontSize: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <h3 style={{ margin: 0, color: '#fff', fontSize: '16px', display: 'flex', alignItems: 'center', gap: '8px' }} data-i18n="resizePopover.alignTitle">
           <Icon name={ICONS.MOVE} style={{width: 18, height: 18}}/> 
           Căn chỉnh (Resize Preview)
         </h3>
@@ -157,7 +157,7 @@ export default function ResizeModal() {
         <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
           
           <div style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
-             <span style={{fontSize: '12px', color: '#888', fontWeight: 500}}>Neo (Anchor):</span>
+             <span style={{fontSize: '12px', color: '#888', fontWeight: 500}} data-i18n="resizePopover.anchor">Neo (Anchor):</span>
              <div style={{
                 display: 'grid', 
                 gridTemplateColumns: 'repeat(3, 12px)', 
@@ -185,16 +185,16 @@ export default function ResizeModal() {
           <div style={{width: 1, height: 24, background: 'var(--color-border)'}}></div>
 
           <button className="btn select-btn" onClick={fitInside} title="Vừa khít (Giữ toàn bộ ảnh trong khung)">
-             <Icon name={ICONS.SHRINK} style={{width: 16, height: 16}}/> Fit
+             <Icon name={ICONS.SHRINK} style={{width: 16, height: 16}}/> <span data-i18n="resizePopover.fit">Fit</span>
           </button>
           <button className="btn select-btn" onClick={() => anchor('left', 'top')} title="Khôi phục mặc định">
-             <Icon name={ICONS.ROTATE_CCW} style={{width: 16, height: 16}}/> Reset
+             <Icon name={ICONS.ROTATE_CCW} style={{width: 16, height: 16}}/> <span data-i18n="resizePopover.reset">Reset</span>
           </button>
         </div>
 
         <div style={{ display: 'flex', gap: '8px' }}>
-          <button className="btn" onClick={closeModal} style={{ backgroundColor: 'transparent', border: '1px solid #555' }}>Hủy</button>
-          <button className="btn btn-primary" onClick={applyResize} style={{ backgroundColor: '#5b5bf0', color: '#fff' }}>Áp dụng</button>
+          <button className="btn" onClick={closeModal} data-i18n="resizePopover.cancel" style={{ backgroundColor: 'transparent', border: '1px solid #555' }}>Hủy</button>
+          <button className="btn btn-primary" onClick={applyResize} data-i18n="resizePopover.apply" style={{ backgroundColor: '#5b5bf0', color: '#fff' }}>Áp dụng</button>
         </div>
       </div>
 
