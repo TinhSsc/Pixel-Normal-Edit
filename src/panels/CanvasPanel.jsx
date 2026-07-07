@@ -89,7 +89,6 @@ export default function CanvasPanel() {
         <canvas id="pixelCanvas"></canvas>
         <div id="gridOverlay" style={{ pointerEvents: 'none', position: 'absolute', top: '-1px', left: '-1px', transformOrigin: '0 0' }}>
           <div id="mirrorLine" style={{ display: 'none', position: 'absolute', left: '50%', top: 0, bottom: 0, background: 'rgba(255, 60, 60, 0.8)', zIndex: 10 }}></div>
-
         </div>
         <div id="brush-cursor"></div>
       </div>

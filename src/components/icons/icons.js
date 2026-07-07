@@ -1,4 +1,6 @@
 export const ICONS = {
+  SUN: 'sun',
+  DROPLET: 'droplet',
   ARROW_LEFT_RIGHT: 'arrow-left-right',
   PENCIL: 'pencil',
   ERASER: 'eraser',
@@ -45,4 +47,8 @@ export const ICONS = {
   CLOUD_DOWNLOAD: 'cloud-download',
   CLOUD_COG: 'cloud-cog',
   CLOUD_OFF: 'cloud-off',
+  CROP: 'crop',
+  SPRAY_CAN: 'spray-can',
+  REPLACE: 'replace',
+  RULER: 'ruler',
 };

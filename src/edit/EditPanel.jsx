@@ -1,13 +1,33 @@
 import { Icon, ICONS } from '../components/icons';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { bindPopups } from '../js/core/popup-manager.js';
+import { editConfig } from './edit-manager.js';
+import { navigationConfig } from './navigation-manager.js';
+import { updateDOM } from '../js/lang/i18n.js';
+import ToolButton from '../toolbar/ToolButton';
 
-export default function SettingsPanel() {
+export default function EditPanel() {
+  const [hiddenEdits, setHiddenEdits] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem('pixel-edit-hidden-edits')) || [];
+    } catch {
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    const onHiddenEditsChanged = (e) => setHiddenEdits(e.detail || []);
+    window.addEventListener('hidden-edits-changed', onHiddenEditsChanged);
+    return () => window.removeEventListener('hidden-edits-changed', onHiddenEditsChanged);
+  }, []);
+
+  useEffect(() => {
+    if (window.lucide) window.lucide.createIcons();
+    updateDOM();
+  }, [hiddenEdits]);
+
   useEffect(() => {
     window.dispatchEvent(new CustomEvent('settings-mounted'));
-
-    const unbindPopups = bindPopups('.right-panel', 'right');
-
 
     const themeSelect = document.getElementById('themeSelect');
     const customThemeSettings = document.getElementById('customThemeSettings');
@@ -138,7 +158,6 @@ export default function SettingsPanel() {
     }
 
     return () => {
-      unbindPopups();
       if (themeSelect) {
         themeSelect.removeEventListener('change', updateTheme);
         customBgColor.removeEventListener('input', updateTheme);
@@ -150,62 +169,77 @@ export default function SettingsPanel() {
     };
   }, []);
 
+  useEffect(() => {
+    let unbind = () => {};
+    // Need a small timeout to let React render the new DOM elements first
+    const timer = setTimeout(() => {
+      unbind = bindPopups('.right-panel', 'right');
+    }, 50);
+    return () => {
+      clearTimeout(timer);
+      unbind();
+    };
+  }, [hiddenEdits]);
+
   return (
     <div className="right-panel" style={{ width: '100%', height: '100%', overflowY: 'auto', overflowX: 'hidden' }}>
-      <div className="tool-group">
-        <div className="tool-group-title" onClick={(e) => e.target.closest('.tool-group').classList.toggle('collapsed')} style={{ cursor: 'pointer' }} data-i18n="group.settings">Chế độ &amp; Trạng thái</div>
-        <div className="tool-grid" style={{ gap: '10px' }}>
-          <div className="tool-with-popup-bottom">
-            <label data-i18n="tooltip.gradientMode" className="tool-btn" id="gradientModeLabel" style={{ cursor: 'pointer', margin: 0 }}>
-              <input type="checkbox" id="gradientMode" style={{ display: 'none' }} />
-              <Icon name={ICONS.BLEND} />
-            </label>
-            <div className="popup-bridge-bottom">
-              <div className="tool-popup">
-                <label style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }} data-i18n="label.gradDir">Hướng đổ</label>
-                <select id="gradientDirection" className="btn" style={{ fontSize: '12px', padding: '4px', background: 'var(--color-bg)', border: '1px solid var(--color-border)', color: 'var(--color-text)', borderRadius: '4px' }} data-i18n="tooltip.gradDir">
-                  <option value="vertical" data-i18n="option.vertical">Dọc (Trên-Dưới)</option>
-                  <option value="horizontal" data-i18n="option.horizontal">Ngang (Trái-Phải)</option>
-                  <option value="diagonal" data-i18n="option.diagonal">Chéo (Góc)</option>
-                  <option value="radial" data-i18n="option.radial">Tỏa tròn (Tâm)</option>
-                </select>
-              </div>
+      {[...navigationConfig.groups, ...editConfig.groups].map(group => {
+        const isNavigation = navigationConfig.groups.some(g => g.id === group.id);
+        const configToUse = isNavigation ? navigationConfig : editConfig;
+        
+        const visibleTools = group.tools.filter(toolId => !hiddenEdits.includes(toolId));
+        if (visibleTools.length === 0) return null;
+
+        return (
+          <div className="tool-group" key={group.id}>
+            <div className="tool-group-title" onClick={(e) => e.target.closest('.tool-group').classList.toggle('collapsed')} style={{ cursor: 'pointer' }} data-i18n={group.titleKey}>{group.defaultTitle}</div>
+            <div className="tool-grid" style={{ gap: '10px' }}>
+              {visibleTools.map(toolId => {
+                const tool = configToUse.tools[toolId];
+                if (!tool) return null;
+
+                let btnContent = null;
+                if (tool.type === 'checkbox') {
+                  btnContent = (
+                    <label data-i18n={tool.tooltipKey} className={`tool-btn ${tool.defaultActive ? 'active' : ''}`} id={tool.labelId} style={{ cursor: 'pointer', margin: 0 }}>
+                      <input type="checkbox" id={tool.inputId} style={{ display: 'none' }} defaultChecked={tool.defaultActive} />
+                      <Icon name={tool.icon} />
+                    </label>
+                  );
+                } else if (tool.type === 'button') {
+                  btnContent = (
+                    <button id={tool.buttonId} className="tool-btn" data-i18n={tool.tooltipKey}>
+                      <Icon name={tool.icon} />
+                    </button>
+                  );
+                } else if (tool.type === 'tool') {
+                  btnContent = <ToolButton toolConfig={tool} />;
+                }
+
+                if (!tool.hasPopup) {
+                  return <React.Fragment key={toolId}>{btnContent}</React.Fragment>;
+                }
+
+                return (
+                  <div key={toolId} className={`tool-with-popup-${tool.popupPosition}`}>
+                    {btnContent}
+                    <div className={`popup-bridge-${tool.popupPosition}`}>
+                      <div className="tool-popup" style={tool.type === 'button' ? { width: 'max-content' } : {}}>
+                        <label style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }} data-i18n={tool.popupContent.labelKey}>{tool.popupContent.defaultTitle}</label>
+                        <select id={tool.popupContent.selectId} className="btn" style={{ fontSize: '12px', padding: '4px', background: 'var(--color-bg)', border: '1px solid var(--color-border)', color: 'var(--color-text)', borderRadius: '4px' }} data-i18n={tool.popupContent.selectTooltipKey}>
+                          {tool.popupContent.options.map((opt, idx) => (
+                            <option key={idx} value={opt.value} data-i18n={opt.labelKey}>{opt.defaultLabel}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
-
-          <label data-i18n="tooltip.showGrid" className="tool-btn active" id="showGridLabel" style={{ cursor: 'pointer', margin: 0 }}>
-            <input type="checkbox" id="showGrid" style={{ display: 'none' }} defaultChecked />
-            <Icon name={ICONS.GRID} />
-          </label>
-
-          <label data-i18n="tooltip.mirrorMode" className="tool-btn" id="mirrorModeLabel" style={{ cursor: 'pointer', margin: 0 }}>
-            <input type="checkbox" id="mirrorMode" style={{ display: 'none' }} />
-            <Icon name={ICONS.SPLIT_SQUARE_VERTICAL} />
-          </label>
-        </div>
-      </div>
-
-
-
-      <div className="tool-group">
-        <div className="tool-group-title" onClick={(e) => e.target.closest('.tool-group').classList.toggle('collapsed')} style={{ cursor: 'pointer' }} data-i18n="group.imageOps">Thao tác ảnh</div>
-        <div className="tool-grid" style={{ gap: '10px' }}>
-          <div className="tool-with-popup-bottom">
-            <button id="rotateBtn" className="tool-btn" data-i18n="transform.rotate"><Icon name={ICONS.ROTATE_CW} /></button>
-            <div className="popup-bridge-bottom">
-              <div className="tool-popup" style={{ width: 'max-content' }}>
-                <label style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }} data-i18n="label.rotateOptions">Tùy chọn xoay (khi không vuông)</label>
-                <select id="rotateModeSelect" className="btn" style={{ fontSize: '12px', padding: '4px', background: 'var(--color-bg)', border: '1px solid var(--color-border)', color: 'var(--color-text)', borderRadius: '4px' }}>
-                  <option value="size" data-i18n="option.rotateSize">Xoay luôn size pixel</option>
-                  <option value="pixel" data-i18n="option.rotatePixel">Chỉ xoay pixel thôi</option>
-                </select>
-              </div>
-            </div>
-          </div>
-          <button id="flipHBtn" className="tool-btn" data-i18n="transform.flipH"><Icon name={ICONS.FLIP_HORIZONTAL} /></button>
-          <button id="flipVBtn" className="tool-btn" data-i18n="transform.flipV"><Icon name={ICONS.FLIP_VERTICAL} /></button>
-        </div>
-      </div>
+        );
+      })}
 
       <div className="panel-section" style={{ marginTop: 'auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', borderBottom: '1px solid #444', paddingBottom: '5px' }}>

@@ -7,7 +7,10 @@ import { beginStroke, commitStroke } from './core/history.js';
 import { debouncedSaveWorkspace } from './core/tab-manager.js';
 import { writePixel } from './shared/pixel-writer.js';
 
-import { usePencil } from './tools/pencil.js';
+import { usePixelPen } from './tools/pen/pixel-pen.js';
+import { useHighlightPen } from './tools/pen/highlight-pen.js';
+import { useBlendBrush } from './tools/pen/blend-brush.js';
+import { useSprayPen } from './tools/pen/spray-pen.js';
 import { useEraser } from './tools/eraser.js';
 import { usePicker } from './tools/picker.js';
 import { useFill } from './tools/fill.js';
@@ -16,10 +19,13 @@ import { useOutline } from './tools/outline.js';
 import { useLineTool } from './tools/line.js';
 import { useRectTool } from './tools/rect.js';
 import { useCircleTool } from './tools/circle.js';
+import { useHandTool } from './tools/hand.js';
+import { useReplaceColor } from './tools/replace-color.js';
 
 let isDrawing = false;
 let lastCell = null;
 let panStart = null;
+let strokeStartCell = null;
 
 function getColor(btn) {
   if (btn === 2) return els.colorPicker2?.value || '#ffffff';
@@ -51,9 +57,22 @@ function updateBrushCursor(e, cell) {
     return;
   }
 
-  if (!cell || ['pan', 'picker', 'fill', 'outline', 'magic-eraser'].includes(currentTool)) {
+  const canvasElement = document.getElementById('pixelCanvas');
+
+  if (!cell || ['pan', 'hand', 'picker', 'fill', 'outline', 'magic-eraser', 'replace-color'].includes(currentTool)) {
     cursor.style.display = 'none';
+    if (canvasElement) {
+      if (currentTool === 'hand' || panStart) {
+        canvasElement.style.cursor = panStart ? 'grabbing' : 'grab';
+      } else {
+        canvasElement.style.cursor = '';
+      }
+    }
     return;
+  }
+
+  if (canvasElement) {
+    canvasElement.style.cursor = '';
   }
 
   let size = 1;
@@ -64,8 +83,14 @@ function updateBrushCursor(e, cell) {
     size = parseInt(document.getElementById('eraserSize')?.value || '1', 10);
     color1 = '#ff0000';
     borderColor = '#ff0000';
-  } else if (currentTool === 'pencil') {
-    size = parseInt(document.getElementById('pencilSize')?.value || '1', 10);
+  } else if (currentTool === 'pixel-pen') {
+    size = parseInt(document.getElementById('pixelPenSize')?.value || '1', 10);
+  } else if (currentTool === 'highlight-pen') {
+    size = parseInt(document.getElementById('highlightPenSize')?.value || '1', 10);
+  } else if (currentTool === 'blend-brush') {
+    size = parseInt(document.getElementById('blendBrushSize')?.value || '1', 10);
+  } else if (currentTool === 'spray-pen') {
+    size = parseInt(document.getElementById('sprayPenSize')?.value || '10', 10);
   } else if (['line', 'rect', 'circle'].includes(currentTool)) {
     const shapeInputs = document.querySelectorAll('.shape-thickness');
     for (const input of shapeInputs) {
@@ -104,6 +129,61 @@ function updateBrushCursor(e, cell) {
   cursor.style.pointerEvents = 'none';
   cursor.style.zIndex = '999';
   cursor.style.boxSizing = 'border-box';
+  
+  const penTools = ['pixel-pen', 'highlight-pen', 'blend-brush', 'spray-pen', 'eraser'];
+  if (penTools.includes(currentTool)) {
+    const shape = document.getElementById('globalPenShape')?.value || 'circle';
+    
+    // For regular pens, size 1 and 2 are always drawn as squares to avoid missing pixels.
+    // Spray pen can always be a circle visually.
+    if (shape === 'circle' && (currentTool === 'spray-pen' || size > 2)) {
+      cursor.style.borderRadius = '50%';
+    } else {
+      cursor.style.borderRadius = '0';
+    }
+  } else {
+    cursor.style.borderRadius = '0';
+  }
+  
+  if (currentTool === 'spray-pen') {
+    cursor.style.background = 'transparent';
+  }
+
+  // Ruler Mode Logic
+  let rulerLabel = cursor.querySelector('.ruler-label');
+  if (!rulerLabel) {
+    rulerLabel = document.createElement('div');
+    rulerLabel.className = 'ruler-label';
+    rulerLabel.style.position = 'absolute';
+    rulerLabel.style.bottom = '100%';
+    rulerLabel.style.left = '50%';
+    rulerLabel.style.transform = 'translate(-50%, -5px)';
+    rulerLabel.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+    rulerLabel.style.color = '#fff';
+    rulerLabel.style.padding = '2px 6px';
+    rulerLabel.style.borderRadius = '4px';
+    rulerLabel.style.fontSize = '12px';
+    rulerLabel.style.whiteSpace = 'nowrap';
+    rulerLabel.style.pointerEvents = 'none';
+    cursor.appendChild(rulerLabel);
+  }
+
+  const rulerMode = document.getElementById('rulerMode')?.checked;
+  if (rulerMode && isDrawing && typeof strokeStartCell !== 'undefined' && strokeStartCell && cell) {
+    if (cell.y === strokeStartCell.y) {
+      const len = Math.abs(cell.x - strokeStartCell.x) + 1;
+      rulerLabel.textContent = `<--- ${len} --->`;
+      rulerLabel.style.display = 'block';
+    } else if (cell.x === strokeStartCell.x) {
+      const len = Math.abs(cell.y - strokeStartCell.y) + 1;
+      rulerLabel.textContent = `↑ ${len} ↓`;
+      rulerLabel.style.display = 'block';
+    } else {
+      rulerLabel.style.display = 'none';
+    }
+  } else {
+    rulerLabel.style.display = 'none';
+  }
 }
 
 function spawnParticle(x, y, color) {
@@ -136,7 +216,10 @@ function onPointerDown(e) {
       const picked = pixelMap[idx];
       if (picked && els.colorPicker) {
         import('./core/color-utils.js').then(({ parseUint32ToHex }) => {
-           els.colorPicker.value = parseUint32ToHex(picked);
+           const hex = parseUint32ToHex(picked);
+           els.colorPicker.value = hex;
+           els.colorPicker.dispatchEvent(new Event('change', { bubbles: true }));
+           setStatus(`${t('status.pickedColor')} ${hex}`);
         });
       }
     }
@@ -152,6 +235,13 @@ function onPointerDown(e) {
     return;
   }
 
+  // Verify that the current tool is actually selected and visible in the UI
+  const activeBtn = document.querySelector(`.tool-btn[data-tool="${currentTool}"]`);
+  if (!activeBtn || !activeBtn.classList.contains('active')) {
+    setStatus(t('status.toolHidden') || 'Vui lòng chọn một công cụ để sử dụng.');
+    return;
+  }
+
   if (!cell) {
     if (e.target.closest('.canvas-wrap') && !e.target.closest('.toolbar-container')) {
       spawnParticle(e.clientX, e.clientY, getColor(e.button));
@@ -161,7 +251,12 @@ function onPointerDown(e) {
   }
   isDrawing = true;
   lastCell = cell;
-  beginStroke();
+  strokeStartCell = { ...cell };
+
+  const isAsyncTool = ['fill', 'magic-eraser', 'outline', 'replace-color'].includes(currentTool);
+  if (!isAsyncTool) {
+    beginStroke();
+  }
 
   const color = getColor(e.button);
   dispatchTool(currentTool, 'down', cell, color, e);
@@ -175,6 +270,7 @@ function onPointerMove(e) {
     const dy = e.clientY - panStart.y;
     setPan(panStart.px + dx, panStart.py + dy);
     applyTransform(document.getElementById('pixelCanvas'));
+    updateBrushCursor(e, null); // Cập nhật cursor (grabbing)
     return;
   }
 
@@ -226,10 +322,15 @@ function onPointerUp(e) {
   dispatchTool(currentTool, 'up', cell, color, e, lastCell);
 
 
+  const isAsyncTool = ['fill', 'magic-eraser', 'outline'].includes(currentTool);
+  if (!isAsyncTool) {
+    commitStroke(pixelMap);
+  }
+  
   setPreviewPixels(null);
-  commitStroke(pixelMap);
   renderPixels();
   lastCell = null;
+  strokeStartCell = null;
   debouncedSaveWorkspace();
 }
 
@@ -264,15 +365,20 @@ function onWheel(e) {
 
 function dispatchTool(tool, event, cell, color, e, prevCell) {
   switch (tool) {
-    case 'pencil':      usePencil(event, cell, color, prevCell); break;
+    case 'pixel-pen':   usePixelPen(event, cell, color, prevCell); break;
+    case 'highlight-pen': useHighlightPen(event, cell, color, prevCell); break;
+    case 'blend-brush': useBlendBrush(event, cell, color, prevCell); break;
+    case 'spray-pen':   useSprayPen(event, cell, color); break;
     case 'eraser':      useEraser(event, cell, prevCell); break;
     case 'picker':      if (event === 'down') usePicker(cell); break;
     case 'fill':        if (event === 'down') useFill(cell, color); break;
+    case 'replace-color':if (event === 'down') useReplaceColor(cell, color); break;
     case 'magic-eraser':if (event === 'down') useMagicEraser(cell); break;
     case 'outline':     if (event === 'down') useOutline(color, cell); break;
     case 'line':        useLineTool(event, cell, color, prevCell); break;
     case 'rect':        useRectTool(event, cell, color, prevCell); break;
     case 'circle':      useCircleTool(event, cell, color, prevCell); break;
+    case 'hand':        useHandTool(event, cell, e); break;
   }
 }
 
@@ -285,4 +391,10 @@ export function setupCanvasEvents() {
   window.addEventListener('pointerup', onPointerUp);
   canvas.addEventListener('wheel', onWheel, { passive: false });
   canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+  document.body.addEventListener('change', (e) => {
+    if (e.target.id === 'rulerMode') {
+      document.getElementById('rulerModeLabel')?.classList.toggle('active', e.target.checked);
+    }
+  });
 }

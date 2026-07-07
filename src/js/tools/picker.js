@@ -11,6 +11,7 @@ export function usePicker(cell) {
     // HTML5 color input only accepts #RRGGBB (6 hex digits)
     const hex6 = hex.length > 7 ? hex.slice(0, 7) : hex;
     els.colorPicker.value = hex6;
+    els.colorPicker.dispatchEvent(new Event('change', { bubbles: true }));
     setStatus(`${t('status.pickedColor')} ${hex6}`);
   }
 }

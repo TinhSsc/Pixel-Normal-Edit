@@ -1,13 +1,16 @@
 import { applyTransform } from '../core/viewport.js';
 import { setShowGrid } from '../core/render.js';
 
+let isSetup = false;
 export function setupShowGrid() {
-  const checkbox = document.getElementById('showGrid');
-  if (!checkbox) return;
+  if (isSetup) return;
+  isSetup = true;
 
-  checkbox.addEventListener('change', () => {
-    document.getElementById('showGridLabel')?.classList.toggle('active', checkbox.checked);
-    setShowGrid(checkbox.checked);
-    applyTransform(document.getElementById('pixelCanvas'));
+  document.body.addEventListener('change', (e) => {
+    if (e.target.id === 'showGrid') {
+      document.getElementById('showGridLabel')?.classList.toggle('active', e.target.checked);
+      setShowGrid(e.target.checked);
+      applyTransform(document.getElementById('pixelCanvas'));
+    }
   });
 }

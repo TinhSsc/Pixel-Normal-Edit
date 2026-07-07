@@ -1,11 +1,12 @@
-import { writePixel } from '../shared/pixel-writer.js';
-import { bresenhamLine } from '../shared/line-algo.js';
+import { GRID_WIDTH, GRID_HEIGHT } from '../../core/state.js';
+import { writePixel } from '../../shared/pixel-writer.js';
+import { bresenhamLine } from '../../shared/line-algo.js';
 
-export function useEraser(event, cell, prevCell) {
-  const sizeInput = document.getElementById('eraserSize');
+export function usePixelPen(event, cell, color, prevCell) {
+  const sizeInput = document.getElementById('pixelPenSize');
   const size = sizeInput ? parseInt(sizeInput.value) || 1 : 1;
 
-  const eraseSize = (cx, cy) => {
+  const writeSize = (cx, cy) => {
     const offset = Math.floor(size / 2);
     const shapeInput = document.getElementById('globalPenShape');
     const shape = shapeInput ? shapeInput.value : 'circle';
@@ -20,7 +21,13 @@ export function useEraser(event, cell, prevCell) {
           const radius = (size / 2) - 0.1;
           if (dx * dx + dy * dy > radius * radius) continue;
         }
-        writePixel(cx - offset + x, cy - offset + y, null);
+
+        const px = cx - offset + x;
+        const py = cy - offset + y;
+
+        if (px < 0 || py < 0 || px >= GRID_WIDTH || py >= GRID_HEIGHT) continue;
+        
+        writePixel(px, py, color);
       }
     }
   };
@@ -28,10 +35,10 @@ export function useEraser(event, cell, prevCell) {
   if (event === 'down' || event === 'move') {
     if (prevCell && event === 'move') {
       bresenhamLine(prevCell.x, prevCell.y, cell.x, cell.y, (x, y) => {
-        eraseSize(x, y);
+        writeSize(x, y);
       });
     } else {
-      eraseSize(cell.x, cell.y);
+      writeSize(cell.x, cell.y);
     }
   }
 }

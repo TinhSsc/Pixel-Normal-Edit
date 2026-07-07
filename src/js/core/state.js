@@ -80,6 +80,7 @@ export let groupMap = new Map();
 export let previewPixels = null;
 
 export let currentTool = "pencil";
+export let currentVariant = null;
 
 export function setGridSizeParams(w, h, imageData, data32) {
   GRID_WIDTH = w;
@@ -98,6 +99,8 @@ export function setPreviewPixels(pixels) {
   previewPixels = pixels;
 }
 
-export function setCurrentTool(tool) {
+export function setCurrentTool(tool, variant = null) {
   currentTool = tool;
+  currentVariant = variant;
+  window.dispatchEvent(new CustomEvent('tool-changed', { detail: { tool, variant } }));
 }

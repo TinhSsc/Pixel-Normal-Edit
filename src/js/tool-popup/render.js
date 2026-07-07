@@ -9,6 +9,8 @@ export function getVariant(baseTool, variantId) {
 
 // Chèn nút expand vào trong .tool-popup của 1 wrapper (gọi 1 lần/wrapper)
 export function enhancePopup(wrapper, baseTool) {
+  renderVariantList(baseTool); // Always render variant list in Settings
+
   const popup = wrapper.querySelector('.tool-popup');
   if (!popup || popup.querySelector('.tool-popup-expand-btn')) return; // đã enhance rồi
 
@@ -19,7 +21,6 @@ export function enhancePopup(wrapper, baseTool) {
   expandBtn.title = 'Mở cài đặt công cụ';
   popup.appendChild(expandBtn);
 
-  renderVariantList(baseTool);
   if (window.lucide) window.lucide.createIcons();
 }
 
@@ -61,30 +62,33 @@ export function renderQuickPinBar(baseTools) {
     const wrapper = document.querySelector(`.toolbar [data-variants="${baseTool}"]`);
     if (!wrapper) return;
 
-    const popup = wrapper.querySelector('.tool-popup');
-    if (!popup) return;
+    const grid = wrapper.closest('.tool-grid');
+    if (!grid) return;
 
-    let bar = popup.querySelector('.tool-quick-pin-bar');
-    if (!bar) {
-      bar = document.createElement('div');
-      bar.className = 'tool-quick-pin-bar';
-      popup.insertBefore(bar, popup.firstChild);
-    }
+    // Remove old pinned buttons from grid
+    grid.querySelectorAll(`.pinned-tool-btn[data-base-tool="${baseTool}"]`).forEach(el => el.remove());
 
     const pins = getPins(baseTool);
     const activeId = getActiveVariant(baseTool, (TOOL_VARIANTS[baseTool] || [])[0]?.id);
-    const items = [];
+    
+    // Insert after the wrapper
+    const nextSibling = wrapper.nextSibling;
+
     pins.forEach(variantId => {
       const variant = getVariant(baseTool, variantId);
-      if (variant) items.push(variant);
-    });
+      if (!variant) return;
 
-    bar.style.display = items.length ? 'flex' : 'none';
-    bar.innerHTML = items.map(variant => `
-      <button type="button" class="tool-quick-pin-btn${variant.id === activeId ? ' active' : ''}" data-base-tool="${baseTool}" data-variant-id="${variant.id}" title="${variant.label}">
-        <i data-lucide="${variant.icon}"></i>
-      </button>
-    `).join('');
+      const btn = document.createElement('button');
+      btn.className = `tool-btn pinned-tool-btn${variant.id === activeId ? ' active' : ''}`;
+      btn.dataset.baseTool = baseTool;
+      btn.dataset.variantId = variant.id;
+      btn.dataset.pinned = 'true';
+      btn.dataset.tooltip = variant.label;
+      btn.title = variant.label;
+      btn.innerHTML = `<i data-lucide="${variant.icon}"></i>`;
+      
+      grid.insertBefore(btn, nextSibling);
+    });
   });
 
   if (window.lucide) window.lucide.createIcons();

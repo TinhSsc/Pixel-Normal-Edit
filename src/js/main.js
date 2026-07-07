@@ -36,6 +36,9 @@ import { setupCanvasEvents } from './canvas-events.js';
 import { initToolPopup } from './tool-popup/index.js';
 import { updateDOM, toggleLang, t } from './lang/i18n.js';
 
+import { saveToolbarState } from './core/toolbar-save.js';
+import { loadAndResetToolbarState } from './core/toolbar-reset.js';
+
 let initialized = false;
 
 export function initEditor() {
@@ -203,71 +206,36 @@ window.addEventListener('toolbar-mounted', () => {
   initEls();
   setupSwapColors();
   
-  const saveToolbarState = () => {
-    const state = {
-      color1: els.colorPicker?.value,
-      color2: els.colorPicker2?.value,
-      pencilSize: document.getElementById('pencilSize')?.value,
-      eraserSize: document.getElementById('eraserSize')?.value,
-      outlineThickness: document.getElementById('outlineThickness')?.value,
-      shapeThickness: document.querySelector('.shape-thickness')?.value,
-      currentTool: document.querySelector('.tool-btn.active')?.dataset?.tool || 'pencil'
-    };
-    localStorage.setItem('pixel_toolbar_state', JSON.stringify(state));
-  };
+  // Đã chuyển logic sang toolbar-save.js và toolbar-reset.js
+  loadAndResetToolbarState();
 
-  const loadToolbarState = () => {
-    try {
-      const state = JSON.parse(localStorage.getItem('pixel_toolbar_state') || '{}');
-      if (state.color1 && els.colorPicker) els.colorPicker.value = state.color1;
-      if (state.color2 && els.colorPicker2) els.colorPicker2.value = state.color2;
-      if (state.pencilSize) {
-        const p = document.getElementById('pencilSize');
-        if (p) p.value = state.pencilSize;
-      }
-      if (state.eraserSize) {
-        const e = document.getElementById('eraserSize');
-        if (e) e.value = state.eraserSize;
-      }
-      if (state.outlineThickness) {
-        const o = document.getElementById('outlineThickness');
-        if (o) o.value = state.outlineThickness;
-      }
-      if (state.shapeThickness) {
-        document.querySelectorAll('.shape-thickness').forEach(el => el.value = state.shapeThickness);
-      }
-      if (state.currentTool) {
-        const btn = document.querySelector(`.tool-btn[data-tool="${state.currentTool}"]`);
-        if (btn) btn.click();
-      }
-    } catch(e) {}
-  };
-
-  loadToolbarState();
-
-  if (els.toolBtns) {
-    els.toolBtns.forEach(btn => {
-      btn.addEventListener("click", () => {
-        els.toolBtns.forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        setCurrentTool(btn.dataset.tool);
-        setStatus(`${t("status.toolSelected")} ${btn.getAttribute("data-tooltip") || btn.title}`);
-        saveToolbarState();
-      });
-    });
-  }
-
-  const shapeThicknessInputs = document.querySelectorAll(".shape-thickness");
-  shapeThicknessInputs.forEach(input => {
-    input.addEventListener("input", (e) => {
-      shapeThicknessInputs.forEach(other => other.value = e.target.value);
+  document.body.addEventListener('click', (e) => {
+    const btn = e.target.closest('.tool-btn[data-tool]');
+    if (btn) {
+      document.querySelectorAll('.tool-btn[data-tool]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      setCurrentTool(btn.dataset.tool);
+      setStatus(`${t("status.toolSelected")} ${btn.getAttribute("data-tooltip") || btn.title}`);
       saveToolbarState();
-    });
+    }
   });
 
-  ['colorPicker', 'colorPicker2', 'pencilSize', 'eraserSize', 'outlineThickness'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener('change', saveToolbarState);
+  window.addEventListener('tool-changed', () => {
+    saveToolbarState();
+  });
+
+  document.body.addEventListener('input', (e) => {
+    if (e.target.classList.contains('shape-thickness')) {
+      document.querySelectorAll('.shape-thickness').forEach(other => other.value = e.target.value);
+      saveToolbarState();
+    }
+  });
+
+  document.body.addEventListener('change', (e) => {
+    const ids = ['colorPicker', 'colorPicker2', 'pixelPenSize', 'highlightPenSize', 'blendBrushSize', 'eraserSize', 'outlineThickness', 'globalPenShape', 'sprayPenSize', 'sprayPenDensity', 'replaceTolerance'];
+    if (ids.includes(e.target.id)) {
+      saveToolbarState();
+    }
   });
 
   // Re-run mobile popups for toolbar items

@@ -2,6 +2,8 @@ let undoStack = [];
 let redoStack = [];
 let currentStroke = null;
 
+import { debounceExtractCanvasColors } from './color-palette.js';
+
 export function resetHistory() {
   undoStack = [];
   redoStack = [];
@@ -45,6 +47,7 @@ export function commitStroke(pixelMap) {
   
   redoStack = [];
   currentStroke = null;
+  debounceExtractCanvasColors();
 }
 
 export function undo(pixelMap, renderFn) {
@@ -58,6 +61,7 @@ export function undo(pixelMap, renderFn) {
   }
   
   renderFn();
+  debounceExtractCanvasColors();
   return true;
 }
 
@@ -72,6 +76,7 @@ export function redo(pixelMap, renderFn) {
   }
   
   renderFn();
+  debounceExtractCanvasColors();
   return true;
 }
 

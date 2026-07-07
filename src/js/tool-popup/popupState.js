@@ -15,6 +15,8 @@ function loadPins() {
 
 function savePins() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(pins));
+  // Dispatch event để React components (ToolGroup) re-render pinned buttons
+  window.dispatchEvent(new CustomEvent('pins-changed', { detail: { pins } }));
 }
 
 export function isExpanded(baseTool) {

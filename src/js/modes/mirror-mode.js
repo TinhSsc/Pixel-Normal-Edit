@@ -1,16 +1,19 @@
 import { setMirrorModeActive } from '../shared/pixel-writer.js';
 
+let isSetup = false;
 export function setupMirrorMode() {
-  const checkbox = document.getElementById('mirrorMode');
-  if (!checkbox) return;
+  if (isSetup) return;
+  isSetup = true;
 
-  checkbox.addEventListener('change', () => {
-    setMirrorModeActive(checkbox.checked);
-    document.getElementById('mirrorModeLabel')?.classList.toggle('active', checkbox.checked);
-    
-    const mirrorLine = document.getElementById('mirrorLine');
-    if (mirrorLine) {
-      mirrorLine.style.display = checkbox.checked ? 'block' : 'none';
+  document.body.addEventListener('change', (e) => {
+    if (e.target.id === 'mirrorMode') {
+      setMirrorModeActive(e.target.checked);
+      document.getElementById('mirrorModeLabel')?.classList.toggle('active', e.target.checked);
+      
+      const mirrorLine = document.getElementById('mirrorLine');
+      if (mirrorLine) {
+        mirrorLine.style.display = e.target.checked ? 'block' : 'none';
+      }
     }
   });
 }

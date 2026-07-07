@@ -7,10 +7,11 @@ import { renderPixels, setForceFullRender } from '../core/render.js';
 import { resetHistory } from '../core/history.js';
 import { setStatus } from '../core/state.js';
 import { debouncedSaveWorkspace, saveCurrentTabState } from '../core/tab-manager.js';
+import { debounceExtractCanvasColors } from '../core/color-palette.js';
 
 import { pixelMap } from '../core/state.js';
 
-export function setGridSize(w, h, mode = 'clear') {
+export function setGridSize(w, h, mode = 'clear', dx = 0, dy = 0) {
   const oldW = GRID_WIDTH;
   const oldH = GRID_HEIGHT;
   const oldData32 = pixelMap; // Reference to old array
@@ -33,7 +34,7 @@ export function setGridSize(w, h, mode = 'clear') {
       newCtx.imageSmoothingEnabled = false;
       newCtx.drawImage(tmpCanvas, 0, 0, w, h);
     } else {
-      newCtx.drawImage(tmpCanvas, 0, 0);
+      newCtx.drawImage(tmpCanvas, dx, dy);
     }
   }
 
@@ -60,6 +61,7 @@ export function setGridSize(w, h, mode = 'clear') {
   resetHistory();
   saveCurrentTabState();
   debouncedSaveWorkspace();
+  debounceExtractCanvasColors();
 }
 
 export function syncGridSizeUI(w, h) {
@@ -194,8 +196,13 @@ export function setupGridSizeSelect() {
          // Do nothing if sizes are the same
          return;
       }
-      setGridSize(pendingW, pendingH, mode);
-      setStatus(`${t("status.sizeChanged")} ${pendingW}x${pendingH}`);
+      
+      if (mode === 'keep') {
+        window.dispatchEvent(new CustomEvent('open-resize-modal', { detail: { w: pendingW, h: pendingH } }));
+      } else {
+        setGridSize(pendingW, pendingH, mode);
+        setStatus(`${t("status.sizeChanged")} ${pendingW}x${pendingH}`);
+      }
     }
   };
 

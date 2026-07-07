@@ -8,7 +8,39 @@ export function getZoom() { return zoom; }
 export function getPan() { return { x: panX, y: panY }; }
 
 export function setZoom(z) { zoom = z; }
-export function setPan(x, y) { panX = Math.round(x); panY = Math.round(y); }
+export function setPan(x, y) {
+  const canvas = document.getElementById("pixelCanvas");
+  const wrap = canvas?.parentElement;
+  
+  if (!wrap) {
+    panX = Math.round(x); 
+    panY = Math.round(y);
+    return;
+  }
+  
+  const ww = wrap.clientWidth;
+  const wh = wrap.clientHeight;
+  const cw = GRID_WIDTH * zoom;
+  const ch = GRID_HEIGHT * zoom;
+  
+  let newX = x;
+  let newY = y;
+  
+  if (cw <= ww) {
+    newX = Math.max(0, Math.min(newX, ww - cw));
+  } else {
+    newX = Math.max(ww - cw, Math.min(newX, 0));
+  }
+  
+  if (ch <= wh) {
+    newY = Math.max(0, Math.min(newY, wh - ch));
+  } else {
+    newY = Math.max(wh - ch, Math.min(newY, 0));
+  }
+  
+  panX = Math.round(newX); 
+  panY = Math.round(newY); 
+}
 
 export function getMinZoom() {
   const MIN_SCREEN_SIZE = 32;

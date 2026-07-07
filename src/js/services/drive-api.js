@@ -28,9 +28,8 @@ export function initGoogleDrive() {
     },
   });
 
-  if (localStorage.getItem('drive_was_logged_in') === 'true') {
-    tokenClient.requestAccessToken({ prompt: '' });
-  }
+  // Removed automatic requestAccessToken on load to avoid frequent/annoying popups
+  // Users will need to click the Drive button to re-authenticate if they refresh
 }
 
 export function loginToDrive() {

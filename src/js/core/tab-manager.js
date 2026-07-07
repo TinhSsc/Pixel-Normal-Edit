@@ -8,6 +8,7 @@ import { setSourceImage, updateBgButtonsUI } from '../actions/set-background.js'
 import { saveWorkspace } from './storage.js';
 import { generateWorkspacePngBlob } from '../io/export/export-png.js';
 import { uploadToDrive, getDriveToken, ensureDriveLogin } from '../services/drive-api.js';
+import { debounceExtractCanvasColors } from './color-palette.js';
 
 let tabs = [];
 let activeTabId = null;
@@ -15,6 +16,14 @@ let tabCounter = 1;
 
 export function getTabs() { return tabs; }
 export function getActiveTabId() { return activeTabId; }
+
+export function updateTabMetadata(id, meta) {
+  const tab = tabs.find(t => t.id === id);
+  if (tab) {
+    if (!tab.meta) tab.meta = {};
+    Object.assign(tab.meta, meta);
+  }
+}
 
 function generateId() {
   return 'tab_' + Math.random().toString(36).substr(2, 9);
@@ -178,6 +187,7 @@ export function initTabs(savedData = null) {
   resizeCanvas();
   fitToScreen();
   renderPixels();
+  debounceExtractCanvasColors();
 }
 
 export function saveCurrentTabState() {
@@ -248,6 +258,7 @@ export function switchTab(id) {
       // Remove fade out to trigger fade in
       canvasWrap.classList.remove('fade-out');
       debouncedSaveWorkspace();
+      debounceExtractCanvasColors();
     }, 150); // Match CSS transition duration
   } else {
     loadTabState(targetTab);
@@ -256,6 +267,7 @@ export function switchTab(id) {
     renderPixels();
     renderTabsUI();
     debouncedSaveWorkspace();
+    debounceExtractCanvasColors();
   }
 }
 
@@ -296,6 +308,7 @@ export function createNewTab() {
     renderPixels();
     renderTabsUI();
     debouncedSaveWorkspace();
+    debounceExtractCanvasColors();
   } catch (err) {
     alert("Error creating tab: " + err.message + "\n" + err.stack);
   }
@@ -330,6 +343,7 @@ export function closeTab(id) {
   
   renderTabsUI();
   debouncedSaveWorkspace();
+  debounceExtractCanvasColors();
 }
 
 export function renameTab(id, newName) {
