@@ -25,7 +25,10 @@ import { useReplaceColor } from './tools/replace-color.js';
 let isDrawing = false;
 let lastCell = null;
 let panStart = null;
-let strokeStartCell = null;
+let rulerAnchor = null;
+let rulerDir = null;
+let measureStartCell = null;
+let measureHideTimer = null;
 
 function getColor(btn) {
   if (btn === 2) return els.colorPicker2?.value || '#ffffff';
@@ -116,7 +119,7 @@ function updateBrushCursor(e, cell) {
   cursor.style.top = `${screenY}px`;
   cursor.style.width = `${size * zoom}px`;
   cursor.style.height = `${size * zoom}px`;
-  
+
   const gradientMode = document.getElementById('gradientMode')?.checked;
   if (gradientMode && currentTool !== 'eraser') {
     const color2 = getColor(e.buttons & 2 ? 0 : 2);
@@ -124,16 +127,16 @@ function updateBrushCursor(e, cell) {
   } else {
     cursor.style.background = hexToRgba(color1, 0.4);
   }
-  
+
   cursor.style.border = `1px solid ${borderColor}`;
   cursor.style.pointerEvents = 'none';
   cursor.style.zIndex = '999';
   cursor.style.boxSizing = 'border-box';
-  
+
   const penTools = ['pixel-pen', 'highlight-pen', 'blend-brush', 'spray-pen', 'eraser'];
   if (penTools.includes(currentTool)) {
     const shape = document.getElementById('globalPenShape')?.value || 'circle';
-    
+
     // For regular pens, size 1 and 2 are always drawn as squares to avoid missing pixels.
     // Spray pen can always be a circle visually.
     if (shape === 'circle' && (currentTool === 'spray-pen' || size > 2)) {
@@ -144,46 +147,91 @@ function updateBrushCursor(e, cell) {
   } else {
     cursor.style.borderRadius = '0';
   }
-  
+
   if (currentTool === 'spray-pen') {
     cursor.style.background = 'transparent';
   }
 
   // Ruler Mode Logic
-  let rulerLabel = cursor.querySelector('.ruler-label');
-  if (!rulerLabel) {
-    rulerLabel = document.createElement('div');
-    rulerLabel.className = 'ruler-label';
-    rulerLabel.style.position = 'absolute';
-    rulerLabel.style.bottom = '100%';
-    rulerLabel.style.left = '50%';
-    rulerLabel.style.transform = 'translate(-50%, -5px)';
-    rulerLabel.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-    rulerLabel.style.color = '#fff';
-    rulerLabel.style.padding = '2px 6px';
-    rulerLabel.style.borderRadius = '4px';
-    rulerLabel.style.fontSize = '12px';
-    rulerLabel.style.whiteSpace = 'nowrap';
-    rulerLabel.style.pointerEvents = 'none';
-    cursor.appendChild(rulerLabel);
+  const rulerMode = document.getElementById('rulerMode')?.checked;
+  const rulerOption = document.getElementById('rulerOptionSelect')?.value || 'draw';
+  
+  if (rulerMode && rulerOption === 'draw') {
+    if (isDrawing && rulerAnchor && cell) {
+      drawRulerOverlay(rulerAnchor, cell);
+    } else {
+      hideRulerOverlay();
+    }
+  } else if (!rulerMode) {
+    hideRulerOverlay();
+  }
+}
+
+function hideRulerOverlay() {
+  const overlay = document.getElementById('ruler-overlay');
+  if (overlay) overlay.style.display = 'none';
+}
+
+function drawRulerOverlay(startCell, endCell) {
+  const overlay = document.getElementById('ruler-overlay');
+  if (!overlay) return;
+
+  const zoom = getZoom();
+  const pan = getPan();
+  const toScreen = (cx, cy) => ({
+    x: pan.x + (cx + 0.5) * zoom,
+    y: pan.y + (cy + 0.5) * zoom,
+  });
+
+  const p1 = toScreen(startCell.x, startCell.y);
+  const p2 = toScreen(endCell.x, endCell.y);
+
+  const dx = p2.x - p1.x;
+  const dy = p2.y - p1.y;
+  const dist = Math.hypot(dx, dy);
+
+  if (dist < 1) {
+    overlay.style.display = 'none';
+    return;
   }
 
-  const rulerMode = document.getElementById('rulerMode')?.checked;
-  if (rulerMode && isDrawing && typeof strokeStartCell !== 'undefined' && strokeStartCell && cell) {
-    if (cell.y === strokeStartCell.y) {
-      const len = Math.abs(cell.x - strokeStartCell.x) + 1;
-      rulerLabel.textContent = `<--- ${len} --->`;
-      rulerLabel.style.display = 'block';
-    } else if (cell.x === strokeStartCell.x) {
-      const len = Math.abs(cell.y - strokeStartCell.y) + 1;
-      rulerLabel.textContent = `↑ ${len} ↓`;
-      rulerLabel.style.display = 'block';
-    } else {
-      rulerLabel.style.display = 'none';
-    }
-  } else {
-    rulerLabel.style.display = 'none';
-  }
+  // Unit vector along the line, and its perpendicular, for tick marks
+  const ux = dx / dist;
+  const uy = dy / dist;
+  const px = -uy;
+  const py = ux;
+  const tickLen = 6;
+
+  const line = document.getElementById('rulerLine');
+  const tickStart = document.getElementById('rulerTickStart');
+  const tickEnd = document.getElementById('rulerTickEnd');
+  const label = document.getElementById('rulerLabel');
+
+  line.setAttribute('x1', p1.x);
+  line.setAttribute('y1', p1.y);
+  line.setAttribute('x2', p2.x);
+  line.setAttribute('y2', p2.y);
+
+  tickStart.setAttribute('x1', p1.x - px * tickLen);
+  tickStart.setAttribute('y1', p1.y - py * tickLen);
+  tickStart.setAttribute('x2', p1.x + px * tickLen);
+  tickStart.setAttribute('y2', p1.y + py * tickLen);
+
+  tickEnd.setAttribute('x1', p2.x - px * tickLen);
+  tickEnd.setAttribute('y1', p2.y - py * tickLen);
+  tickEnd.setAttribute('x2', p2.x + px * tickLen);
+  tickEnd.setAttribute('y2', p2.y + py * tickLen);
+
+  const midX = (p1.x + p2.x) / 2;
+  const midY = (p1.y + p2.y) / 2;
+  const labelOffset = 12;
+  label.setAttribute('x', midX + px * labelOffset);
+  label.setAttribute('y', midY + py * labelOffset);
+
+  const pixelDist = Math.round(dist / zoom) + 1;
+  label.textContent = `${pixelDist}px`;
+
+  overlay.style.display = 'block';
 }
 
 function spawnParticle(x, y, color) {
@@ -216,10 +264,10 @@ function onPointerDown(e) {
       const picked = pixelMap[idx];
       if (picked && els.colorPicker) {
         import('./core/color-utils.js').then(({ parseUint32ToHex }) => {
-           const hex = parseUint32ToHex(picked);
-           els.colorPicker.value = hex;
-           els.colorPicker.dispatchEvent(new Event('change', { bubbles: true }));
-           setStatus(`${t('status.pickedColor')} ${hex}`);
+          const hex = parseUint32ToHex(picked);
+          els.colorPicker.value = hex;
+          els.colorPicker.dispatchEvent(new Event('change', { bubbles: true }));
+          setStatus(`${t('status.pickedColor')} ${hex}`);
         });
       }
     }
@@ -247,11 +295,38 @@ function onPointerDown(e) {
       spawnParticle(e.clientX, e.clientY, getColor(e.button));
     }
     updateBrushCursor(e, null);
+    if (measureHideTimer) {
+      clearTimeout(measureHideTimer);
+      hideRulerOverlay();
+      measureStartCell = null;
+    }
     return;
   }
+
+  const rulerMode = document.getElementById('rulerMode')?.checked;
+  const rulerOption = document.getElementById('rulerOptionSelect')?.value || 'draw';
+  const isMeasureOnly = rulerMode && rulerOption === 'measure';
+
+  if (isMeasureOnly) {
+    if (measureHideTimer) {
+      clearTimeout(measureHideTimer);
+      measureHideTimer = null;
+    }
+    if (measureStartCell) {
+      drawRulerOverlay(measureStartCell, cell);
+      measureStartCell = null;
+      measureHideTimer = setTimeout(() => hideRulerOverlay(), 3000);
+    } else {
+      measureStartCell = { ...cell };
+      drawRulerOverlay(measureStartCell, cell);
+    }
+    return;
+  }
+
   isDrawing = true;
   lastCell = cell;
-  strokeStartCell = { ...cell };
+  rulerAnchor = { ...cell };
+  rulerDir = null;
 
   const isAsyncTool = ['fill', 'magic-eraser', 'outline', 'replace-color'].includes(currentTool);
   if (!isAsyncTool) {
@@ -275,7 +350,7 @@ function onPointerMove(e) {
   }
 
   let cell = getCellPx(e.clientX, e.clientY);
-  
+
   if (!cell) {
     if (e.target.closest('.canvas-wrap') && !e.target.closest('.toolbar-container')) {
       const now = Date.now();
@@ -284,13 +359,33 @@ function onPointerMove(e) {
         lastParticleTime = now;
       }
     }
-    
+
     if (isDrawing) {
       cell = getCellPxClamped(e.clientX, e.clientY);
     } else {
       updateBrushCursor(e, null);
       return;
     }
+  }
+
+  if (isDrawing && lastCell && (cell.x !== lastCell.x || cell.y !== lastCell.y)) {
+    const stepDir = { x: Math.sign(cell.x - lastCell.x), y: Math.sign(cell.y - lastCell.y) };
+    if (rulerDir && (stepDir.x !== rulerDir.x || stepDir.y !== rulerDir.y)) {
+      rulerAnchor = { ...lastCell };
+    }
+    rulerDir = stepDir;
+  }
+
+  const rulerMode = document.getElementById('rulerMode')?.checked;
+  const rulerOption = document.getElementById('rulerOptionSelect')?.value || 'draw';
+  const isMeasureOnly = rulerMode && rulerOption === 'measure';
+
+  if (isMeasureOnly) {
+    if (measureStartCell && cell) {
+      drawRulerOverlay(measureStartCell, cell);
+    }
+    updateBrushCursor(e, cell);
+    return;
   }
 
   updateBrushCursor(e, cell);
@@ -307,12 +402,31 @@ function onPointerMove(e) {
 }
 
 function onPointerUp(e) {
-  if (panStart) { 
-    panStart = null; 
+  if (panStart) {
+    panStart = null;
     const cell = getCellPx(e.clientX, e.clientY);
     updateBrushCursor(e, cell);
-    return; 
+    return;
   }
+
+  const rulerMode = document.getElementById('rulerMode')?.checked;
+  const rulerOption = document.getElementById('rulerOptionSelect')?.value || 'draw';
+  const isMeasureOnly = rulerMode && rulerOption === 'measure';
+
+  if (isMeasureOnly) {
+    if (measureStartCell) {
+      const cell = getCellPx(e.clientX, e.clientY) || getCellPxClamped(e.clientX, e.clientY);
+      if (cell && (cell.x !== measureStartCell.x || cell.y !== measureStartCell.y)) {
+        // User dragged and released on a different cell, lock measurement
+        drawRulerOverlay(measureStartCell, cell);
+        measureStartCell = null;
+        if (measureHideTimer) clearTimeout(measureHideTimer);
+        measureHideTimer = setTimeout(() => hideRulerOverlay(), 3000);
+      }
+    }
+    return;
+  }
+
   if (!isDrawing) return;
 
   isDrawing = false;
@@ -326,11 +440,13 @@ function onPointerUp(e) {
   if (!isAsyncTool) {
     commitStroke(pixelMap);
   }
-  
+
   setPreviewPixels(null);
   renderPixels();
   lastCell = null;
-  strokeStartCell = null;
+  rulerAnchor = null;
+  rulerDir = null;
+  hideRulerOverlay();
   debouncedSaveWorkspace();
 }
 
@@ -365,20 +481,20 @@ function onWheel(e) {
 
 function dispatchTool(tool, event, cell, color, e, prevCell) {
   switch (tool) {
-    case 'pixel-pen':   usePixelPen(event, cell, color, prevCell); break;
+    case 'pixel-pen': usePixelPen(event, cell, color, prevCell); break;
     case 'highlight-pen': useHighlightPen(event, cell, color, prevCell); break;
     case 'blend-brush': useBlendBrush(event, cell, color, prevCell); break;
-    case 'spray-pen':   useSprayPen(event, cell, color); break;
-    case 'eraser':      useEraser(event, cell, prevCell); break;
-    case 'picker':      if (event === 'down') usePicker(cell); break;
-    case 'fill':        if (event === 'down') useFill(cell, color); break;
-    case 'replace-color':if (event === 'down') useReplaceColor(cell, color); break;
-    case 'magic-eraser':if (event === 'down') useMagicEraser(cell); break;
-    case 'outline':     if (event === 'down') useOutline(color, cell); break;
-    case 'line':        useLineTool(event, cell, color, prevCell); break;
-    case 'rect':        useRectTool(event, cell, color, prevCell); break;
-    case 'circle':      useCircleTool(event, cell, color, prevCell); break;
-    case 'hand':        useHandTool(event, cell, e); break;
+    case 'spray-pen': useSprayPen(event, cell, color); break;
+    case 'eraser': useEraser(event, cell, prevCell); break;
+    case 'picker': if (event === 'down') usePicker(cell); break;
+    case 'fill': if (event === 'down') useFill(cell, color); break;
+    case 'replace-color': if (event === 'down') useReplaceColor(cell, color); break;
+    case 'magic-eraser': if (event === 'down') useMagicEraser(cell); break;
+    case 'outline': if (event === 'down') useOutline(color, cell); break;
+    case 'line': useLineTool(event, cell, color, prevCell); break;
+    case 'rect': useRectTool(event, cell, color, prevCell); break;
+    case 'circle': useCircleTool(event, cell, color, prevCell); break;
+    case 'hand': useHandTool(event, cell, e); break;
   }
 }
 

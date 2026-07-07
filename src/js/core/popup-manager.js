@@ -98,6 +98,27 @@ export function bindPopups(containerSelector, side = 'left') {
     if (window.innerWidth <= 768) return;
     const wrapper = e.currentTarget;
     
+    // Ignore clicks inside the popup itself
+    if (e.target.closest('[class^="popup-bridge"]')) return;
+
+    const checkbox = wrapper.querySelector('input[type="checkbox"]');
+    if (checkbox) {
+      if (e.target === checkbox) return; 
+      
+      setTimeout(() => {
+        if (checkbox.checked) {
+          closeAllPopups(wrapper);
+          wrapper.dataset.clicked = 'true';
+          if (!activePopups.includes(wrapper)) activePopups.push(wrapper);
+          showPopup(wrapper);
+        } else {
+          hidePopup(wrapper);
+          activePopups = activePopups.filter(w => w !== wrapper);
+        }
+      }, 10);
+      return;
+    }
+    
     if (wrapper.dataset.clicked === 'true') {
       hidePopup(wrapper);
       activePopups = activePopups.filter(w => w !== wrapper);

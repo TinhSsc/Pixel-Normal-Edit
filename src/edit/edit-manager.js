@@ -23,7 +23,18 @@ export const editConfig = {
       inputId: 'rulerMode',
       icon: ICONS.RULER,
       tooltipKey: 'tooltip.rulerMode',
-      defaultActive: false
+      defaultActive: false,
+      hasPopup: true,
+      popupPosition: 'bottom',
+      popupContent: {
+        labelKey: 'label.rulerOptions',
+        defaultTitle: 'Tùy chọn thước đo',
+        selectId: 'rulerOptionSelect',
+        options: [
+          { value: 'draw', labelKey: 'option.rulerDraw', defaultLabel: 'Đo khi vẽ' },
+          { value: 'measure', labelKey: 'option.rulerMeasure', defaultLabel: 'Chỉ đo (không vẽ)' }
+        ]
+      }
     },
     'gradientMode': {
       id: 'gradientMode',
