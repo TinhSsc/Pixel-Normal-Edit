@@ -1,8 +1,43 @@
 import { Icon, ICONS } from '../components/icons';
 import React, { useEffect, useState } from 'react';
+import {
+  isAnimationMode as animationModeState,
+  toggleAnimationMode,
+  initAnimationFromCurrentState,
+  addFrame,
+  frames,
+} from '../js/core/animation-state.js';
+import { GRID_WIDTH, GRID_HEIGHT } from '../js/core/state.js';
 
 export default function CanvasPanel() {
   const [isToolbarCollapsed, setIsToolbarCollapsed] = useState(false);
+  // Batch 1.2: chỉ theo dõi trạng thái bật/tắt Animation Mode để đổi icon nút.
+  // CHƯA đổi giao diện canvas (sẽ làm ở Batch 2.1) — mục tiêu batch này là
+  // có nút toggle hoạt động đúng, verify được qua console.log.
+  const [isAnimMode, setIsAnimMode] = useState(animationModeState);
+  // Batch 1.3: chỉ cần biết SỐ LƯỢNG frame để trigger re-render và hiển thị
+  // tạm thời (VD: số frame hiện có). Danh sách canvas thật (Animation Strip)
+  // sẽ làm ở Batch 2.1 — batch này chỉ cần nút "+" hoạt động đúng.
+  const [frameCount, setFrameCount] = useState(frames.length);
+
+  const handleToggleAnimationMode = () => {
+    const newValue = toggleAnimationMode();
+    if (newValue) {
+      // Lần đầu bật Animation Mode: biến ảnh đang vẽ dở thành frame đầu tiên.
+      initAnimationFromCurrentState();
+      setFrameCount(frames.length);
+    }
+    setIsAnimMode(newValue);
+    // eslint-disable-next-line no-console
+    console.log('[AnimationMode]', newValue ? 'BẬT' : 'TẮT');
+  };
+
+  const handleAddFrame = () => {
+    addFrame(GRID_WIDTH, GRID_HEIGHT);
+    setFrameCount(frames.length);
+    // eslint-disable-next-line no-console
+    console.log('[AnimationMode] Tổng số frame:', frames.length);
+  };
 
   useEffect(() => {
     window.dispatchEvent(new CustomEvent('canvas-mounted'));
@@ -84,6 +119,36 @@ export default function CanvasPanel() {
                 <button id="resizeApplyBtn" className="btn btn-primary" style={{ width: '100%', padding: '8px 0', fontSize: '13px', fontWeight: 600, borderRadius: '6px', boxShadow: '0 2px 8px rgba(0,0,0,0.2)' }} data-i18n="resizePopover.apply">Áp dụng (Apply)</button>
               </div>
             </div>
+
+            {/* Batch 1.2: nút toggle Animation Mode. Khi bật, sẽ chuyển sang
+                Animation Strip view ở Batch 2.1. Hiện tại chỉ đổi trạng thái
+                module (animation-state.js) và đổi icon/tô sáng nút. */}
+            <button
+              id="toggleAnimationModeBtn"
+              className="btn"
+              onClick={handleToggleAnimationMode}
+              title={isAnimMode ? 'Xem Source Image' : 'Xem Animation'}
+              style={isAnimMode ? { background: 'var(--color-primary)', color: '#fff' } : undefined}
+            >
+              <Icon name={ICONS.FILM} style={{ width: '16px', height: '16px' }} />
+            </button>
+
+            {/* Batch 1.3: nút "+" thêm 1 trang animation (frame) mới, cùng
+                kích thước với canvas hiện tại (VD 32x32). Chỉ hiện khi đang
+                ở Animation Mode. Hiển thị tạm số lượng frame bằng badge nhỏ
+                — layout canvas thật (nằm kế bên nhau) sẽ làm ở Batch 2.1. */}
+            {isAnimMode && (
+              <button
+                id="addAnimationFrameBtn"
+                className="btn"
+                onClick={handleAddFrame}
+                title="Thêm trang animation"
+                style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+              >
+                <Icon name={ICONS.PLUS} style={{ width: '16px', height: '16px' }} />
+                <span style={{ fontSize: '11px' }}>{frameCount}</span>
+              </button>
+            )}
           </div>
         </div>
         <canvas id="pixelCanvas"></canvas>

@@ -1,13 +1,15 @@
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+const API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
 const SCOPES = 'https://www.googleapis.com/auth/drive.file';
 
 let tokenClient = null;
-let accessToken = null;
+let accessToken = sessionStorage.getItem('drive_access_token') || null;
 let appFolderId = null;
 
 export function initGoogleDrive() {
   if (typeof google === 'undefined') {
-    console.error('Google Identity Services script not loaded');
+    // Retry initialization after a short delay since the script is async
+    setTimeout(initGoogleDrive, 500);
     return;
   }
   
@@ -21,9 +23,7 @@ export function initGoogleDrive() {
     scope: SCOPES,
     callback: (tokenResponse) => {
       if (tokenResponse && tokenResponse.access_token) {
-        accessToken = tokenResponse.access_token;
-        localStorage.setItem('drive_was_logged_in', 'true');
-        window.dispatchEvent(new CustomEvent('drive-connected', { detail: { accessToken } }));
+        setDriveToken(tokenResponse.access_token);
       }
     },
   });
@@ -46,18 +46,27 @@ export function getDriveToken() {
   return accessToken;
 }
 
+export function setDriveToken(token) {
+  accessToken = token;
+  if (token) {
+    sessionStorage.setItem('drive_access_token', token);
+    localStorage.setItem('drive_was_logged_in', 'true');
+    window.dispatchEvent(new CustomEvent('drive-connected', { detail: { accessToken } }));
+  } else {
+    sessionStorage.removeItem('drive_access_token');
+    localStorage.removeItem('drive_was_logged_in');
+    window.dispatchEvent(new CustomEvent('drive-disconnected'));
+  }
+}
+
 export function logoutDrive() {
   if (accessToken) {
     if (typeof google !== 'undefined') {
       google.accounts.oauth2.revoke(accessToken, () => {
-        accessToken = null;
-        localStorage.removeItem('drive_was_logged_in');
-        window.dispatchEvent(new CustomEvent('drive-disconnected'));
+        setDriveToken(null);
       });
     } else {
-      accessToken = null;
-      localStorage.removeItem('drive_was_logged_in');
-      window.dispatchEvent(new CustomEvent('drive-disconnected'));
+      setDriveToken(null);
     }
   }
 }
@@ -83,6 +92,11 @@ async function getOrCreateAppFolder() {
   const searchRes = await fetch(`https://www.googleapis.com/drive/v3/files?q=${query}&fields=files(id,name)`, {
     headers: { Authorization: `Bearer ${accessToken}` }
   });
+  
+  if (searchRes.status === 401) {
+    setDriveToken(null);
+    throw new Error('Phiên đăng nhập Google Drive đã hết hạn. Vui lòng kết nối lại.');
+  }
   
   const searchData = await searchRes.json();
   if (searchData.files && searchData.files.length > 0) {
@@ -113,9 +127,14 @@ async function getOrCreateAppFolder() {
 export async function uploadToDrive(fileName, fileBlob, fileId = null) {
   if (!accessToken) throw new Error("Not logged in to Google Drive");
 
+  let mimeType = 'image/png';
+  if (fileName.toLowerCase().endsWith('.jpg') || fileName.toLowerCase().endsWith('.jpeg')) mimeType = 'image/jpeg';
+  else if (fileName.toLowerCase().endsWith('.webp')) mimeType = 'image/webp';
+  else if (fileName.toLowerCase().endsWith('.json')) mimeType = 'application/json';
+
   const metadata = {
     name: fileName,
-    mimeType: 'image/png',
+    mimeType: mimeType,
   };
   
   if (!fileId) {
@@ -141,6 +160,11 @@ export async function uploadToDrive(fileName, fileBlob, fileId = null) {
     body: form,
   });
 
+  if (res.status === 401) {
+    setDriveToken(null);
+    throw new Error('Phiên đăng nhập Google Drive đã hết hạn. Vui lòng kết nối lại.');
+  }
+
   if (!res.ok) {
     const err = await res.json();
     throw new Error(err.error?.message || "Lỗi khi upload file lên Drive");
@@ -153,13 +177,18 @@ export async function uploadToDrive(fileName, fileBlob, fileId = null) {
 export async function listDriveFiles() {
   if (!accessToken) throw new Error("Not logged in to Google Drive");
 
-  const query = encodeURIComponent("mimeType='image/png' and trashed=false");
+  const query = encodeURIComponent("(mimeType='image/png' or mimeType='image/jpeg' or mimeType='image/webp' or mimeType='application/json') and trashed=false");
   const res = await fetch(`https://www.googleapis.com/drive/v3/files?q=${query}&fields=files(id,name,modifiedTime,thumbnailLink)`, {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${accessToken}`,
     }
   });
+
+  if (res.status === 401) {
+    setDriveToken(null);
+    throw new Error('Phiên đăng nhập Google Drive đã hết hạn. Vui lòng kết nối lại.');
+  }
 
   if (!res.ok) {
     const err = await res.json();
@@ -180,6 +209,11 @@ export async function downloadFromDrive(fileId) {
     }
   });
 
+  if (res.status === 401) {
+    setDriveToken(null);
+    throw new Error('Phiên đăng nhập Google Drive đã hết hạn. Vui lòng kết nối lại.');
+  }
+
   if (!res.ok) {
     const err = await res.json();
     throw new Error(err.error?.message || "Lỗi khi tải file từ Drive");
@@ -199,6 +233,11 @@ export async function downloadImageFromDrive(fileId) {
     }
   });
 
+  if (res.status === 401) {
+    setDriveToken(null);
+    throw new Error('Phiên đăng nhập Google Drive đã hết hạn. Vui lòng kết nối lại.');
+  }
+
   if (!res.ok) {
     const err = await res.json();
     throw new Error(err.error?.message || "Lỗi khi tải ảnh từ Drive");
@@ -207,3 +246,46 @@ export async function downloadImageFromDrive(fileId) {
   const blob = await res.blob();
   return blob;
 }
+
+export function openDrivePicker(onFilePicked, onCancel) {
+  if (!accessToken) {
+    throw new Error("Chưa đăng nhập Google Drive");
+  }
+  if (!API_KEY) {
+    throw new Error("Thiếu cấu hình VITE_GOOGLE_API_KEY trong .env");
+  }
+  if (typeof gapi === 'undefined') {
+    throw new Error("Đang tải thư viện API, vui lòng thử lại sau.");
+  }
+
+  gapi.load('picker', { callback: createPicker });
+
+  function createPicker() {
+    // Only show images and JSON
+    const view = new google.picker.DocsView(google.picker.ViewId.DOCS);
+    view.setMimeTypes('image/png,image/jpeg,image/webp,application/json');
+
+    const picker = new google.picker.PickerBuilder()
+      .addView(view)
+      .setOAuthToken(accessToken)
+      .setDeveloperKey(API_KEY)
+      .setCallback(pickerCallback)
+      .build();
+    
+    picker.setVisible(true);
+  }
+
+  function pickerCallback(data) {
+    if (data.action === google.picker.Action.PICKED) {
+      const file = data.docs[0];
+      if (onFilePicked) {
+        onFilePicked(file.id, file.name, file.mimeType);
+      }
+    } else if (data.action === google.picker.Action.CANCEL) {
+      if (onCancel) {
+        onCancel();
+      }
+    }
+  }
+}
+

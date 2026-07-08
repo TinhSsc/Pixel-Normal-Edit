@@ -7,7 +7,12 @@ import { syncGridSizeUI } from '../actions/grid-size-select.js';
 import { setSourceImage, updateBgButtonsUI } from '../actions/set-background.js';
 import { saveWorkspace } from './storage.js';
 import { generateWorkspacePngBlob } from '../io/export/export-png.js';
-import { uploadToDrive, getDriveToken, ensureDriveLogin } from '../services/drive-api.js';
+import { generateWorkspaceJpegBlob } from '../io/export/export-jpeg.js';
+import { generateWorkspaceWebpBlob } from '../io/export/export-webp.js';
+import { generateWorkspaceJsonBlob } from '../io/export/export-json.js';
+import { uploadToDrive, getDriveToken } from '../services/drive-api.js';
+import { saveFileToLocalDrive, getCurrentDirectoryHandle } from '../services/local-drive.js';
+import { showNotification } from '../services/drive-ui.js';
 import { debounceExtractCanvasColors } from './color-palette.js';
 
 let tabs = [];
@@ -37,80 +42,162 @@ export function clearPendingSave() {
   if (maxWaitTimeout) clearTimeout(maxWaitTimeout);
 }
 
-let isUploading = false;
-let pendingUpload = false;
+let isUploadingDrive = false;
+let isUploadingLocal = false;
 
-async function syncToDrive(tab, btn) {
-  if (isUploading) {
-    pendingUpload = true;
-    return;
-  }
-  isUploading = true;
-  try {
-    if (btn) {
-      btn.innerHTML = `<i data-lucide="refresh-cw" class="spin" style="width: 14px; height: 14px; color: var(--color-sync);"></i>`;
-      if (window.lucide) window.lucide.createIcons({ root: btn });
+function setHeaderStatus(statusText) {
+  const indicator = document.getElementById('saveStatusIndicator');
+  if (indicator) {
+    if (statusText === 'saving') {
+      indicator.innerHTML = '<i data-lucide="loader-2" class="spin" style="width:12px;height:12px"></i> Đang lưu...';
+      indicator.style.color = 'var(--color-info)';
+    } else if (statusText === 'saved') {
+      indicator.innerHTML = '<i data-lucide="check" style="width:12px;height:12px"></i> Đã lưu';
+      indicator.style.color = 'var(--color-success)';
+      setTimeout(() => { if (indicator.innerHTML.includes('Đã lưu')) indicator.innerHTML = ''; }, 3000);
+    } else if (statusText === 'error') {
+      indicator.innerHTML = '<i data-lucide="x" style="width:12px;height:12px"></i> Lỗi đồng bộ';
+      indicator.style.color = 'var(--color-danger)';
+    } else {
+      indicator.innerHTML = '';
     }
-    const blob = await generateWorkspacePngBlob(tab);
-    const fileName = `${tab.name || 'pixel-art'}.png`;
-    const fileId = await uploadToDrive(fileName, blob, tab.driveFileId);
-    if (!tab.driveFileId) tab.driveFileId = fileId;
-  } catch (err) {
-    console.error("Auto backup failed:", err);
-  } finally {
-    isUploading = false;
-    if (btn) {
-      btn.innerHTML = `<i data-lucide="cloud-check" style="width: 14px; height: 14px; color: var(--color-success);"></i>`;
-      if (window.lucide) window.lucide.createIcons({ root: btn });
-    }
-    if (pendingUpload) {
-      pendingUpload = false;
-      syncToDrive(tab, btn);
-    }
+    if (window.lucide) window.lucide.createIcons({ root: indicator });
   }
 }
 
-async function performSave() {
-  const currentTab = tabs.find(t => t.id === activeTabId);
-  const btn = currentTab ? document.getElementById('autobackup_btn_' + currentTab.id) : null;
-  
-  // Hiệu ứng lưu local
-  if (btn && (!currentTab.autoBackupDrive || !getDriveToken())) {
-    btn.innerHTML = `<i data-lucide="loader" class="spin" style="width: 14px; height: 14px; color: var(--color-info);"></i>`;
-    if (window.lucide) window.lucide.createIcons({ root: btn });
-    
-    setTimeout(() => {
-      btn.innerHTML = `<i data-lucide="cloud-upload" style="width: 14px; height: 14px; color: var(--color-text-muted);"></i>`;
-      if (window.lucide) window.lucide.createIcons({ root: btn });
-    }, 1000);
+async function getBlobForTab(tab) {
+  const format = tab.format || 'png';
+  if (format === 'json') return new Blob([generateWorkspaceJsonBlob(tab)], { type: 'application/json' });
+  if (format === 'jpeg') return await generateWorkspaceJpegBlob(tab);
+  if (format === 'webp') return await generateWorkspaceWebpBlob(tab);
+  return await generateWorkspacePngBlob(tab);
+}
+
+function getExtForTab(tab) {
+  const format = tab.format || 'png';
+  if (format === 'jpeg') return 'jpg';
+  return format;
+}
+
+export async function syncToDrive(tab) {
+  if (isUploadingDrive) return false;
+  isUploadingDrive = true;
+  setHeaderStatus('saving');
+  try {
+    const blob = await getBlobForTab(tab);
+    const fileName = `${tab.name || 'pixel-art'}.${getExtForTab(tab)}`;
+    const fileId = tab.storage.type === 'drive' ? tab.storage.id : null;
+    const newFileId = await uploadToDrive(fileName, blob, fileId);
+
+    // Nếu lưu thành công, cập nhật storage
+    tab.storage = { type: 'drive', id: newFileId, handle: null, name: fileName };
+    return true;
+  } catch (err) {
+    console.error("Drive sync failed:", err);
+    setHeaderStatus('error');
+    return false;
+  } finally {
+    isUploadingDrive = false;
   }
-  
+}
+
+export async function syncToLocal(tab) {
+  if (isUploadingLocal) return false;
+  isUploadingLocal = true;
+  setHeaderStatus('saving');
+  try {
+    const blob = await getBlobForTab(tab);
+    const fileName = `${tab.name || 'pixel-art'}.${getExtForTab(tab)}`;
+
+    // Nếu tab đã được link với một file handle (đã mở hoặc save as qua local)
+    // Thực tế File System Access API cho phép lấy file handle từ directory handle.
+    // Nếu tab.storage.handle có tồn tại thì có thể ghi trực tiếp, tuy nhiên để đơn giản, ta lưu qua saveFileToLocalDrive
+    await saveFileToLocalDrive(fileName, blob);
+
+    // Cập nhật storage
+    tab.storage = { type: 'local', id: null, handle: null, name: fileName };
+    return true;
+  } catch (err) {
+    console.error("Local sync failed:", err);
+    setHeaderStatus('error');
+    return false;
+  } finally {
+    isUploadingLocal = false;
+  }
+}
+
+export async function performQuickSave() {
+  const currentTab = tabs.find(t => t.id === activeTabId);
+  if (!currentTab) return;
+
   saveCurrentTabState();
   saveWorkspace(tabs, activeTabId);
-  
-  if (currentTab && currentTab.autoBackupDrive && getDriveToken()) {
-    syncToDrive(currentTab, btn);
+
+  let success = false;
+
+  if (currentTab.storage && currentTab.storage.type === 'drive') {
+    success = await syncToDrive(currentTab);
+    if (success) { setHeaderStatus('saved'); showNotification('Đã lưu vào Google Drive'); }
+  } else if (currentTab.storage && currentTab.storage.type === 'local') {
+    success = await syncToLocal(currentTab);
+    if (success) { setHeaderStatus('saved'); showNotification('Đã lưu vào Thư mục cục bộ'); }
+  } else if (getCurrentDirectoryHandle()) {
+    // Nếu đã cấu hình local directory mà tab chưa link đâu, lưu vào local dir
+    success = await syncToLocal(currentTab);
+    if (success) { setHeaderStatus('saved'); showNotification('Đã tạo file tại Thư mục cục bộ'); }
+  } else {
+    // Không có link nào, mở Save As
+    const btn = document.getElementById('openDownloadModalBtn');
+    if (btn) btn.click();
+    return;
   }
+}
+
+async function performAutoSave() {
+  const currentTab = tabs.find(t => t.id === activeTabId);
+  saveCurrentTabState();
+  saveWorkspace(tabs, activeTabId);
+
+  const dest = localStorage.getItem('auto_save_destination') || 'drive';
+  if (dest === 'none' || !currentTab) return;
+
+  let success = false;
+  if (dest === 'drive' || dest === 'both') {
+    if (getDriveToken()) {
+      success = await syncToDrive(currentTab) || success;
+    }
+  }
+
+  if (dest === 'local' || dest === 'both') {
+    if (getCurrentDirectoryHandle()) {
+      success = await syncToLocal(currentTab) || success;
+    }
+  }
+
+  if (success) setHeaderStatus('saved');
 }
 
 export function debouncedSaveWorkspace() {
   if (saveTimeout) clearTimeout(saveTimeout);
-  
+
+  setHeaderStatus('');
+  // Dirty state: you can add '*' to tab name or header, but keeping it simple for now
+
   // Debounce 5s
-  saveTimeout = setTimeout(() => {
+  saveTimeout = setTimeout(async () => {
     if (maxWaitTimeout) {
       clearTimeout(maxWaitTimeout);
       maxWaitTimeout = null;
     }
-    performSave();
+    await performAutoSave();
   }, 5000);
 
   // MaxWait 30s
   if (!maxWaitTimeout) {
-    maxWaitTimeout = setTimeout(() => {
+    maxWaitTimeout = setTimeout(async () => {
       if (saveTimeout) clearTimeout(saveTimeout);
       maxWaitTimeout = null;
-      performSave();
+      await performAutoSave();
     }, 30000);
   }
 }
@@ -124,10 +211,10 @@ export function initTabs(savedData = null) {
     const bridge = document.getElementById('canvasTabsReactBridge');
     if (bridge) {
       clearInterval(mergeInterval);
-      
+
       // Inject our custom tabs container into the bridge
       bridge.appendChild(tabsContainer);
-      
+
       tabsContainer.style.background = 'transparent';
       tabsContainer.style.borderBottom = 'none';
       tabsContainer.style.padding = '0';
@@ -139,7 +226,7 @@ export function initTabs(savedData = null) {
   if (savedData && savedData.tabs && savedData.tabs.length > 0) {
     tabs = savedData.tabs;
     activeTabId = savedData.activeTabId || tabs[0].id;
-    
+
     // Parse tab IDs to update tabCounter
     const maxId = Math.max(...tabs.map(t => parseInt(t.name.replace(/[^0-9]/g, '')) || 0));
     if (maxId && !isNaN(maxId)) tabCounter = maxId;
@@ -147,7 +234,7 @@ export function initTabs(savedData = null) {
     // We do NOT reconstruct the offscreenData32 here for all tabs immediately because it requires pixelMap iteration
     // Instead we load the active tab completely
     const activeTab = tabs.find(t => t.id === activeTabId) || tabs[0];
-    
+
     // Provide an empty imageData object for now, it will be recreated in loadTabState if null
     tabs.forEach(tab => {
       if (!tab.grid.imgData) {
@@ -170,19 +257,20 @@ export function initTabs(savedData = null) {
       groupMap: groupMap,
       history: getHistoryState(),
       grid: { w: GRID_WIDTH, h: GRID_HEIGHT, imgData: offscreenImageData, data32: offscreenData32 },
-      bg: { 
-        src: els.imagePreview?.src || '', 
+      bg: {
+        src: els.imagePreview?.src || '',
         css: document.getElementById('pixelCanvas')?.style.getPropertyValue('--bg-url') || '',
         hasBg: document.getElementById('pixelCanvas')?.classList.contains('has-bg') || false
       },
       autoBackupDrive: false,
-      driveFileId: null
+      storage: { type: null, id: null, handle: null, name: null },
+      format: 'png'
     };
-    
+
     tabs.push(initialTab);
     activeTabId = initialTab.id;
   }
-  
+
   renderTabsUI();
   resizeCanvas();
   fitToScreen();
@@ -193,15 +281,15 @@ export function initTabs(savedData = null) {
 export function saveCurrentTabState() {
   const tab = tabs.find(t => t.id === activeTabId);
   if (!tab) return;
-  
+
   tab.pixelMap = new Uint32Array(pixelMap);
   tab.groupMap = groupMap;
   tab.history = getHistoryState();
   tab.grid = { w: GRID_WIDTH, h: GRID_HEIGHT, imgData: offscreenImageData, data32: offscreenData32 };
-  
+
   const canvas = document.getElementById('pixelCanvas');
-  tab.bg = { 
-    src: els.imagePreview?.src || '', 
+  tab.bg = {
+    src: els.imagePreview?.src || '',
     css: canvas?.style.getPropertyValue('--bg-url') || '',
     hasBg: canvas?.classList.contains('has-bg') || false
   };
@@ -212,9 +300,9 @@ function loadTabState(tab) {
   setHistoryState(tab.history);
   setGridSizeParams(tab.grid.w, tab.grid.h, tab.grid.imgData, tab.grid.data32);
   syncGridSizeUI(tab.grid.w, tab.grid.h);
-  
+
   setSourceImage(tab.bg.src || null);
-  
+
   const canvas = document.getElementById('pixelCanvas');
   if (canvas) {
     if (tab.bg.hasBg) {
@@ -222,7 +310,7 @@ function loadTabState(tab) {
     } else {
       canvas.classList.remove('has-bg');
     }
-    
+
     if (tab.bg.css) {
       canvas.style.setProperty('--bg-url', tab.bg.css);
     } else {
@@ -234,19 +322,19 @@ function loadTabState(tab) {
 
 export function switchTab(id) {
   if (id === activeTabId) return;
-  
+
   const targetTab = tabs.find(t => t.id === id);
   if (!targetTab) return;
-  
+
   clearPendingSave();
   saveCurrentTabState();
-  
+
   activeTabId = id;
-  
+
   const canvasWrap = document.querySelector('.canvas-wrap');
   if (canvasWrap) {
     canvasWrap.classList.add('fade-out');
-    
+
     // Wait for fade out
     setTimeout(() => {
       loadTabState(targetTab);
@@ -254,7 +342,7 @@ export function switchTab(id) {
       fitToScreen();
       renderPixels();
       renderTabsUI();
-      
+
       // Remove fade out to trigger fade in
       canvasWrap.classList.remove('fade-out');
       debouncedSaveWorkspace();
@@ -275,34 +363,35 @@ export function createNewTab() {
   try {
     clearPendingSave();
     saveCurrentTabState();
-    
+
     tabCounter++;
-  const DEFAULT_SIZE = 32;
-  const newId = generateId();
-  const newTab = {
-    id: newId,
-    name: (t('tab.newCanvas') || 'New Canvas') + ' ' + tabCounter,
-    pixelMap: new Uint32Array(DEFAULT_SIZE * DEFAULT_SIZE),
-    groupMap: new Map(),
-    history: { undoStack: [], redoStack: [], currentStroke: null },
-    grid: { w: DEFAULT_SIZE, h: DEFAULT_SIZE, imgData: null, data32: null },
-    bg: { src: '', css: '' },
-    autoBackupDrive: false,
-    driveFileId: null
-  };
-  
-  const tmpCanvas = document.createElement('canvas');
-  tmpCanvas.width = DEFAULT_SIZE;
-  tmpCanvas.height = DEFAULT_SIZE;
-  const tmpCtx = tmpCanvas.getContext('2d');
-  newTab.grid.imgData = tmpCtx.getImageData(0, 0, DEFAULT_SIZE, DEFAULT_SIZE);
-  newTab.grid.data32 = new Uint32Array(newTab.grid.imgData.data.buffer);
-  
-  tabs.push(newTab);
-  activeTabId = newId;
-  
-  loadTabState(newTab);
-  
+    const DEFAULT_SIZE = 32;
+    const newId = generateId();
+    const newTab = {
+      id: newId,
+      name: (t('tab.newCanvas') || 'New Canvas') + ' ' + tabCounter,
+      pixelMap: new Uint32Array(DEFAULT_SIZE * DEFAULT_SIZE),
+      groupMap: new Map(),
+      history: { undoStack: [], redoStack: [], currentStroke: null },
+      grid: { w: DEFAULT_SIZE, h: DEFAULT_SIZE, imgData: null, data32: null },
+      bg: { src: '', css: '', hasBg: false },
+      autoBackupDrive: false,
+      storage: { type: null, id: null, handle: null, name: null },
+      format: 'png'
+    };
+
+    const tmpCanvas = document.createElement('canvas');
+    tmpCanvas.width = DEFAULT_SIZE;
+    tmpCanvas.height = DEFAULT_SIZE;
+    const tmpCtx = tmpCanvas.getContext('2d');
+    newTab.grid.imgData = tmpCtx.getImageData(0, 0, DEFAULT_SIZE, DEFAULT_SIZE);
+    newTab.grid.data32 = new Uint32Array(newTab.grid.imgData.data.buffer);
+
+    tabs.push(newTab);
+    activeTabId = newId;
+
+    loadTabState(newTab);
+
     resizeCanvas();
     fitToScreen();
     renderPixels();
@@ -316,12 +405,12 @@ export function createNewTab() {
 
 export function closeTab(id) {
   if (tabs.length === 1) return;
-  
+
   const index = tabs.findIndex(t => t.id === id);
   if (index === -1) return;
-  
+
   clearPendingSave();
-  
+
   const tab = tabs[index];
   const hasModifications = tab.history && tab.history.undoStack && tab.history.undoStack.length > 0;
   if (hasModifications) {
@@ -329,9 +418,9 @@ export function closeTab(id) {
       return;
     }
   }
-  
+
   tabs.splice(index, 1);
-  
+
   if (activeTabId === id) {
     const nextTab = tabs[Math.max(0, index - 1)];
     activeTabId = nextTab.id;
@@ -340,7 +429,7 @@ export function closeTab(id) {
     fitToScreen();
     renderPixels();
   }
-  
+
   renderTabsUI();
   debouncedSaveWorkspace();
   debounceExtractCanvasColors();
@@ -358,16 +447,16 @@ export function renameTab(id, newName) {
 function renderTabsUI() {
   const tabsContainer = document.getElementById('canvasTabsContainer');
   if (!tabsContainer) return;
-  
+
   tabsContainer.innerHTML = '';
-  
+
   const tabList = document.createElement('div');
   tabList.className = 'tab-list';
-  
+
   tabs.forEach(tab => {
     const tabEl = document.createElement('div');
     tabEl.className = `canvas-tab ${tab.id === activeTabId ? 'active' : ''}`;
-    
+
     const nameEl = document.createElement('span');
     nameEl.className = 'tab-name';
     nameEl.textContent = tab.name;
@@ -376,7 +465,7 @@ function renderTabsUI() {
       const newName = window.prompt(t('prompt.renameTab') || 'Nhập tên mới cho tab:', tab.name);
       if (newName !== null) renameTab(tab.id, newName);
     });
-    
+
     const toggleAutoBackupBtn = document.createElement('button');
     toggleAutoBackupBtn.id = 'autobackup_btn_' + tab.id;
     toggleAutoBackupBtn.className = `tab-autobackup-btn ${tab.autoBackupDrive ? 'active' : ''}`;
@@ -385,7 +474,7 @@ function renderTabsUI() {
     toggleAutoBackupBtn.style.cssText = 'background: transparent; border: none; padding: 2px; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 4px;';
     toggleAutoBackupBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      
+
       if (!tab.autoBackupDrive && !getDriveToken()) {
         ensureDriveLogin(() => {
           tab.autoBackupDrive = true;
@@ -394,7 +483,7 @@ function renderTabsUI() {
         });
         return;
       }
-      
+
       tab.autoBackupDrive = !tab.autoBackupDrive;
       renderTabsUI();
       if (tab.autoBackupDrive) debouncedSaveWorkspace();
@@ -407,26 +496,26 @@ function renderTabsUI() {
       e.stopPropagation();
       closeTab(tab.id);
     });
-    
+
     tabEl.appendChild(nameEl);
     tabEl.appendChild(toggleAutoBackupBtn);
     if (tabs.length > 1) {
       tabEl.appendChild(closeBtn);
     }
-    
+
     tabEl.addEventListener('click', () => switchTab(tab.id));
-    
+
     tabList.appendChild(tabEl);
   });
-  
+
   const newTabBtn = document.createElement('button');
   newTabBtn.className = 'new-tab-btn';
   newTabBtn.innerHTML = '<i data-lucide="plus" style="width: 16px; height: 16px;"></i>';
   newTabBtn.title = t('tooltip.newCanvas') || 'New Canvas';
   newTabBtn.addEventListener('click', createNewTab);
-  
+
   tabsContainer.appendChild(tabList);
   tabsContainer.appendChild(newTabBtn);
-  
+
   if (window.lucide) window.lucide.createIcons({ root: tabsContainer });
 }

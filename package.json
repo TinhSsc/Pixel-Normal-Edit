@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "dockview-react": "^7.0.2",
+    "firebase": "^12.15.0",
     "lucide": "^1.23.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7"

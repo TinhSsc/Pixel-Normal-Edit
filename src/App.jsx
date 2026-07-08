@@ -89,14 +89,31 @@ function App() {
   };
 
   const handleLoggedIn = (user) => {
-    setCurrentUserState(user);
-    navigate('');
+    // Tải lại trang hoàn toàn để khởi tạo lại toàn bộ script Canvas
+    window.location.href = window.location.pathname;
   };
 
-  const handleLogout = () => {
-    logout();
-    setCurrentUserState(null);
+  const handleLogout = async () => {
+    await logout();
   };
+
+  useEffect(() => {
+    import('./js/firebase/config.js').then(({ auth }) => {
+      const unsubscribe = auth.onAuthStateChanged((user) => {
+        if (user) {
+          setCurrentUserState({
+            uid: user.uid,
+            email: user.email,
+            name: user.displayName || user.email.split('@')[0],
+            picture: user.photoURL || null
+          });
+        } else {
+          setCurrentUserState(null);
+        }
+      });
+      return () => unsubscribe();
+    }).catch(console.error);
+  }, []);
 
 
 
@@ -365,51 +382,47 @@ function App() {
             </button>
 
 
-            <button id="openDownloadModalBtn" className="btn btn-primary" style={{ background: 'var(--color-success)' }} data-i18n="tooltip.exportFull">
+            <button id="openDownloadModalBtn" className="btn btn-primary" style={{ background: 'var(--color-success)' }} data-i18n="btn.saveAs" onClick={() => { document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none'); document.getElementById('downloadModal').style.display = 'flex'; }}>
               <Icon name={ICONS.DOWNLOAD} style={{ width: '18px', height: '18px' }} />
-              <span data-i18n="btn.export">Tải xuống</span>
+              <span data-i18n="btn.saveAs">Lưu dưới dạng...</span>
             </button>
+            
+            <div id="saveStatusIndicator" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: 'var(--color-text-muted)', marginLeft: '8px', opacity: 0.7 }}>
+              {/* Status will be updated via JS */}
+            </div>
 
             <button className="btn desktop-only undo-btn-action" data-i18n="tooltip.undo"><Icon name={ICONS.UNDO} style={{ width: '18px', height: '18px' }} /></button>
 
             <button className="btn desktop-only redo-btn-action" data-i18n="tooltip.redo"><Icon name={ICONS.REDO} style={{ width: '18px', height: '18px' }} /></button>
 
-            <div id="driveHeaderStatus" title="Chưa kết nối Google Drive" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 4px', cursor: 'help', width: '32px', height: '32px', borderRadius: '8px', transition: 'background 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.background = 'var(--color-surface-alt)'} onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
-              <Icon name={ICONS.HARD_DRIVE} id="driveHeaderIcon" style={{ width: '18px', height: '18px', color: 'var(--color-text-muted)', transition: 'color 0.2s' }} />
-            </div>
 
-            <button id="loginBtn" className="btn" data-i18n="tooltip.login" title={currentUser ? currentUser.name || currentUser.email : ''} onClick={(e) => {
 
+            <button id="loginBtn" className="btn avatar-btn" data-i18n="tooltip.login" title={currentUser ? currentUser.name || currentUser.email : ''} onClick={(e) => {
               e.preventDefault();
-
               if (currentUser) {
-
-                handleLogout();
-
+                const modal = document.getElementById('globalSettingsModal');
+                if (modal) {
+                   document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
+                   modal.style.display = 'flex';
+                   // Automatically switch to account tab
+                   const accTab = modal.querySelector('.modal-tabs [data-tab="tab-account"]');
+                   if (accTab) accTab.click();
+                }
                 return;
-
               }
 
               if (pixelMap && pixelMap.size > 0) {
-
                 if (!window.confirm(t('confirm.leave') || "Bạn có chắc chuyển sang nơi khác? Mọi dữ liệu bản vẽ chưa lưu sẽ bị mất!")) {
-
                   return;
-
                 }
-
               }
-
               navigate('login');
-
             }}>
 
-              {currentUser && currentUser.picture ? (
-                <img src={currentUser.picture} alt="" style={{ width: '18px', height: '18px', borderRadius: '50%' }} />
-              ) : (
-                <Icon name={ICONS.USER} style={{ width: '18px', height: '18px' }} />
-              )}
-
+              <img src={currentUser?.picture || undefined} alt="" className="avatar-img" style={{ display: (currentUser && currentUser.picture) ? 'block' : 'none' }} />
+              <div className="avatar-placeholder" style={{ display: (currentUser && currentUser.picture) ? 'none' : 'flex' }}>
+                <Icon name={ICONS.USER} style={{ width: '18px', height: '18px', color: 'var(--color-text-bright)' }} />
+              </div>
             </button>
 
           </div>
@@ -484,7 +497,7 @@ function App() {
 
           <div className="tab-content active" id="tab-image">
             <div className="source-tabs">
-               <button className="source-btn active" data-source="local">
+               <button className="source-btn active" data-source="local-dir">
                  <Icon name={ICONS.MONITOR} style={{ width: '16px', height: '16px' }} /> <span data-i18n="modal.tabComputer">Máy tính</span>
                </button>
                <button className="source-btn" data-source="drive">
@@ -497,17 +510,39 @@ function App() {
               <span data-i18n="modal.autoSize">Tự động chỉnh lưới theo kích thước ảnh</span>
             </label>
             
-            <div id="source-local-content">
-              <div id="imageDropZone" className="drag-drop-zone">
-                <Icon name={ICONS.UPLOAD_CLOUD} style={{ width: '48px', height: '48px', color: 'var(--color-primary)', marginBottom: '16px' }} />
-                <div style={{ fontSize: '16px', fontWeight: 500, color: 'var(--color-text-bright)', marginBottom: '8px' }} data-i18n="modal.dropImage">Kéo thả ảnh vào đây</div>
-                <div style={{ fontSize: '14px', color: 'var(--color-text-muted)' }} data-i18n="modal.clickToSelect">hoặc nhấp để chọn file từ máy tính</div>
+            <div id="source-local-dir-content" style={{ minHeight: '180px' }}>
+              <div id="imageDropZone" className="drag-drop-zone" style={{ marginBottom: '16px', padding: '16px', minHeight: 'auto', borderStyle: 'solid', borderWidth: '1px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                  <Icon name={ICONS.UPLOAD_CLOUD} style={{ width: '20px', height: '20px', color: 'var(--color-primary)' }} />
+                  <span style={{ fontSize: '14px', fontWeight: 500, color: 'var(--color-text-bright)' }} data-i18n="modal.clickToSelect">Nhấp hoặc kéo thả file để tải lên</span>
+                </div>
                 <input type="file" id="imageUploadModal" accept="image/*" style={{ display: 'none' }} />
+              </div>
+
+              <div id="localDirUploadList" style={{ width: '100%', height: '100%', maxHeight: '45vh', overflowY: 'auto', paddingRight: '8px' }}>
+                <div style={{ textAlign: 'center', padding: '30px 20px', color: 'var(--color-text-muted)', background: 'var(--color-surface-alt)', borderRadius: '8px', border: '1px dashed var(--color-border)' }}>
+                   <Icon name={ICONS.FOLDER} style={{ width: '36px', height: '36px', marginBottom: '12px', opacity: 0.5 }} />
+                   <div style={{ marginBottom: '12px' }} data-i18n="settings.noDirectorySelected">Bạn chưa cấu hình Thư mục cục bộ</div>
+                   <button className="btn btn-primary" style={{ padding: '8px 16px' }} onClick={() => {
+                     document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
+                     document.getElementById('globalSettingsModal').style.display = 'flex';
+                     setTimeout(() => {
+                        const accountBtn = document.querySelector('.tab-btn[data-tab="tab-account"]');
+                        if (accountBtn) accountBtn.click();
+                     }, 50);
+                   }} data-i18n="settings.changeDirectory">Đi tới Cài đặt</button>
+                </div>
               </div>
             </div>
             
             <div id="source-drive-content" style={{ display: 'none', minHeight: '180px' }}>
-              <div id="driveUploadList" style={{ width: '100%', height: '100%' }}>
+              <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'flex-end' }}>
+                <button id="openDrivePickerBtn" className="btn btn-secondary" style={{ padding: '8px 16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Icon name={ICONS.SEARCH} style={{ width: '16px', height: '16px' }} />
+                  <span data-i18n="drive.openPicker">Duyệt toàn bộ Drive...</span>
+                </button>
+              </div>
+              <div id="driveUploadList" style={{ width: '100%', height: '100%', maxHeight: '45vh', overflowY: 'auto', paddingRight: '8px' }}>
                 <div style={{ textAlign: 'center', padding: '30px 20px', color: 'var(--color-text-muted)', background: 'var(--color-surface-alt)', borderRadius: '8px', border: '1px dashed var(--color-border)' }}>
                    <Icon name={ICONS.CLOUD} style={{ width: '36px', height: '36px', marginBottom: '12px', opacity: 0.5 }} />
                    <div style={{ marginBottom: '12px' }}>Bạn cần đăng nhập Google Drive để chọn ảnh</div>

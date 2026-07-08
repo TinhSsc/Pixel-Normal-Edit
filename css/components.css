@@ -181,3 +181,45 @@ input[type="color"] {
 .resize-popover-input:focus {
   border-color: var(--color-primary);
 }
+
+/* Avatar Button Redesign */
+.avatar-btn {
+  width: 40px !important;
+  height: 40px !important;
+  padding: 0 !important;
+  border-radius: 12px !important;
+  background: transparent !important;
+  border: none !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: none !important;
+  transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1) !important;
+}
+
+.avatar-btn:hover {
+  background: var(--color-surface-hover, rgba(255, 255, 255, 0.05)) !important;
+  transform: translateY(-1px);
+}
+
+.avatar-btn:active {
+  transform: translateY(0);
+}
+
+.avatar-img {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.avatar-placeholder {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

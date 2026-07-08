@@ -1,7 +1,7 @@
 import { resizeCanvas, fitToScreen } from './core/viewport.js';
 import { renderPixels } from './core/render.js';
 import { els, setStatus, setCurrentTool, initEls } from './core/state.js';
-import { getTabs, getActiveTabId } from './core/tab-manager.js';
+import { getTabs, getActiveTabId, initTabs, performQuickSave } from './core/tab-manager.js';
 
 import { setupGradientMode } from './modes/gradient-mode.js';
 import { setupMirrorMode } from './modes/mirror-mode.js';
@@ -14,7 +14,6 @@ import { setupSetBackground } from './actions/set-background.js';
 import { setupTrim } from './actions/trim.js';
 import { setupGridSizeSelect, setGridSize } from './actions/grid-size-select.js';
 import { setupToggleToolsPanel } from './actions/toggle-tools-panel.js';
-import { initTabs } from './core/tab-manager.js';
 import { loadWorkspace } from './core/storage.js';
 
 import { setupRotate } from './transforms/rotate.js';
@@ -22,10 +21,11 @@ import { setupFlipH } from './transforms/flip-h.js';
 import { setupFlipV } from './transforms/flip-v.js';
 
 import { setupUploadModal } from './io/upload/upload-modal.js';
-import { exportPng } from './io/export/export-png.js';
-import { exportJpeg } from './io/export/export-jpeg.js';
-import { exportWebp } from './io/export/export-webp.js';
-import { exportJson } from './io/export/export-json.js';
+import { exportJpeg, generateWorkspaceJpegBlob } from './io/export/export-jpeg.js';
+import { exportJson, generateWorkspaceJsonBlob } from './io/export/export-json.js';
+import { exportPng, generateWorkspacePngBlob } from './io/export/export-png.js';
+import { exportWebp, generateWorkspaceWebpBlob } from './io/export/export-webp.js';
+import { getCurrentDirectoryHandle, saveFileToLocalDrive, initLocalDrive } from './services/local-drive.js';
 import { exportToDrive, showNotification } from './services/drive-ui.js';
 
 import { initCustomTooltip } from './ui/tooltip.js';
@@ -74,12 +74,29 @@ export function initEditor() {
   setupToggleToolsPanel();
   setupUploadModal();
 
+  const quickSaveBtn = document.getElementById('quickSaveBtn');
+  if (quickSaveBtn) {
+    quickSaveBtn.addEventListener('click', () => {
+      performQuickSave();
+    });
+  }
+
+  // Hotkeys
+  document.addEventListener('keydown', (e) => {
+    // Ctrl+S
+    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+      e.preventDefault();
+      performQuickSave();
+    }
+  });
+
   const downloadModal = document.getElementById('downloadModal');
   const openDownloadModalBtn = document.getElementById('openDownloadModalBtn');
   const closeDownloadModalBtn = document.getElementById('closeDownloadModalBtn');
 
   if (openDownloadModalBtn && downloadModal) {
     openDownloadModalBtn.addEventListener('click', () => {
+      document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
       downloadModal.style.display = 'flex';
       
       const canvasList = document.getElementById('downloadCanvasList');
@@ -173,13 +190,47 @@ export function initEditor() {
           if (!tab) continue;
 
           if (dest === 'local') {
-            if (format === 'png') exportPng(tab);
-            else if (format === 'jpeg') exportJpeg(tab);
-            else if (format === 'webp') exportWebp(tab);
-            else if (format === 'json') exportJson(tab);
+            const handle = getCurrentDirectoryHandle();
+            if (handle) {
+              const namePrefix = tab.name.replace(/\s+/g, '-');
+              try {
+                if (format === 'png') {
+                  await saveFileToLocalDrive(`${namePrefix}.png`, await generateWorkspacePngBlob(tab));
+                } else if (format === 'jpeg') {
+                  await saveFileToLocalDrive(`${namePrefix}.jpg`, await generateWorkspaceJpegBlob(tab));
+                } else if (format === 'webp') {
+                  await saveFileToLocalDrive(`${namePrefix}.webp`, await generateWorkspaceWebpBlob(tab));
+                } else if (format === 'json') {
+                  await saveFileToLocalDrive(`${namePrefix}.json`, generateWorkspaceJsonBlob(tab));
+                }
+                // Save As thành công: Cập nhật storage sang Local
+                tab.storage = { type: 'local', id: null, handle: null, name: `${namePrefix}.${format === 'jpeg' ? 'jpg' : format}` };
+                tab.format = format;
+              } catch (saveErr) {
+                console.warn('Local drive save failed, falling back to download', saveErr);
+                if (format === 'png') exportPng(tab);
+                else if (format === 'jpeg') exportJpeg(tab);
+                else if (format === 'webp') exportWebp(tab);
+                else if (format === 'json') exportJson(tab);
+              }
+            } else {
+              if (format === 'png') exportPng(tab);
+              else if (format === 'jpeg') exportJpeg(tab);
+              else if (format === 'webp') exportWebp(tab);
+              else if (format === 'json') exportJson(tab);
+            }
             successCount++;
           } else if (dest === 'drive') {
-            await exportToDrive(tab, format);
+            const fileId = tab.storage && tab.storage.type === 'drive' ? tab.storage.id : null;
+            // The exportToDrive function in drive-ui.js doesn't update tab.storage yet.
+            // Wait, exportToDrive doesn't return the new file ID directly to us here.
+            // Let's call it and assume the tab format needs to be updated.
+            const { exportToDrive } = await import('./services/drive-api.js'); // Actually drive-ui.js exports it.
+            // Instead of dealing with circular imports, drive-ui.js exportToDrive updates driveFileId.
+            // We should just use syncToDrive from tab-manager instead!
+            tab.format = format; // temporarily set format
+            const { syncToDrive } = await import('./core/tab-manager.js');
+            await syncToDrive(tab);
             successCount++;
           }
         }
@@ -199,6 +250,8 @@ export function initEditor() {
   initCustomTooltip();
   initMobilePopups(); // Global document click handler inside
 
+  initLocalDrive().catch(console.error);
+  
   setStatus(t('status.init'));
 }
 

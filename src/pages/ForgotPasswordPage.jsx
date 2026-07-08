@@ -1,71 +1,63 @@
 import { useState } from 'react';
-import { findUserByEmail, saveUser } from '../js/auth/fake-db.js';
+import { resetPassword } from '../js/firebase/auth-api.js';
 import './AuthPages.css';
 
 export default function ForgotPasswordPage({ onNavigate }) {
-  const [step, setStep] = useState('email'); // 'email' | 'reset' | 'done'
+  const [step, setStep] = useState('email'); // 'email' | 'done'
   const [email, setEmail] = useState('');
-  const [newPassword, setNewPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleCheckEmail = (e) => {
+  const handleReset = async (e) => {
     e.preventDefault();
-    if (!findUserByEmail(email)) {
-      setError('Không tìm thấy tài khoản với email này.');
-      return;
-    }
     setError('');
-    setStep('reset');
-  };
-
-  const handleReset = (e) => {
-    e.preventDefault();
-    saveUser({ email, password: newPassword });
-    setStep('done');
+    setLoading(true);
+    try {
+      await resetPassword(email);
+      setStep('done');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="auth-page">
       <form
         className="auth-card"
-        onSubmit={step === 'email' ? handleCheckEmail : handleReset}
+        onSubmit={handleReset}
       >
-        <h2>Quên mật khẩu</h2>
+        <h2 data-i18n="auth.forgotTitle">Quên mật khẩu</h2>
 
         {step === 'email' && (
-          <div className="auth-field">
-            <label>Nhập email tài khoản</label>
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-          </div>
-        )}
-
-        {step === 'reset' && (
-          <div className="auth-field">
-            <label>Mật khẩu mới</label>
-            <input
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              required
-              minLength={6}
-            />
-          </div>
+          <>
+            <p style={{ fontSize: '14px', color: 'var(--color-text-muted)', marginBottom: '16px' }} data-i18n="auth.forgotDesc">
+              Nhập email tài khoản của bạn, chúng tôi sẽ gửi một liên kết để đặt lại mật khẩu.
+            </p>
+            <div className="auth-field">
+              <label data-i18n="auth.email">Email</label>
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+            </div>
+          </>
         )}
 
         {step === 'done' && (
-          <p className="auth-success">Đã đặt lại mật khẩu. Bạn có thể đăng nhập ngay.</p>
+          <p className="auth-success" data-i18n="auth.forgotSuccess">Đã gửi email đặt lại mật khẩu. Vui lòng kiểm tra hộp thư của bạn.</p>
         )}
 
         {error && <p className="auth-error">{error}</p>}
 
         {step !== 'done' && (
-          <button type="submit" className="btn btn-primary" style={{ justifyContent: 'center' }}>
-            {step === 'email' ? 'Tiếp tục' : 'Đặt lại mật khẩu'}
+          <button type="submit" className="btn btn-primary" style={{ justifyContent: 'center' }} disabled={loading}>
+            <span data-i18n={loading ? "auth.sending" : "auth.sendLink"}>
+              {loading ? 'Đang gửi...' : 'Gửi liên kết'}
+            </span>
           </button>
         )}
 
         <div className="auth-links">
-          <a onClick={() => onNavigate('login')}>Quay lại đăng nhập</a>
+          <a onClick={() => onNavigate('login')} data-i18n="auth.backToLogin">Quay lại đăng nhập</a>
         </div>
       </form>
     </div>

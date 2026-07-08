@@ -51,4 +51,5 @@ export const ICONS = {
   SPRAY_CAN: 'spray-can',
   REPLACE: 'replace',
   RULER: 'ruler',
+  FILM: 'film',
 };

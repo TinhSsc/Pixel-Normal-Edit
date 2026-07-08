@@ -1,4 +1,5 @@
-import { downloadImageFromDrive, initGoogleDrive, listDriveFiles, loginToDrive, logoutDrive, uploadToDrive } from './drive-api.js';
+import { getDriveToken, downloadImageFromDrive, listDriveFiles, initGoogleDrive, loginToDrive, logoutDrive, uploadToDrive, openDrivePicker } from './drive-api.js';
+import { getCurrentDirectoryHandle, listLocalFiles, readLocalFile } from './local-drive.js';
 import { getActiveTabId, getTabs, switchTab, createNewTab, renameTab } from '../core/tab-manager.js';
 import { generateWorkspacePngBlob } from '../io/export/export-png.js';
 import { generateWorkspaceJpegBlob } from '../io/export/export-jpeg.js';
@@ -45,6 +46,12 @@ export function setupDriveUI() {
   const driveHeaderStatus = document.getElementById('driveHeaderStatus');
 
   let driveUserEmail = "";
+
+  if (getDriveToken()) {
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('drive-connected', { detail: { accessToken: getDriveToken() } }));
+    }, 100);
+  }
 
   // Handle connection events
   window.addEventListener('drive-connected', async (e) => {
@@ -125,10 +132,10 @@ export function setupDriveUI() {
   
   // Note: saveToDriveBtn event logic has been moved to main.js for batch export
 
-  // Upload Modal Source Tabs
   const sourceBtns = document.querySelectorAll('.source-btn');
   const sourceLocalContent = document.getElementById('source-local-content');
   const sourceDriveContent = document.getElementById('source-drive-content');
+  const sourceLocalDirContent = document.getElementById('source-local-dir-content');
   const autoSizeLabel = document.getElementById('autoSizeLabel');
 
   sourceBtns.forEach(btn => {
@@ -144,17 +151,21 @@ export function setupDriveUI() {
       targetBtn.style.color = 'var(--color-text-bright)';
 
       const source = targetBtn.dataset.source;
-      if (source === 'local') {
-        if (sourceLocalContent) {
-          sourceLocalContent.style.display = 'block';
-          sourceLocalContent.classList.remove('tab-pane-transition');
-          void sourceLocalContent.offsetWidth; // trigger reflow
-          sourceLocalContent.classList.add('tab-pane-transition');
+      
+      if (sourceLocalContent) sourceLocalContent.style.display = 'none';
+      if (sourceDriveContent) sourceDriveContent.style.display = 'none';
+      if (sourceLocalDirContent) sourceLocalDirContent.style.display = 'none';
+      
+      if (source === 'local-dir') {
+        if (sourceLocalDirContent) {
+          sourceLocalDirContent.style.display = 'block';
+          sourceLocalDirContent.classList.remove('tab-pane-transition');
+          void sourceLocalDirContent.offsetWidth;
+          sourceLocalDirContent.classList.add('tab-pane-transition');
         }
-        if (sourceDriveContent) sourceDriveContent.style.display = 'none';
         if (autoSizeLabel) autoSizeLabel.style.display = 'flex';
+        loadLocalDirFileList();
       } else {
-        if (sourceLocalContent) sourceLocalContent.style.display = 'none';
         if (sourceDriveContent) {
           sourceDriveContent.style.display = 'block';
           sourceDriveContent.classList.remove('tab-pane-transition');
@@ -170,11 +181,68 @@ export function setupDriveUI() {
   const uploadDriveLoginBtn = document.getElementById('uploadDriveLoginBtn');
   if (uploadDriveLoginBtn) uploadDriveLoginBtn.addEventListener('click', loginToDrive);
 
+  const openDrivePickerBtn = document.getElementById('openDrivePickerBtn');
+  if (openDrivePickerBtn) {
+    openDrivePickerBtn.addEventListener('click', () => {
+      try {
+        const uploadModal = document.getElementById('uploadModal');
+        if (uploadModal) uploadModal.style.display = 'none'; // Ẩn ngay lập tức để không che Picker
+
+        openDrivePicker(async (fileId, fileName, mimeType) => {
+          try {
+            openDrivePickerBtn.innerHTML = '<i data-lucide="loader-2" class="spin" style="width: 16px; height: 16px;"></i> Đang tải...';
+            if (window.lucide) window.lucide.createIcons();
+            
+            const imgBlob = await downloadImageFromDrive(fileId);
+            
+            const newTabId = createNewTab();
+            switchTab(newTabId);
+            
+            const baseName = fileName.replace(/\.(png|jpg|jpeg|webp|json)$/i, '');
+            if (baseName) renameTab(newTabId, baseName);
+            
+            const isJson = fileName.toLowerCase().endsWith('.json') || mimeType === 'application/json';
+            
+            const tabs = getTabs();
+            const newTab = tabs.find(t => t.id === newTabId);
+            if (newTab) {
+              newTab.storage = { type: 'drive', id: fileId, handle: null, name: fileName };
+              newTab.format = isJson ? 'json' : 'png';
+            }
+            
+            if (isJson) {
+              const { handleJsonFile } = await import('../io/upload/upload-modal.js');
+              const jsonFile = new File([imgBlob], fileName, { type: 'application/json' });
+              handleJsonFile(jsonFile);
+              showNotification(`Đã mở dự án: ${fileName}`);
+            } else {
+              const imgFile = new File([imgBlob], fileName, { type: imgBlob.type || 'image/png' });
+              handleImageFile(imgFile, true);
+              showNotification(`Đã mở ảnh: ${fileName}`);
+            }
+            
+          } catch (err) {
+            showNotification(err.message, true);
+          } finally {
+            openDrivePickerBtn.innerHTML = `<i data-lucide="search" style="width: 16px; height: 16px;"></i><span data-i18n="drive.openPicker">${t('drive.openPicker') || 'Duyệt toàn bộ Drive...'}</span>`;
+            if (window.lucide) window.lucide.createIcons();
+          }
+        }, () => {
+          // Bắt sự kiện Cancel
+          const uploadModal = document.getElementById('uploadModal');
+          if (uploadModal) uploadModal.style.display = 'flex'; // Hiện lại
+        });
+      } catch (err) {
+        showNotification(err.message, true);
+      }
+    });
+  }
+
   async function loadDriveFileList() {
     const driveUploadList = document.getElementById('driveUploadList');
     if (!driveUploadList) return;
 
-    if (!driveLogoutBtn || driveLogoutBtn.style.display === 'none') {
+    if (!getDriveToken()) {
       // Not logged in
       return;
     }
@@ -206,9 +274,17 @@ export function setupDriveUI() {
         
         const date = new Date(file.modifiedTime).toLocaleDateString();
         
-        const imgHtml = file.thumbnailLink 
-          ? `<img src="${file.thumbnailLink}" style="width: 100%; aspect-ratio: 1; object-fit: contain; margin-bottom: 8px; border-radius: 4px; background: var(--color-surface-alt);" />`
-          : `<div style="width: 100%; aspect-ratio: 1; background: var(--color-surface-alt); display: flex; align-items: center; justify-content: center; margin-bottom: 8px; border-radius: 4px;"><i data-lucide="image" style="color: var(--color-text-muted);"></i></div>`;
+        const isJson = file.name.toLowerCase().endsWith('.json');
+        const defaultIcon = isJson ? 'file-json-2' : 'image';
+        
+        let imgHtml;
+        if (file.thumbnailLink && !isJson) {
+          imgHtml = `<img src="${file.thumbnailLink}" referrerpolicy="no-referrer"
+            onerror="this.onerror=null; this.outerHTML='<div style=\\'width: 100%; aspect-ratio: 1; background: var(--color-surface-alt); display: flex; align-items: center; justify-content: center; margin-bottom: 8px; border-radius: 4px;\\'><i data-lucide=\\'${defaultIcon}\\' style=\\'color: var(--color-text-muted);\\'></i></div>'; if(window.lucide) window.lucide.createIcons();" 
+            style="width: 100%; aspect-ratio: 1; object-fit: contain; margin-bottom: 8px; border-radius: 4px; background: var(--color-surface-alt);" />`;
+        } else {
+          imgHtml = `<div style="width: 100%; aspect-ratio: 1; background: var(--color-surface-alt); display: flex; align-items: center; justify-content: center; margin-bottom: 8px; border-radius: 4px;"><i data-lucide="${defaultIcon}" style="color: var(--color-text-muted); width: 32px; height: 32px;"></i></div>`;
+        }
           
         item.innerHTML = `
           ${imgHtml}
@@ -226,19 +302,29 @@ export function setupDriveUI() {
             const newTabId = createNewTab();
             switchTab(newTabId);
             
-            const baseName = file.name.replace(/\.png$/i, '');
+            const baseName = file.name.replace(/\.(png|jpg|jpeg|webp|json)$/i, '');
             if (baseName) {
               renameTab(newTabId, baseName);
             }
             
-            // Cập nhật driveFileId cho tab mới
+            // Cập nhật tab.storage cho tab mới
             const tabs = getTabs();
             const newTab = tabs.find(t => t.id === newTabId);
-            if (newTab) newTab.driveFileId = file.id;
+            if (newTab) {
+              newTab.storage = { type: 'drive', id: file.id, handle: null, name: file.name };
+              newTab.format = isJson ? 'json' : 'png';
+            }
             
-            const imgFile = new File([imgBlob], file.name, { type: 'image/png' });
-            handleImageFile(imgFile, true);
-            showNotification(`Đã mở ảnh: ${file.name}`);
+            if (file.name.toLowerCase().endsWith('.json')) {
+              const { handleJsonFile } = await import('../io/upload/upload-modal.js');
+              const jsonFile = new File([imgBlob], file.name, { type: 'application/json' });
+              handleJsonFile(jsonFile);
+              showNotification(`Đã mở dự án: ${file.name}`);
+            } else {
+              const imgFile = new File([imgBlob], file.name, { type: imgBlob.type || 'image/png' });
+              handleImageFile(imgFile, true);
+              showNotification(`Đã mở ảnh: ${file.name}`);
+            }
             
           } catch (err) {
             showNotification(err.message, true);
@@ -252,6 +338,112 @@ export function setupDriveUI() {
       
     } catch (err) {
       driveUploadList.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--color-danger);">${err.message}</div>`;
+    }
+  }
+
+  async function loadLocalDirFileList() {
+    const localDirUploadList = document.getElementById('localDirUploadList');
+    if (!localDirUploadList) return;
+
+    const handle = getCurrentDirectoryHandle();
+    if (!handle) {
+      // Show default "not configured" message which is already in HTML
+      return;
+    }
+
+    try {
+      localDirUploadList.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--color-text-muted);"><i data-lucide="loader-2" class="spin"></i> Đang tải danh sách...</div>`;
+      if (window.lucide) window.lucide.createIcons();
+      
+      const files = await listLocalFiles();
+      if (files.length === 0) {
+        localDirUploadList.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--color-text-muted);">Không tìm thấy ảnh hoặc project nào trong Thư mục cục bộ</div>`;
+        return;
+      }
+
+      localDirUploadList.style.display = 'grid';
+      localDirUploadList.style.gridTemplateColumns = 'repeat(auto-fill, minmax(100px, 1fr))';
+      localDirUploadList.style.gap = '12px';
+      localDirUploadList.innerHTML = '';
+      
+      files.forEach(file => {
+        const item = document.createElement('div');
+        item.style.cssText = `
+          display: flex; flex-direction: column; align-items: center; 
+          padding: 8px; border: 1px solid var(--color-border); border-radius: 8px; cursor: pointer;
+          transition: background 0.2s; position: relative;
+        `;
+        item.onmouseover = () => item.style.background = 'var(--color-surface-alt)';
+        item.onmouseout = () => item.style.background = 'transparent';
+        
+        const date = new Date(file.lastModified).toLocaleDateString();
+        const defaultIcon = file.isJson ? 'file-json-2' : 'image';
+        
+        const imgContainerId = 'local-img-' + Math.random().toString(36).substr(2, 9);
+        const imgHtml = `<div id="${imgContainerId}" style="width: 100%; aspect-ratio: 1; background: var(--color-surface-alt); display: flex; align-items: center; justify-content: center; margin-bottom: 8px; border-radius: 4px;"><i data-lucide="${defaultIcon}" style="color: var(--color-text-muted); width: 32px; height: 32px;"></i></div>`;
+          
+        item.innerHTML = `
+          ${imgHtml}
+          <div style="font-size: 12px; font-weight: 500; color: var(--color-text-bright); text-align: center; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${file.name}">${file.name}</div>
+          <div style="font-size: 10px; color: var(--color-text-muted); text-align: center;">${date}</div>
+        `;
+        
+        item.addEventListener('click', async () => {
+          try {
+            item.style.opacity = '0.5';
+            const fileBlob = await readLocalFile(file.handle);
+            
+            const uploadModal = document.getElementById('uploadModal');
+            if (uploadModal) uploadModal.style.display = 'none';
+            
+            const newTabId = createNewTab();
+            switchTab(newTabId);
+            
+            const baseName = file.name.replace(/\.(png|jpg|jpeg|webp|json)$/i, '');
+            if (baseName) {
+              renameTab(newTabId, baseName);
+            }
+            
+            // Cập nhật tab.storage cho tab mới
+            const tabs = getTabs();
+            const newTab = tabs.find(t => t.id === newTabId);
+            if (newTab) {
+              newTab.storage = { type: 'local', id: null, handle: file.handle, name: file.name };
+              newTab.format = file.isJson ? 'json' : 'png';
+            }
+            
+            if (file.isJson) {
+              const { handleJsonFile } = await import('../io/upload/upload-modal.js');
+              handleJsonFile(fileBlob);
+              showNotification(`Đã mở dự án: ${file.name}`);
+            } else {
+              handleImageFile(fileBlob, true);
+              showNotification(`Đã mở ảnh: ${file.name}`);
+            }
+            
+          } catch (err) {
+            showNotification(err.message, true);
+            item.style.opacity = '1';
+          }
+        });
+        
+        localDirUploadList.appendChild(item);
+        
+        // Load thumbnail asynchronously
+        if (!file.isJson) {
+          file.handle.getFile().then(blob => {
+            const url = URL.createObjectURL(blob);
+            const container = document.getElementById(imgContainerId);
+            if (container) {
+              container.innerHTML = `<img src="${url}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 4px;" onload="URL.revokeObjectURL(this.src)" />`;
+            }
+          }).catch(err => console.error("Thumbnail load error:", err));
+        }
+      });
+      if (window.lucide) window.lucide.createIcons();
+      
+    } catch (err) {
+      localDirUploadList.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--color-danger);">${err.message}</div>`;
     }
   }
 }

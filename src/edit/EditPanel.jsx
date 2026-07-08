@@ -157,6 +157,31 @@ export default function EditPanel() {
       showBtnNamesToggle.addEventListener('change', updateShowNames);
     }
 
+    const animationsToggle = document.getElementById('animationsToggle');
+    const updateAnimations = () => {
+      if (!animationsToggle) return;
+      const isChecked = animationsToggle.checked;
+      localStorage.setItem('pixel-edit-animations-enabled', isChecked);
+      if (isChecked) {
+        document.documentElement.classList.add('animations-enabled');
+      } else {
+        document.documentElement.classList.remove('animations-enabled');
+      }
+    };
+
+    if (animationsToggle) {
+      const savedAnimations = localStorage.getItem('pixel-edit-animations-enabled');
+      // Default to true if not set
+      const isEnabled = savedAnimations === null ? true : savedAnimations === 'true';
+      animationsToggle.checked = isEnabled;
+      if (isEnabled) {
+        document.documentElement.classList.add('animations-enabled');
+      } else {
+        document.documentElement.classList.remove('animations-enabled');
+      }
+      animationsToggle.addEventListener('change', updateAnimations);
+    }
+
     return () => {
       if (themeSelect) {
         themeSelect.removeEventListener('change', updateTheme);
@@ -165,6 +190,9 @@ export default function EditPanel() {
       }
       if (showBtnNamesToggle) {
         showBtnNamesToggle.removeEventListener('change', updateShowNames);
+      }
+      if (animationsToggle) {
+        animationsToggle.removeEventListener('change', updateAnimations);
       }
     };
   }, []);

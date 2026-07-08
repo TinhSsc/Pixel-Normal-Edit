@@ -49,3 +49,52 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+/* UI Animations - Toggled via .animations-enabled class */
+html.animations-enabled .btn,
+html.animations-enabled .tool-btn,
+html.animations-enabled .tab-btn,
+html.animations-enabled .source-btn,
+html.animations-enabled .dl-format-btn,
+html.animations-enabled .dl-dest-btn,
+html.animations-enabled .select-btn {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html.animations-enabled .btn:active,
+html.animations-enabled .tool-btn:active,
+html.animations-enabled .tab-btn:active,
+html.animations-enabled .source-btn:active,
+html.animations-enabled .dl-format-btn:active,
+html.animations-enabled .dl-dest-btn:active,
+html.animations-enabled .select-btn:active {
+  transform: scale(0.95);
+}
+
+html.animations-enabled .tool-btn.active {
+  transform: scale(1.05);
+}
+
+html.animations-enabled .modal-content {
+  animation: modalSlideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+html.animations-enabled .tab-content.active {
+  animation: fadeInTab 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html.animations-enabled .tool-popup,
+html.animations-enabled .popup-bridge-bottom .tool-popup,
+html.animations-enabled .popup-bridge-left .tool-popup {
+  animation: fadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html.animations-enabled .dockview-theme-dark .dv-tab,
+html.animations-enabled .dockview-theme-light .dv-tab {
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+html.animations-enabled .panel-section {
+  animation: fadeInTab 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+

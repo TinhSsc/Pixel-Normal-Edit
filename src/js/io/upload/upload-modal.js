@@ -22,6 +22,7 @@ export function setupUploadModal() {
   if (!modal) return;
 
   openBtn?.addEventListener('click', () => {
+    document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
     modal.style.display = 'flex';
   });
 
@@ -146,7 +147,7 @@ function proceedWithImage(img, src, autoSize) {
   document.getElementById('uploadModal').style.display = 'none';
 }
 
-function handleJsonFile(file) {
+export function handleJsonFile(file) {
   const reader = new FileReader();
   reader.onload = e => handleJsonText(e.target.result);
   reader.readAsText(file);

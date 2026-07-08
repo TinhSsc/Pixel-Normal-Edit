@@ -1,30 +1,49 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import GoogleButton from '../components/GoogleButton.jsx';
-import { findUserByEmail, saveUser } from '../js/auth/fake-db.js';
+import { loginWithEmail, loginWithGoogle } from '../js/firebase/auth-api.js';
 import { setCurrentUser } from '../js/auth/auth-state.js';
+import { setDriveToken } from '../js/services/drive-api.js';
 import './AuthPages.css';
 
 export default function LoginPage({ onLoggedIn, onNavigate }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const user = findUserByEmail(email);
-    if (!user || user.password !== password) {
-      setError('Email hoặc mật khẩu không đúng.');
-      return;
+    setError('');
+    setLoading(true);
+    try {
+      const user = await loginWithEmail(email, password);
+      // user is returned from Firebase, handled automatically by auth state listener in App,
+      // but we can call onLoggedIn directly to transition the UI fast.
+      setCurrentUser(user);
+      onLoggedIn(user);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
-    setCurrentUser(user);
-    onLoggedIn(user);
   };
 
-  const handleGoogle = useCallback((googleUser) => {
-    const user = saveUser(googleUser);
-    setCurrentUser(user);
-    onLoggedIn(user);
-  }, [onLoggedIn]);
+  const handleGoogle = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      const { user, driveToken } = await loginWithGoogle();
+      if (driveToken) {
+        setDriveToken(driveToken);
+      }
+      setCurrentUser(user);
+      onLoggedIn(user);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="auth-page">
