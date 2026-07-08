@@ -303,9 +303,12 @@
 
 /* Mobile Responsive Layout */
 @media (max-width: 768px) {
+  html, body {
+    overflow: auto;
+    height: auto;
+  }
   body {
     padding: 10px;
-    height: auto;
     min-height: 100vh;
   }
 

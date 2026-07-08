@@ -150,67 +150,55 @@ function App() {
 
 
   const onReady = (event) => {
+    let loaded = false;
+    try {
+      const savedLayout = localStorage.getItem('dockview_layout');
+      if (savedLayout) {
+        event.api.fromJSON(JSON.parse(savedLayout));
+        loaded = true;
+      }
+    } catch (e) {
+      console.warn('Failed to load dockview layout:', e);
+      localStorage.removeItem('dockview_layout');
+    }
 
-    const canvasPanel = event.api.addPanel({
+    if (!loaded) {
+      const canvasPanel = event.api.addPanel({
+        id: 'canvas',
+        component: 'canvas',
+        tabComponent: 'canvasTab',
+        title: t('app.title') || 'Pixel Normal Edit',
+      });
 
-      id: 'canvas',
+      const toolbarPanel = event.api.addPanel({
+        id: 'toolbar',
+        component: 'toolbar',
+        title: t('group.draw') || 'Công cụ',
+        position: { direction: 'left', referencePanel: 'canvas' },
+        minimumWidth: 120,
+      });
 
-      component: 'canvas',
+      const settingsPanel = event.api.addPanel({
+        id: 'settings',
+        component: 'settings',
+        title: t('group.operations') || 'Thao tác',
+        position: { direction: 'right', referencePanel: 'canvas' },
+        minimumWidth: 160,
+      });
 
-      tabComponent: 'canvasTab',
+      requestAnimationFrame(() => {
+        try {
+          toolbarPanel.api.setSize({ width: 150 });
+          settingsPanel.api.setSize({ width: 220 });
+        } catch (_) { }
+      });
+    }
 
-      title: t('app.title') || 'Pixel Normal Edit',
-
-    });
-
-
-
-    const toolbarPanel = event.api.addPanel({
-
-      id: 'toolbar',
-
-      component: 'toolbar',
-
-      title: t('group.draw') || 'Công cụ',
-
-      position: { direction: 'left', referencePanel: 'canvas' },
-
-      minimumWidth: 120,
-
-    });
-
-
-
-    const settingsPanel = event.api.addPanel({
-
-      id: 'settings',
-
-      component: 'settings',
-
-      title: t('group.operations') || 'Thao tác',
-
-      position: { direction: 'right', referencePanel: 'canvas' },
-
-      minimumWidth: 160,
-
-    });
-
-
-
-    // Set initial sizes once - user can freely resize after this
-
-    requestAnimationFrame(() => {
-
+    event.api.onDidLayoutChange(() => {
       try {
-
-        toolbarPanel.api.setSize({ width: 150 });
-
-        settingsPanel.api.setSize({ width: 220 });
-
-      } catch (_) { }
-
+        localStorage.setItem('dockview_layout', JSON.stringify(event.api.toJSON()));
+      } catch (e) { }
     });
-
   };
 
   useEffect(() => {

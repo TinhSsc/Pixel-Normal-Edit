@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Icon, ICONS } from '../components/icons';
 import DrawToolsTab from '../toolbar/DrawToolsTab.jsx';
 import EditToolsTab from '../edit/EditToolsTab.jsx';
-import { t } from '../js/lang/i18n.js';
+import { t, getCurrentLang } from '../js/lang/i18n.js';
 
 export default function GlobalSettingsModal() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -80,6 +80,28 @@ export default function GlobalSettingsModal() {
 
         <div style={{ flex: 1, overflowY: 'auto', padding: '4px' }}>
           <div className="tab-content active" id="tab-appearance">
+            <div style={{ background: 'var(--color-bg)', padding: '20px', borderRadius: '12px', border: '1px solid var(--color-border)', marginBottom: '12px' }}>
+              <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--color-text-bright)' }} data-i18n="settings.language">Ngôn ngữ (Language)</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div style={{ position: 'relative' }}>
+                  <select 
+                    id="languageSelect" 
+                    className="select-dropdown" 
+                    defaultValue={getCurrentLang()}
+                    onChange={(e) => {
+                      import('../js/lang/i18n.js').then(({ setLang }) => {
+                        setLang(e.target.value);
+                      });
+                    }}
+                  >
+                    <option value="vi">Tiếng Việt</option>
+                    <option value="en">English</option>
+                  </select>
+                  <Icon name={ICONS.CHEVRON_DOWN} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: 'var(--color-text-muted)', pointerEvents: 'none' }} />
+                </div>
+              </div>
+            </div>
+
             <div style={{ background: 'var(--color-bg)', padding: '20px', borderRadius: '12px', border: '1px solid var(--color-border)' }}>
               <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--color-text-bright)' }} data-i18n="theme.title">Giao diện (Theme)</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -139,17 +161,17 @@ export default function GlobalSettingsModal() {
 
           <div className="tab-content" id="tab-account">
             <div style={{ background: 'var(--color-bg)', padding: '20px', borderRadius: '12px', border: '1px solid var(--color-border)', marginBottom: '16px' }}>
-              <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--color-text-bright)' }}>Tài khoản Pixel Normal Edit</div>
+              <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--color-text-bright)' }} data-i18n="settings.accountTitle">Tài khoản Pixel Normal Edit</div>
               <div className="setting-group" style={{ marginBottom: '0' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--color-surface-alt)', borderRadius: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--color-surface-alt)', borderRadius: '8px', flexWrap: 'wrap', gap: '12px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }} id="pixelAccountInfo">
                     <img src={currentUser?.picture || undefined} alt="" style={{ display: (currentUser && currentUser.picture) ? 'block' : 'none', width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }} />
                     <div style={{ display: (currentUser && currentUser.picture) ? 'none' : 'block' }}>
                       <Icon name={ICONS.USER} style={{ color: 'var(--color-text-muted)', width: '24px', height: '24px' }} />
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
-                      <span id="pixelAccountName" style={{ fontSize: '14px', fontWeight: 500, color: 'var(--color-text-bright)' }}>{currentUser ? currentUser.name : 'Chưa đăng nhập'}</span>
-                      <span id="pixelAccountEmail" style={{ fontSize: '12px', color: 'var(--color-text-muted)' }}>{currentUser ? currentUser.email : 'Vui lòng đăng nhập để đồng bộ'}</span>
+                      <span id="pixelAccountName" style={{ fontSize: '14px', fontWeight: 500, color: 'var(--color-text-bright)' }} data-i18n={currentUser ? null : "auth.notLoggedIn"}>{currentUser ? currentUser.name : (t('auth.notLoggedIn') || 'Chưa đăng nhập')}</span>
+                      <span id="pixelAccountEmail" style={{ fontSize: '12px', color: 'var(--color-text-muted)', wordBreak: 'break-all' }} data-i18n={currentUser ? null : "auth.loginToSync"}>{currentUser ? currentUser.email : (t('auth.loginToSync') || 'Vui lòng đăng nhập để đồng bộ')}</span>
                     </div>
                   </div>
                   {currentUser && (
@@ -158,7 +180,7 @@ export default function GlobalSettingsModal() {
                         logout();
                         document.getElementById('globalSettingsModal').style.display = 'none';
                       });
-                    }}>Đăng xuất</button>
+                    }} data-i18n="auth.logout">{t('auth.logout') || 'Đăng xuất'}</button>
                   )}
                 </div>
               </div>
@@ -168,7 +190,7 @@ export default function GlobalSettingsModal() {
               <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--color-text-bright)' }} data-i18n="group.backupSync">Lưu trữ & Đồng bộ</div>
               <div className="setting-group" style={{ marginBottom: '0' }}>
                 <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', color: 'var(--color-text)' }}>Google Drive</h4>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--color-surface-alt)', borderRadius: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--color-surface-alt)', borderRadius: '8px', flexWrap: 'wrap', gap: '12px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <Icon name={ICONS.CLOUD} style={{ color: 'var(--color-text-muted)' }} />
                     <span id="driveStatusText" style={{ fontSize: '13px', color: 'var(--color-text-muted)' }} data-i18n="status.driveDisconnected">Chưa kết nối</span>

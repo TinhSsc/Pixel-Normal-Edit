@@ -181,6 +181,7 @@ export default {
   "theme.bg": "Nền (Bg)",
   "theme.primary": "Nhấn (Primary)",
   "theme.gridLine": "Màu lưới (Grid)",
+  "settings.language": "Ngôn ngữ",
 
   "status.init": "Chào mừng đến với Pixel Normal Edit!",
   "status.rotated": "Đã xoay 90°.",
@@ -218,6 +219,10 @@ export default {
   "auth.sendLink": "Gửi liên kết",
   "auth.backToLogin": "Quay lại đăng nhập",
   "auth.google": "Tiếp tục với Google",
+  "auth.notLoggedIn": "Chưa đăng nhập",
+  "auth.loginToSync": "Vui lòng đăng nhập để đồng bộ",
+  "auth.logout": "Đăng xuất",
+  "settings.accountTitle": "Tài khoản Pixel Normal Edit",
   "status.pickedColor": "Đã hút màu:",
   "status.processing": "Đang xử lý...",
   "status.fillComplete": "Đã hoàn tất đổ màu",
