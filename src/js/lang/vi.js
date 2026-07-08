@@ -221,6 +221,9 @@ export default {
   "status.pickedColor": "Đã hút màu:",
   "status.processing": "Đang xử lý...",
   "status.fillComplete": "Đã hoàn tất đổ màu",
+  "status.saving": "Đang lưu...",
+  "status.saved": "Đã lưu",
+  "status.syncError": "Lỗi đồng bộ",
   "status.toolSelected": "Đã chọn công cụ:",
   "status.jsonInvalid": "Cấu trúc JSON không hợp lệ.",
   "status.jsonLoaded": "Đã tải JSON.",
@@ -281,11 +284,11 @@ export default {
   "download.execute": "Tiến hành tải xuống",
 
   "settings.localDirectory": "Thư mục cục bộ",
-  "settings.localDirectoryDesc": "Cấp quyền để ứng dụng lưu file trực tiếp vào máy mà không cần hộp thoại tải xuống.",
-  "settings.noDirectorySelected": "Chưa chọn thư mục nào",
-  "settings.selectDirectory": "Chọn thư mục",
-  "settings.changeDirectory": "Thay đổi thư mục",
+  "settings.localDirectoryDesc": "Cấp quyền cho trình duyệt lưu file trực tiếp vào thiết bị của bạn mà không cần phải hiện hộp thoại tải xuống.",
+  "settings.noDirectorySelected": "Chưa cấu hình Thư mục cục bộ",
   "settings.clearDirectory": "Xóa cấu hình",
+  "settings.changeDirectory": "Thay đổi thư mục",
+  "settings.selectDirectory": "Chọn thư mục",
 
   "modal.clickToSelect": "hoặc nhấp để chọn file từ máy tính",
 

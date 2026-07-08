@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Icon, ICONS } from '../components/icons';
 import DrawToolsTab from '../toolbar/DrawToolsTab.jsx';
 import EditToolsTab from '../edit/EditToolsTab.jsx';
+import { t } from '../js/lang/i18n.js';
 
 export default function GlobalSettingsModal() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -193,13 +194,13 @@ export default function GlobalSettingsModal() {
                     {localDirName && (
                       <button className="btn" style={{ padding: '6px 12px', fontSize: '13px', background: 'var(--color-danger)', color: 'white' }} onClick={() => {
                         import('../js/services/local-drive.js').then(({ clearLocalDirectory }) => clearLocalDirectory());
-                      }} data-i18n="settings.clearDirectory">Xóa cấu hình</button>
+                      }} data-i18n="settings.clearDirectory">{t('settings.clearDirectory') || "Xóa cấu hình"}</button>
                     )}
                     <button className="btn btn-primary" style={{ padding: '6px 12px', fontSize: '13px' }} onClick={() => {
                       import('../js/services/local-drive.js').then(({ pickLocalDirectory }) => pickLocalDirectory());
                     }}>
                       <span data-i18n={localDirName ? "settings.changeDirectory" : "settings.selectDirectory"}>
-                        {localDirName ? "Thay đổi thư mục" : "Chọn thư mục"}
+                        {localDirName ? (t('settings.changeDirectory') || "Thay đổi thư mục") : (t('settings.selectDirectory') || "Chọn thư mục")}
                       </span>
                     </button>
                   </div>

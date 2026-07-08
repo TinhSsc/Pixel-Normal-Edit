@@ -49,14 +49,14 @@ function setHeaderStatus(statusText) {
   const indicator = document.getElementById('saveStatusIndicator');
   if (indicator) {
     if (statusText === 'saving') {
-      indicator.innerHTML = '<i data-lucide="loader-2" class="spin" style="width:12px;height:12px"></i> Đang lưu...';
+      indicator.innerHTML = `<i data-lucide="loader-2" class="spin" style="width:12px;height:12px"></i> <span data-i18n="status.saving">${t('status.saving') || 'Đang lưu...'}</span>`;
       indicator.style.color = 'var(--color-info)';
     } else if (statusText === 'saved') {
-      indicator.innerHTML = '<i data-lucide="check" style="width:12px;height:12px"></i> Đã lưu';
+      indicator.innerHTML = `<i data-lucide="check" style="width:12px;height:12px"></i> <span data-i18n="status.saved">${t('status.saved') || 'Đã lưu'}</span>`;
       indicator.style.color = 'var(--color-success)';
-      setTimeout(() => { if (indicator.innerHTML.includes('Đã lưu')) indicator.innerHTML = ''; }, 3000);
+      setTimeout(() => { if (indicator.innerHTML.includes('check')) indicator.innerHTML = ''; }, 3000);
     } else if (statusText === 'error') {
-      indicator.innerHTML = '<i data-lucide="x" style="width:12px;height:12px"></i> Lỗi đồng bộ';
+      indicator.innerHTML = `<i data-lucide="x" style="width:12px;height:12px"></i> <span data-i18n="status.syncError">${t('status.syncError') || 'Lỗi đồng bộ'}</span>`;
       indicator.style.color = 'var(--color-danger)';
     } else {
       indicator.innerHTML = '';
