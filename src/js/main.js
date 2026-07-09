@@ -1,7 +1,7 @@
 import { resizeCanvas, fitToScreen } from './core/viewport.js';
 import { renderPixels } from './core/render.js';
 import { els, setStatus, setCurrentTool, initEls } from './core/state.js';
-import { getTabs, getActiveTabId, initTabs, performQuickSave } from './core/tab-manager.js';
+import { getTabs, getActiveTabId, initTabs, performQuickSave, syncToDrive } from './core/tab-manager.js';
 
 import { setupGradientMode } from './modes/gradient-mode.js';
 import { setupMirrorMode } from './modes/mirror-mode.js';
@@ -14,6 +14,7 @@ import { setupSetBackground } from './actions/set-background.js';
 import { setupTrim } from './actions/trim.js';
 import { setupGridSizeSelect, setGridSize } from './actions/grid-size-select.js';
 import { setupToggleToolsPanel } from './actions/toggle-tools-panel.js';
+import { handleCopy, handleCut, handlePaste, handleDeleteSelection } from './actions/clipboard.js';
 import { loadWorkspace } from './core/storage.js';
 
 import { setupRotate } from './transforms/rotate.js';
@@ -83,10 +84,33 @@ export function initEditor() {
 
   // Hotkeys
   document.addEventListener('keydown', (e) => {
+    // Avoid triggering canvas hotkeys when typing in inputs
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
     // Ctrl+S
     if ((e.ctrlKey || e.metaKey) && e.key === 's') {
       e.preventDefault();
       performQuickSave();
+    }
+    // Ctrl+C
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
+      e.preventDefault();
+      handleCopy();
+    }
+    // Ctrl+X
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'x') {
+      e.preventDefault();
+      handleCut();
+    }
+    // Ctrl+V
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v') {
+      e.preventDefault();
+      handlePaste();
+    }
+    // Delete / Backspace
+    if (e.key === 'Delete' || e.key === 'Backspace') {
+      e.preventDefault();
+      handleDeleteSelection();
     }
   });
 
@@ -225,11 +249,8 @@ export function initEditor() {
             // The exportToDrive function in drive-ui.js doesn't update tab.storage yet.
             // Wait, exportToDrive doesn't return the new file ID directly to us here.
             // Let's call it and assume the tab format needs to be updated.
-            const { exportToDrive } = await import('./services/drive-api.js'); // Actually drive-ui.js exports it.
-            // Instead of dealing with circular imports, drive-ui.js exportToDrive updates driveFileId.
-            // We should just use syncToDrive from tab-manager instead!
+            // We already imported syncToDrive from tab-manager statically
             tab.format = format; // temporarily set format
-            const { syncToDrive } = await import('./core/tab-manager.js');
             await syncToDrive(tab);
             successCount++;
           }
@@ -265,9 +286,18 @@ window.addEventListener('toolbar-mounted', () => {
   document.body.addEventListener('click', (e) => {
     const btn = e.target.closest('.tool-btn[data-tool]');
     if (btn) {
+      const toolId = btn.dataset.tool;
+      if (['cut', 'copy', 'paste'].includes(toolId)) {
+        if (toolId === 'cut') handleCut();
+        if (toolId === 'copy') handleCopy();
+        if (toolId === 'paste') handlePaste();
+        // Do not make these active tools
+        return;
+      }
+      
       document.querySelectorAll('.tool-btn[data-tool]').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      setCurrentTool(btn.dataset.tool);
+      setCurrentTool(toolId);
       setStatus(`${t("status.toolSelected")} ${btn.getAttribute("data-tooltip") || btn.title}`);
       saveToolbarState();
     }

@@ -4,8 +4,11 @@ import { renderPixels } from '../core/render.js';
 import { t } from '../lang/i18n.js';
 import { debouncedSaveWorkspace } from '../core/tab-manager.js';
 
+import { handleSelectUndo } from '../tools/select.js';
+
 export function setupUndo() {
   els.undoBtns?.forEach(btn => btn.addEventListener('click', () => {
+    if (handleSelectUndo()) return;
     const did = undo(pixelMap, renderPixels);
     if (did) {
       setStatus(t('status.undo'));
@@ -16,6 +19,7 @@ export function setupUndo() {
   document.addEventListener('keydown', e => {
     if (e.ctrlKey && !e.shiftKey && e.key.toLowerCase() === 'z') {
       e.preventDefault();
+      if (handleSelectUndo()) return;
       const did = undo(pixelMap, renderPixels);
       if (did) {
         setStatus(t('status.undo'));

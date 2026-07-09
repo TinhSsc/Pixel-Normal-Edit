@@ -5,7 +5,7 @@ import { generateWorkspacePngBlob } from '../io/export/export-png.js';
 import { generateWorkspaceJpegBlob } from '../io/export/export-jpeg.js';
 import { generateWorkspaceWebpBlob } from '../io/export/export-webp.js';
 import { generateWorkspaceJsonBlob } from '../io/export/export-json.js';
-import { handleImageFile } from '../io/upload/upload-modal.js';
+import { handleImageFile, handleJsonFile } from '../io/upload/upload-modal.js';
 import { t } from '../lang/i18n.js';
 
 function showNotification(msg, isError = false) {
@@ -211,7 +211,7 @@ export function setupDriveUI() {
             }
             
             if (isJson) {
-              const { handleJsonFile } = await import('../io/upload/upload-modal.js');
+
               const jsonFile = new File([imgBlob], fileName, { type: 'application/json' });
               handleJsonFile(jsonFile);
               showNotification(`Đã mở dự án: ${fileName}`);
@@ -316,7 +316,7 @@ export function setupDriveUI() {
             }
             
             if (file.name.toLowerCase().endsWith('.json')) {
-              const { handleJsonFile } = await import('../io/upload/upload-modal.js');
+
               const jsonFile = new File([imgBlob], file.name, { type: 'application/json' });
               handleJsonFile(jsonFile);
               showNotification(`Đã mở dự án: ${file.name}`);
@@ -413,7 +413,7 @@ export function setupDriveUI() {
             }
             
             if (file.isJson) {
-              const { handleJsonFile } = await import('../io/upload/upload-modal.js');
+
               handleJsonFile(fileBlob);
               showNotification(`Đã mở dự án: ${file.name}`);
             } else {

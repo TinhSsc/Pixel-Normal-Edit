@@ -75,6 +75,7 @@ export default function ToolbarPanel() {
               </div>
             </div>
           </div>
+          <button className="tool-btn" data-tool="select" data-variants="select" data-i18n="tool.select" title="Bắt (Select/Move)"><Icon name={ICONS.MOUSE_POINTER_2} /></button>
           <button className="tool-btn" data-tool="picker" data-variants="picker" data-i18n="tool.picker"><Icon name={ICONS.PIPETTE} /></button>
         </div>
       </div>

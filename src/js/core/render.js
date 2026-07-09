@@ -1,4 +1,4 @@
-import { ctx, GRID_WIDTH, GRID_HEIGHT, pixelMap, previewPixels, offscreenImageData, offscreenData32 } from './state.js';
+import { ctx, GRID_WIDTH, GRID_HEIGHT, pixelMap, previewPixels, offscreenImageData, offscreenData32, selectionBox, floatingSelection } from './state.js';
 import { getZoom, getPan, applyTransform } from './viewport.js';
 import { parseColorToUint32 } from './color-utils.js';
 import { bresenhamLine } from '../shared/line-algo.js';
@@ -126,13 +126,20 @@ export function renderPixels(isPreviewOnly = false) {
 
     ctx.putImageData(offscreenImageData, 0, 0);
 
-    lastPreviewRect = computeBoundingRect(previewPixels);
+    drawFloatingSelection();
+    drawSelectionBox();
+
+    const selRect1 = selectionBox ? { x: selectionBox.x - 1, y: selectionBox.y - 1, w: selectionBox.width + 2, h: selectionBox.height + 2 } : null;
+    const selRect2 = floatingSelection ? { x: floatingSelection.x - 1, y: floatingSelection.y - 1, w: floatingSelection.width + 2, h: floatingSelection.height + 2 } : null;
+    lastPreviewRect = mergeRects(computeBoundingRect(previewPixels), selRect1, selRect2);
     forceFullRender = false;
     return;
   }
 
   // 2. PARTIAL RENDER PATH (For fast preview drag)
-  const newPreviewRect = computeBoundingRect(previewPixels);
+  const selRect1 = selectionBox ? { x: selectionBox.x - 1, y: selectionBox.y - 1, w: selectionBox.width + 2, h: selectionBox.height + 2 } : null;
+  const selRect2 = floatingSelection ? { x: floatingSelection.x - 1, y: floatingSelection.y - 1, w: floatingSelection.width + 2, h: floatingSelection.height + 2 } : null;
+  const newPreviewRect = mergeRects(computeBoundingRect(previewPixels), selRect1, selRect2);
   let updateRect = mergeRects(lastPreviewRect, newPreviewRect);
   
   if (!updateRect) return;
@@ -171,9 +178,52 @@ export function renderPixels(isPreviewOnly = false) {
     updateRect.x, updateRect.y, updateRect.w, updateRect.h
   );
 
+  // We need to redraw floating selection and selection box on partial updates too.
+  // Because putImageData overwrites them. But since we just updated a partial rect,
+  // we might clear parts of the selection border. For simplicity and robustness,
+  // we can force full render of selection layers if they intersect updateRect.
+  // Actually, putImageData just overwrites the updateRect. So we just re-draw over it.
+  drawFloatingSelection();
+  drawSelectionBox();
+
   drawStampedPreview();
 
   lastPreviewRect = newPreviewRect;
+}
+
+function drawFloatingSelection() {
+  if (!floatingSelection || !ctx) return;
+  const { x, y, width, height, pixels } = floatingSelection;
+  
+  // We draw the floating pixels onto a temporary canvas, then drawImage it
+  const tempCanvas = document.createElement('canvas');
+  tempCanvas.width = width;
+  tempCanvas.height = height;
+  const tctx = tempCanvas.getContext('2d');
+  const timg = tctx.createImageData(width, height);
+  const tdata32 = new Uint32Array(timg.data.buffer);
+  
+  for (let i = 0; i < pixels.length; i++) {
+    tdata32[i] = pixels[i];
+  }
+  tctx.putImageData(timg, 0, 0);
+  
+  ctx.drawImage(tempCanvas, x, y);
+}
+
+function drawSelectionBox() {
+  let box = selectionBox || (floatingSelection ? floatingSelection : null);
+  const el = document.getElementById('selectionOverlay');
+  if (!el) return;
+  if (!box) {
+    el.style.display = 'none';
+    return;
+  }
+  el.style.display = 'block';
+  el.style.left = `${(box.x / GRID_WIDTH) * 100}%`;
+  el.style.top = `${(box.y / GRID_HEIGHT) * 100}%`;
+  el.style.width = `${(box.width / GRID_WIDTH) * 100}%`;
+  el.style.height = `${(box.height / GRID_HEIGHT) * 100}%`;
 }
 
 function drawStampedPreview() {

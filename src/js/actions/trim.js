@@ -1,8 +1,10 @@
 import { els, setStatus, GRID_WIDTH, GRID_HEIGHT, pixelMap, setGridSizeParams, resetMaps } from '../core/state.js';
 import { t } from '../lang/i18n.js';
-import { beginStroke, commitStroke } from '../core/history.js';
+import { beginStroke, commitStroke, resetHistory } from '../core/history.js';
 import { renderPixels } from '../core/render.js';
 import { resizeCanvas, fitToScreen } from '../core/viewport.js';
+
+import { syncGridSizeUI } from './grid-size-select.js';
 
 export function setupTrim() {
   const trimBtn = document.getElementById('trimBtn');
@@ -62,9 +64,7 @@ export function setupTrim() {
     
     setGridSizeParams(newW, newH, newData, newData32);
     
-    import('./grid-size-select.js').then(({ syncGridSizeUI }) => {
-      syncGridSizeUI(newW, newH);
-    });
+    syncGridSizeUI(newW, newH);
 
     resetMaps(newData32);
     // Note: commitStroke in history.js currently only stores pixel diffs.
@@ -72,9 +72,7 @@ export function setupTrim() {
     // to just reset current stroke state. Size undo needs history rewrite.
     commitStroke(newPixelMap);
     
-    import('../core/history.js').then(({ resetHistory }) => {
-      resetHistory();
-    });
+    resetHistory();
     
     resizeCanvas();
     fitToScreen();

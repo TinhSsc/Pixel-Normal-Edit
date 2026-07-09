@@ -1,10 +1,11 @@
-import { setStatus, setGridSizeParams, resetMaps } from '../../core/state.js';
+import { setStatus, setGridSizeParams, resetMaps, pixelMap } from '../../core/state.js';
 import { resizeCanvas, fitToScreen } from '../../core/viewport.js';
 import { renderPixels } from '../../core/render.js';
 import { resetHistory } from '../../core/history.js';
 import { setSourceImage } from '../../actions/set-background.js';
 import { t } from '../../lang/i18n.js';
 import { parseColorToUint32 } from '../../core/color-utils.js';
+import { syncGridSizeUI } from '../../actions/grid-size-select.js';
 export function setupUploadModal() {
   const modal = document.getElementById('uploadModal');
   const openBtn = document.getElementById('openUploadModalBtn');
@@ -86,14 +87,12 @@ export function handleImageFile(file, autoSize = true) {
   const img = new Image();
   img.onload = () => {
     if (img.naturalWidth * img.naturalHeight > 1000000) {
-      import('../../lang/i18n.js').then(({ t }) => {
-        if (!window.confirm(t('status.largeImgWarning'))) {
-          document.getElementById('uploadModal').style.display = 'none';
-          URL.revokeObjectURL(src);
-          return;
-        }
-        proceedWithImage(img, src, autoSize);
-      });
+      if (!window.confirm(t('status.largeImgWarning'))) {
+        document.getElementById('uploadModal').style.display = 'none';
+        URL.revokeObjectURL(src);
+        return;
+      }
+      proceedWithImage(img, src, autoSize);
     } else {
       proceedWithImage(img, src, autoSize);
     }
@@ -115,7 +114,7 @@ function proceedWithImage(img, src, autoSize) {
     const newData = newCtx.getImageData(0, 0, w, h);
     const newData32 = new Uint32Array(newData.data.buffer);
     setGridSizeParams(w, h, newData, newData32);
-    import('../../actions/grid-size-select.js').then(({ syncGridSizeUI }) => syncGridSizeUI(w, h));
+    syncGridSizeUI(w, h);
     
     const newPixelMap = new Uint32Array(newData32);
     const data = newData.data;
@@ -132,17 +131,12 @@ function proceedWithImage(img, src, autoSize) {
     renderPixels();
   }
 
-  setStatus(setStatus => setStatus, false);
-  import('../../core/state.js').then(({ setStatus, pixelMap }) => {
-    import('../../lang/i18n.js').then(({ t }) => {
-      const msg = t('status.imgLoaded');
-      if (autoSize) {
-        setStatus(`${msg} (${pixelMap.length.toLocaleString()} pixels)`);
-      } else {
-        setStatus(msg);
-      }
-    });
-  });
+  const msg = t('status.imgLoaded');
+  if (autoSize) {
+    setStatus(`${msg} (${pixelMap.length.toLocaleString()} pixels)`);
+  } else {
+    setStatus(msg);
+  }
 
   document.getElementById('uploadModal').style.display = 'none';
 }
@@ -157,9 +151,7 @@ export function handleJsonText(text) {
   try {
     const data = JSON.parse(text);
     if (!data.width || !data.height || !data.pixels) {
-      import('../../lang/i18n.js').then(({ t }) => {
-        import('../../core/state.js').then(({ setStatus }) => setStatus(t('status.jsonInvalid'), true));
-      });
+      setStatus(t('status.jsonInvalid'), true);
       return;
     }
 
@@ -171,7 +163,7 @@ export function handleJsonText(text) {
     const newData32 = new Uint32Array(newData.data.buffer);
 
     setGridSizeParams(data.width, data.height, newData, newData32);
-    import('../../actions/grid-size-select.js').then(({ syncGridSizeUI }) => syncGridSizeUI(data.width, data.height));
+    syncGridSizeUI(data.width, data.height);
 
     const newPixelMap = new Uint32Array(data.width * data.height);
     for (const [k, v] of Object.entries(data.pixels)) {
@@ -191,15 +183,9 @@ export function handleJsonText(text) {
     fitToScreen();
     renderPixels();
 
-    import('../../lang/i18n.js').then(({ t }) => {
-      import('../../core/state.js').then(({ setStatus, pixelMap }) => {
-        setStatus(`${t('status.jsonLoaded')} (${pixelMap.length.toLocaleString()} pixels)`);
-      });
-    });
+    setStatus(`${t('status.jsonLoaded')} (${pixelMap.length.toLocaleString()} pixels)`);
     document.getElementById('uploadModal').style.display = 'none';
   } catch (err) {
-    import('../../lang/i18n.js').then(({ t }) => {
-      import('../../core/state.js').then(({ setStatus }) => setStatus(`${t('status.jsonError')} ${err.message}`, true));
-    });
+    setStatus(`${t('status.jsonError')} ${err.message}`, true);
   }
 }

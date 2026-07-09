@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Icon, ICONS } from '../components/icons';
 import DrawToolsTab from '../toolbar/DrawToolsTab.jsx';
 import EditToolsTab from '../edit/EditToolsTab.jsx';
-import { t, getCurrentLang } from '../js/lang/i18n.js';
-
+import { t, getCurrentLang, setLang } from '../js/lang/i18n.js';
+import { auth } from '../js/firebase/config.js';
+import { logout } from '../js/auth/auth-state.js';
+import { getCurrentDirectoryHandle, clearLocalDirectory, pickLocalDirectory } from '../js/services/local-drive.js';
 export default function GlobalSettingsModal() {
   const [currentUser, setCurrentUser] = useState(null);
   const [tabCounterVal, setTabCounterVal] = useState(1);
@@ -11,20 +13,18 @@ export default function GlobalSettingsModal() {
   const [localDirName, setLocalDirName] = useState(null);
 
   useEffect(() => {
-    import('../js/firebase/config.js').then(({ auth }) => {
-      const unsubscribe = auth.onAuthStateChanged((user) => {
-        if (user) {
-          setCurrentUser({
-            name: user.displayName || user.email.split('@')[0],
-            email: user.email,
-            picture: user.photoURL
-          });
-        } else {
-          setCurrentUser(null);
-        }
-      });
-      return () => unsubscribe();
-    }).catch(console.error);
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setCurrentUser({
+          name: user.displayName || user.email.split('@')[0],
+          email: user.email,
+          picture: user.photoURL
+        });
+      } else {
+        setCurrentUser(null);
+      }
+    });
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -32,12 +32,15 @@ export default function GlobalSettingsModal() {
       setLocalDirName(e.detail.name);
     };
     window.addEventListener('local-dir-changed', handleLocalDirChange);
-    
-    import('../js/services/local-drive.js').then(({ getCurrentDirectoryHandle }) => {
+    const checkDir = async () => {
       const handle = getCurrentDirectoryHandle();
-      if (handle) setLocalDirName(handle.name);
-    });
-
+      if (handle) {
+        setLocalDirName(handle.name);
+      } else {
+        setLocalDirName(null);
+      }
+    };
+    checkDir();
     return () => window.removeEventListener('local-dir-changed', handleLocalDirChange);
   }, []);
 
@@ -89,9 +92,8 @@ export default function GlobalSettingsModal() {
                     className="select-dropdown" 
                     defaultValue={getCurrentLang()}
                     onChange={(e) => {
-                      import('../js/lang/i18n.js').then(({ setLang }) => {
-                        setLang(e.target.value);
-                      });
+                      setLang(e.target.value);
+                      window.location.reload();
                     }}
                   >
                     <option value="vi">Tiếng Việt</option>
@@ -175,11 +177,9 @@ export default function GlobalSettingsModal() {
                     </div>
                   </div>
                   {currentUser && (
-                    <button id="pixelLogoutBtn" className="btn btn-primary" style={{ padding: '6px 12px', fontSize: '13px', background: 'var(--color-danger)' }} onClick={() => {
-                      import('../js/auth/auth-state.js').then(({ logout }) => {
-                        logout();
-                        document.getElementById('globalSettingsModal').style.display = 'none';
-                      });
+                    <button id="pixelLogoutBtn" className="btn btn-primary" style={{ padding: '6px 12px', fontSize: '13px', background: 'var(--color-danger)' }} onClick={async () => {
+                      await logout();
+                      document.getElementById('globalSettingsModal').style.display = 'none';
                     }} data-i18n="auth.logout">{t('auth.logout') || 'Đăng xuất'}</button>
                   )}
                 </div>
@@ -215,11 +215,15 @@ export default function GlobalSettingsModal() {
                   <div style={{ display: 'flex', gap: '8px' }}>
                     {localDirName && (
                       <button className="btn" style={{ padding: '6px 12px', fontSize: '13px', background: 'var(--color-danger)', color: 'white' }} onClick={() => {
-                        import('../js/services/local-drive.js').then(({ clearLocalDirectory }) => clearLocalDirectory());
+                        clearLocalDirectory();
+                        setLocalDirName(null);
                       }} data-i18n="settings.clearDirectory">{t('settings.clearDirectory') || "Xóa cấu hình"}</button>
                     )}
-                    <button className="btn btn-primary" style={{ padding: '6px 12px', fontSize: '13px' }} onClick={() => {
-                      import('../js/services/local-drive.js').then(({ pickLocalDirectory }) => pickLocalDirectory());
+                    <button className="btn btn-primary" style={{ padding: '6px 12px', fontSize: '13px' }} onClick={async () => {
+                      const handle = await pickLocalDirectory();
+                      if (handle) {
+                        setLocalDirName(handle.name);
+                      }
                     }}>
                       <span data-i18n={localDirName ? "settings.changeDirectory" : "settings.selectDirectory"}>
                         {localDirName ? (t('settings.changeDirectory') || "Thay đổi thư mục") : (t('settings.selectDirectory') || "Chọn thư mục")}

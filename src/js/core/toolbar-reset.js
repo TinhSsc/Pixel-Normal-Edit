@@ -1,4 +1,4 @@
-import { els } from './state.js';
+import { els, setCurrentTool } from './state.js';
 
 /**
  * Quản lý thứ gì sẽ RESET lại sau khi F5
@@ -62,7 +62,7 @@ export function loadAndResetToolbarState() {
       // Nếu là công cụ trong danh sách bị reset (ví dụ: crop), hoặc không có công cụ nào
       // => Tự động reset về trạng thái "Không có gì cả"
       document.querySelectorAll('.tool-btn[data-tool]').forEach(b => b.classList.remove('active'));
-      import('./state.js').then(({ setCurrentTool }) => setCurrentTool(''));
+      setCurrentTool('');
     }
   } catch(e) {
     console.error("Lỗi khi phục hồi toolbar state", e);

@@ -3,6 +3,7 @@ import { getCellPx, getCellPxClamped, applyTransform, getZoom, getPan, setPan, s
 import { isTaskRunning, abortCurrentTask } from './core/task-manager.js';
 import { t } from './lang/i18n.js';
 import { renderPixels } from './core/render.js';
+import { parseUint32ToHex } from './core/color-utils.js';
 import { beginStroke, commitStroke } from './core/history.js';
 import { debouncedSaveWorkspace } from './core/tab-manager.js';
 import { writePixel } from './shared/pixel-writer.js';
@@ -21,6 +22,7 @@ import { useRectTool } from './tools/rect.js';
 import { useCircleTool } from './tools/circle.js';
 import { useHandTool } from './tools/hand.js';
 import { useReplaceColor } from './tools/replace-color.js';
+import { useSelectTool } from './tools/select.js';
 
 let isDrawing = false;
 let lastCell = null;
@@ -263,12 +265,10 @@ function onPointerDown(e) {
       const idx = cell.y * GRID_WIDTH + cell.x;
       const picked = pixelMap[idx];
       if (picked && els.colorPicker) {
-        import('./core/color-utils.js').then(({ parseUint32ToHex }) => {
-          const hex = parseUint32ToHex(picked);
-          els.colorPicker.value = hex;
-          els.colorPicker.dispatchEvent(new Event('change', { bubbles: true }));
-          setStatus(`${t('status.pickedColor')} ${hex}`);
-        });
+        const hex = parseUint32ToHex(picked);
+        els.colorPicker.value = hex;
+        els.colorPicker.dispatchEvent(new Event('change', { bubbles: true }));
+        setStatus(`${t('status.pickedColor')} ${hex}`);
       }
     }
     updateBrushCursor(e, cell);
@@ -495,6 +495,7 @@ function dispatchTool(tool, event, cell, color, e, prevCell) {
     case 'rect': useRectTool(event, cell, color, prevCell); break;
     case 'circle': useCircleTool(event, cell, color, prevCell); break;
     case 'hand': useHandTool(event, cell, e); break;
+    case 'select': useSelectTool(event, cell, color, prevCell); break;
   }
 }
 

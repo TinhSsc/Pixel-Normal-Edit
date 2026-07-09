@@ -165,6 +165,13 @@
   .tool-with-popup-left.show-popup .popup-bridge-left,
   .tool-with-popup-bottom.show-popup .popup-bridge-bottom {
     display: block;
+    position: fixed !important;
+    top: auto !important;
+    bottom: 80px !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    z-index: 9999;
   }
 }
 
@@ -361,7 +368,19 @@
   }
 
   .floating-nav-content {
-    justify-content: center;
+    justify-content: flex-start;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 5px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  }
+  .floating-nav-content::-webkit-scrollbar {
+    height: 4px;
+  }
+  .floating-nav-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
   }
 
   .toolbar {

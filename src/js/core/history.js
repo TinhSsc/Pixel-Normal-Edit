@@ -50,6 +50,17 @@ export function commitStroke(pixelMap) {
   debounceExtractCanvasColors();
 }
 
+export function popLastStroke() {
+  if (undoStack.length === 0) return null;
+  return undoStack.pop();
+}
+
+export function pushStrokeDirectly(stroke) {
+  undoStack.push(stroke);
+  redoStack = [];
+  debounceExtractCanvasColors();
+}
+
 export function undo(pixelMap, renderFn) {
   if (undoStack.length === 0) return false;
   const stroke = undoStack.pop();
@@ -62,6 +73,7 @@ export function undo(pixelMap, renderFn) {
   
   renderFn();
   debounceExtractCanvasColors();
+  window.dispatchEvent(new Event('history-undone'));
   return true;
 }
 

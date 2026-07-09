@@ -1,5 +1,8 @@
 import { els, setStatus, GRID_WIDTH, GRID_HEIGHT, pixelMap } from '../core/state.js';
 import { t } from '../lang/i18n.js';
+import { beginStroke, commitStroke } from '../core/history.js';
+import { parseColorToUint32 } from '../core/color-utils.js';
+import { renderPixels } from '../core/render.js';
 
 export function setupCompress() {
   els.compressBtn?.addEventListener('click', async () => {
@@ -19,33 +22,37 @@ export function setupCompress() {
       // Draw image scaled down to the grid size
       ctx.drawImage(img, 0, 0, GRID_WIDTH, GRID_HEIGHT);
 
-      const imageData = ctx.getImageData(0, 0, GRID_WIDTH, GRID_HEIGHT).data;
+      const imgData = ctx.getImageData(0, 0, GRID_WIDTH, GRID_HEIGHT);
+
+      beginStroke(pixelMap);
       
-      import('../core/history.js').then(({ beginStroke, commitStroke }) => {
-        import('../core/color-utils.js').then(({ parseColorToUint32 }) => {
-          beginStroke();
-          for (let y = 0; y < GRID_HEIGHT; y++) {
-            for (let x = 0; x < GRID_WIDTH; x++) {
-              const i = (y * GRID_WIDTH + x) * 4;
-              const a = imageData[i + 3];
-              const idx = y * GRID_WIDTH + x;
-              if (a > 10) {
-                const r = imageData[i];
-                const g = imageData[i + 1];
-                const b = imageData[i + 2];
-                const hex = '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1) + (a < 255 ? a.toString(16).padStart(2, '0') : '');
-                pixelMap[idx] = parseColorToUint32(hex);
-              } else {
-                pixelMap[idx] = 0;
-              }
+      let changed = false;
+      for (let y = 0; y < GRID_HEIGHT; y++) {
+        for (let x = 0; x < GRID_WIDTH; x++) {
+          const idx = y * GRID_WIDTH + x;
+          const px = (y * GRID_WIDTH + x) * 4;
+          const a = imgData.data[px + 3];
+
+          if (a > 128) {
+            const r = imgData.data[px];
+            const g = imgData.data[px + 1];
+            const b = imgData.data[px + 2];
+            const hex = "#" + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1);
+            const clr = parseColorToUint32(hex);
+            if (pixelMap[idx] !== clr) {
+              pixelMap[idx] = clr;
+              changed = true;
             }
           }
-          commitStroke(pixelMap);
-          import('../core/render.js').then(({ renderPixels }) => renderPixels());
-          setStatus(t('status.compressing'));
-          setTimeout(() => setStatus(t('status.imgComplete')), 1000);
-        });
-      });
+        }
+      }
+      
+      commitStroke(pixelMap);
+      if (changed) {
+        renderPixels();
+      }
+      
+      setStatus(t('status.compressed'));setTimeout(() => setStatus(t('status.imgComplete')), 1000);
     } catch (err) {
       setStatus(t('status.imgProcessing'), true);
     }

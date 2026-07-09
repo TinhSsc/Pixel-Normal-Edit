@@ -1,3 +1,5 @@
+import { abortCurrentTask } from './task-manager.js';
+
 export const els = {};
 export let canvas = null;
 export let ctx = null;
@@ -30,7 +32,7 @@ export function initEls() {
 
   if (els.stopTaskBtn) {
     els.stopTaskBtn.addEventListener('click', () => {
-      import('./task-manager.js').then(({ abortCurrentTask }) => abortCurrentTask());
+      abortCurrentTask();
     });
   }
   
@@ -79,6 +81,10 @@ export let pixelMap = new Uint32Array(GRID_WIDTH * GRID_HEIGHT);
 export let groupMap = new Map();
 export let previewPixels = null;
 
+export let selectionBox = null;
+export let clipboardData = null;
+export let floatingSelection = null;
+
 export let currentTool = "pencil";
 export let currentVariant = null;
 
@@ -97,6 +103,18 @@ export function resetMaps(newPixelMap = null, newGroupMap = new Map()) {
 
 export function setPreviewPixels(pixels) {
   previewPixels = pixels;
+}
+
+export function setSelectionBox(box) {
+  selectionBox = box;
+}
+
+export function setClipboardData(data) {
+  clipboardData = data;
+}
+
+export function setFloatingSelection(selection) {
+  floatingSelection = selection;
 }
 
 export function setCurrentTool(tool, variant = null) {

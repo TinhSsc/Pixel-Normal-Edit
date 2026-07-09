@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Icon, ICONS } from '../icons';
-import { GRID_WIDTH, GRID_HEIGHT, setStatus } from '../../js/core/state.js';
+import { GRID_WIDTH, GRID_HEIGHT, setStatus, offscreenCanvas, offscreenCtx, offscreenImageData } from '../../js/core/state.js';
 import { setGridSize } from '../../js/actions/grid-size-select.js';
 
 export default function ResizeModal() {
@@ -46,15 +46,13 @@ export default function ResizeModal() {
       setOldSize({ w: GRID_WIDTH, h: GRID_HEIGHT });
       setImgPos({ x: 0, y: 0 }); // Mặc định neo Top-Left
       
-      import('../../js/core/state.js').then(({ offscreenCanvas, offscreenCtx, offscreenImageData, GRID_WIDTH, GRID_HEIGHT }) => {
-        if (offscreenCtx && offscreenImageData) {
-          offscreenCanvas.width = GRID_WIDTH;
-          offscreenCanvas.height = GRID_HEIGHT;
-          offscreenCtx.putImageData(offscreenImageData, 0, 0);
-          setImgDataUrl(offscreenCanvas.toDataURL());
-        }
-        setIsOpen(true);
-      });
+      if (offscreenCtx && offscreenImageData) {
+        offscreenCanvas.width = GRID_WIDTH;
+        offscreenCanvas.height = GRID_HEIGHT;
+        offscreenCtx.putImageData(offscreenImageData, 0, 0);
+        setImgDataUrl(offscreenCanvas.toDataURL());
+      }
+      setIsOpen(true);
     };
     
     window.addEventListener('open-resize-modal', handleOpen);

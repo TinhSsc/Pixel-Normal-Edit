@@ -6,8 +6,53 @@ import {
   initAnimationFromCurrentState,
   addFrame,
   frames,
+  activeFrameIndex as activeFrameIndexState,
+  setActiveFrameIndex,
+  goToFrame,
+  prevFrame,
+  nextFrame,
+  showOnionSkin as showOnionSkinState,
+  toggleOnionSkin,
+  getPreviousFrame,
 } from '../js/core/animation-state.js';
+import AnimationStripPanel from './AnimationStripPanel.jsx';
 import { GRID_WIDTH, GRID_HEIGHT } from '../js/core/state.js';
+import { renderPixels, setForceFullRender } from '../js/core/render.js';
+
+function OnionSkinLayer({ frame }) {
+  const ref = React.useRef(null);
+
+  React.useEffect(() => {
+    if (!ref.current || !frame) return;
+    const { width, height, pixelMap } = frame;
+    ref.current.width = width;
+    ref.current.height = height;
+    const ctx2d = ref.current.getContext('2d');
+    const imageData = ctx2d.createImageData(width, height);
+    const data32 = new Uint32Array(imageData.data.buffer);
+    data32.set(pixelMap);
+    ctx2d.putImageData(imageData, 0, 0);
+  }, [frame]);
+
+  if (!frame) return null;
+
+  return (
+    <canvas
+      ref={ref}
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        opacity: 0.35,
+        pointerEvents: 'none',
+        imageRendering: 'pixelated',
+        zIndex: 1,
+      }}
+    />
+  );
+}
 
 export default function CanvasPanel() {
   const [isToolbarCollapsed, setIsToolbarCollapsed] = useState(false);
@@ -19,6 +64,36 @@ export default function CanvasPanel() {
   // tạm thời (VD: số frame hiện có). Danh sách canvas thật (Animation Strip)
   // sẽ làm ở Batch 2.1 — batch này chỉ cần nút "+" hoạt động đúng.
   const [frameCount, setFrameCount] = useState(frames.length);
+
+  const [activeIndex, setActiveIndexState] = useState(activeFrameIndexState);
+  const [showOnion, setShowOnion] = useState(showOnionSkinState);
+
+  const handleToggleOnionSkin = () => {
+    setShowOnion(toggleOnionSkin());
+  };
+
+  const handleSelectFrame = (index) => {
+    const newIndex = goToFrame(index);
+    setActiveIndexState(newIndex);
+    triggerCanvasRedraw();
+  };
+
+  const handlePrevFrame = () => {
+    const newIndex = prevFrame();
+    setActiveIndexState(newIndex);
+    triggerCanvasRedraw();
+  };
+
+  const handleNextFrame = () => {
+    const newIndex = nextFrame();
+    setActiveIndexState(newIndex);
+    triggerCanvasRedraw();
+  };
+
+  const triggerCanvasRedraw = () => {
+    setForceFullRender(true);
+    renderPixels();
+  };
 
   const handleToggleAnimationMode = () => {
     const newValue = toggleAnimationMode();
@@ -151,9 +226,24 @@ export default function CanvasPanel() {
             )}
           </div>
         </div>
+        {isAnimMode && showOnion && (
+          <OnionSkinLayer frame={getPreviousFrame()} />
+        )}
         <canvas id="pixelCanvas"></canvas>
+        {isAnimMode && (
+          <AnimationStripPanel
+            frames={frames}
+            activeFrameIndex={activeIndex}
+            onSelectFrame={handleSelectFrame}
+            onPrevFrame={handlePrevFrame}
+            onNextFrame={handleNextFrame}
+            showOnionSkin={showOnion}
+            onToggleOnionSkin={handleToggleOnionSkin}
+          />
+        )}
         <div id="gridOverlay" style={{ pointerEvents: 'none', position: 'absolute', top: '-1px', left: '-1px', transformOrigin: '0 0' }}>
           <div id="mirrorLine" style={{ display: 'none', position: 'absolute', left: '50%', top: 0, bottom: 0, background: 'rgba(255, 60, 60, 0.8)', zIndex: 10 }}></div>
+          <div id="selectionOverlay" style={{ display: 'none', position: 'absolute', pointerEvents: 'none', border: '1px dashed white', boxShadow: '0 0 0 1px black', zIndex: 20 }}></div>
         </div>
         <div id="brush-cursor"></div>
         <svg id="ruler-overlay" style={{ display: 'none', position: 'absolute', top: 0, left: 0, overflow: 'visible', pointerEvents: 'none', zIndex: 998 }}>
@@ -173,6 +263,9 @@ export default function CanvasPanel() {
         <div className="floating-nav-content" id="floatingNavContent">
           <button className="btn action-btn mobile-only undo-btn-action" data-i18n="tooltip.undo"><Icon name={ICONS.UNDO} /></button>
           <button className="btn action-btn mobile-only redo-btn-action" data-i18n="tooltip.redo"><Icon name={ICONS.REDO} /></button>
+          <button className="tool-btn mobile-only" data-tool="cut" data-i18n="tooltip.cut" title="Cut (Ctrl+X)"><Icon name={ICONS.SCISSORS} /></button>
+          <button className="tool-btn mobile-only" data-tool="copy" data-i18n="tooltip.copy" title="Copy (Ctrl+C)"><Icon name={ICONS.COPY} /></button>
+          <button className="tool-btn mobile-only" data-tool="paste" data-i18n="tooltip.paste" title="Paste (Ctrl+V)"><Icon name={ICONS.CLIPBOARD_PASTE} /></button>
           <button className="tool-btn" data-tool="pan" data-i18n="tool.pan"><Icon name={ICONS.HAND} /></button>
           <button className="btn action-btn" id="zoomInBtn" data-i18n="tooltip.zoomIn"><Icon name={ICONS.ZOOM_IN} /></button>
           <button className="btn action-btn" id="zoomOutBtn" data-i18n="tooltip.zoomOut"><Icon name={ICONS.ZOOM_OUT} /></button>

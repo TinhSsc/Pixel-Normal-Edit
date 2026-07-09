@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Icon, ICONS } from '../icons';
-import { GRID_WIDTH, GRID_HEIGHT, pixelMap, setCurrentTool, setStatus } from '../../js/core/state.js';
+import { GRID_WIDTH, GRID_HEIGHT, pixelMap, setCurrentTool, setStatus, offscreenCanvas, offscreenCtx, offscreenImageData } from '../../js/core/state.js';
 import { beginStroke, commitStroke, recordChange } from '../../js/core/history.js';
 import { renderPixels } from '../../js/core/render.js';
 import { parseUint32ToHex } from '../../js/core/color-utils.js';
@@ -57,19 +57,15 @@ export default function CropModal() {
   }, []);
 
   const openModal = () => {
-    import('../../js/core/state.js').then(({ offscreenCanvas, offscreenCtx, offscreenImageData, GRID_WIDTH, GRID_HEIGHT }) => {
-      if (offscreenCtx && offscreenImageData) {
-        // MUST resize the offscreen canvas to match the current grid!
-        offscreenCanvas.width = GRID_WIDTH;
-        offscreenCanvas.height = GRID_HEIGHT;
-        offscreenCtx.putImageData(offscreenImageData, 0, 0);
-      }
+    if (offscreenCtx && offscreenImageData) {
+      offscreenCanvas.width = GRID_WIDTH;
+      offscreenCanvas.height = GRID_HEIGHT;
+      offscreenCtx.putImageData(offscreenImageData, 0, 0);
       setImgDataUrl(offscreenCanvas.toDataURL());
-      setBox({ x: 0, y: 0, w: GRID_WIDTH, h: GRID_HEIGHT }); // logical coordinates
-      setAspect(null);
-      setIsOpen(true);
-      // Removed setTimeout calculateDisplaySize as onLoad handles it perfectly
-    });
+    }
+    setBox({ x: 0, y: 0, w: GRID_WIDTH, h: GRID_HEIGHT }); // logical coordinates
+    setAspect(null);
+    setIsOpen(true);
   };
 
   const closeModal = () => {

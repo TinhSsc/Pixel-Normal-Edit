@@ -29,3 +29,22 @@
 * Quản lý Pen:
 
   * `src/js/tools/pen`
+* Nguồn liên quan Select & Lịch sử:
+
+  * [select.js](file:///c:/Users/ADMIN/Downloads/aitaoanh/src/js/tools/select.js) (Xử lý logic khoanh vùng, nhấc điểm ảnh, di chuyển và hợp nhất nét vẽ)
+  * [render.js](file:///c:/Users/ADMIN/Downloads/aitaoanh/src/js/core/render.js) (Vẽ và hiển thị Overlay khung chọn, Partial/Full render)
+  * [CanvasPanel.jsx](file:///c:/Users/ADMIN/Downloads/aitaoanh/src/panels/CanvasPanel.jsx) (Cấu trúc HTML DOM overlay của Select, thanh điều hướng nút Copy/Paste/Undo)
+  * [ToolbarPanel.jsx](file:///c:/Users/ADMIN/Downloads/aitaoanh/src/panels/ToolbarPanel.jsx) (Giao diện bảng công cụ bên phải và cấu hình Pop-up)
+
+* Quản lý Lịch sử (Undo/Redo):
+
+  * [history.js](file:///c:/Users/ADMIN/Downloads/aitaoanh/src/js/core/history.js) (Lõi xử lý Undo Stack, Redo Stack, lưu nét vẽ `recordChange`, gộp bước di chuyển)
+  * [undo-redo.js](file:///c:/Users/ADMIN/Downloads/aitaoanh/src/js/actions/undo-redo.js) (Bắt sự kiện phím tắt Ctrl+Z, Ctrl+Y để hoàn tác)
+
+* Clipboard & Sao chép/Cắt/Dán:
+
+  * [clipboard.js](file:///c:/Users/ADMIN/Downloads/aitaoanh/src/js/actions/clipboard.js) (Ghi chép và xử lý logic `handleCopy`, `handleCut`, `handlePaste` từ bàn phím và nút bấm)
+
+* Định dạng Giao diện (CSS):
+
+  * [layout.css](file:///c:/Users/ADMIN/Downloads/aitaoanh/css/layout.css) (CSS điều khiển hiển thị Menu di động, chống tràn Tool-popup, thêm thanh cuộn cho thanh nav)

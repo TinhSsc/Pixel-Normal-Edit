@@ -22,6 +22,7 @@ import {
     resetMaps,
     setGridSizeParams,
 } from "./state.js";
+import { getHistoryState, setHistoryState } from './history.js';
 
 /**
  * Danh sách các frame của animation hiện tại.
@@ -43,6 +44,24 @@ export let activeFrameIndex = 0;
 
 /** Đang ở chế độ Animation (true) hay Source Image (false, mặc định). */
 export let isAnimationMode = false;
+
+/** Có đang bật xem "hình mờ" của frame liền trước hay không. */
+export let showOnionSkin = false;
+
+export function setOnionSkin(value) {
+  showOnionSkin = !!value;
+  return showOnionSkin;
+}
+
+export function toggleOnionSkin() {
+  return setOnionSkin(!showOnionSkin);
+}
+
+/** Lấy frame liền trước frame đang active, hoặc null nếu là frame đầu tiên. */
+export function getPreviousFrame() {
+  if (activeFrameIndex <= 0) return null;
+  return frames[activeFrameIndex - 1] ?? null;
+}
 
 let frameIdCounter = 0;
 
@@ -86,6 +105,7 @@ export function initAnimationFromCurrentState() {
             offscreenData32: offscreenData32,
             width: GRID_WIDTH,
             height: GRID_HEIGHT,
+            historyState: getHistoryState(),
         },
     ];
     activeFrameIndex = 0;
@@ -110,6 +130,7 @@ export function addFrame(width = GRID_WIDTH, height = GRID_HEIGHT) {
         offscreenData32: null,
         width,
         height,
+        historyState: { undoStack: [], redoStack: [], currentStroke: null },
     };
 
     frames.push(newFrame);
@@ -150,6 +171,7 @@ export function syncCurrentStateToFrame() {
     frame.offscreenData32 = offscreenData32;
     frame.width = GRID_WIDTH;
     frame.height = GRID_HEIGHT;
+    frame.historyState = getHistoryState();
 
     return frame;
 }
@@ -175,6 +197,42 @@ export function loadFrameToCurrentState(index) {
         frame.offscreenData32
     );
     resetMaps(frame.pixelMap.slice(), new Map(frame.groupMap));
+    setHistoryState(
+        frame.historyState || { undoStack: [], redoStack: [], currentStroke: null }
+    );
 
     return frame;
+}
+
+/**
+ * Chuyển sang frame trước đó.
+ * Thứ tự bắt buộc: sync dữ liệu đang vẽ dở của frame hiện tại TRƯỚC,
+ * rồi mới load dữ liệu frame mới vào state.js — để không mất nét vẽ.
+ */
+export function prevFrame() {
+  if (activeFrameIndex <= 0) return activeFrameIndex;
+  syncCurrentStateToFrame();
+  loadFrameToCurrentState(activeFrameIndex - 1);
+  return activeFrameIndex;
+}
+
+/** Chuyển sang frame kế tiếp — cùng nguyên tắc như prevFrame(). */
+export function nextFrame() {
+  if (activeFrameIndex >= frames.length - 1) return activeFrameIndex;
+  syncCurrentStateToFrame();
+  loadFrameToCurrentState(activeFrameIndex + 1);
+  return activeFrameIndex;
+}
+
+/**
+ * Chuyển thẳng tới 1 frame theo index bất kỳ (dùng khi click trực tiếp
+ * vào 1 thumbnail trong AnimationStripPanel), cùng nguyên tắc sync trước
+ * khi load.
+ */
+export function goToFrame(index) {
+  if (index === activeFrameIndex) return activeFrameIndex;
+  if (index < 0 || index >= frames.length) return activeFrameIndex;
+  syncCurrentStateToFrame();
+  loadFrameToCurrentState(index);
+  return activeFrameIndex;
 }

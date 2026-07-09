@@ -9,6 +9,6 @@
 @import url('./css/tabs.css');
 @import url('./css/modals.css');
 @import url('./css/tool-popup.css');
+@import url('./css/animation-strip.css');
 .spin { animation: spin 1.5s linear infinite; } 
-@keyframes spin { 100% { transform: rotate(360deg); } }  
- 
+@keyframes spin { 100% { transform: rotate(360deg); } }

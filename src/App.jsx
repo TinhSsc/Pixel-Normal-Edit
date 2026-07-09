@@ -1,5 +1,6 @@
 import { Icon, ICONS } from './components/icons';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, Suspense, lazy } from 'react';
+import { auth } from './js/firebase/config.js';
 
 import { initEditor } from './js/main.js';
 
@@ -19,13 +20,13 @@ import DrawToolsTab from './toolbar/DrawToolsTab.jsx';
 import CanvasPanel from './panels/CanvasPanel.jsx';
 
 import EditPanel from './edit/EditPanel.jsx';
-import GlobalSettingsModal from './settings/GlobalSettingsModal.jsx';
-import CropModal from './components/crop/CropModal.jsx';
-import ResizeModal from './components/resize/ResizeModal.jsx';
+const GlobalSettingsModal = lazy(() => import('./settings/GlobalSettingsModal.jsx'));
+const CropModal = lazy(() => import('./components/crop/CropModal.jsx'));
+const ResizeModal = lazy(() => import('./components/resize/ResizeModal.jsx'));
 
-import LoginPage from './pages/LoginPage.jsx';
-import RegisterPage from './pages/RegisterPage.jsx';
-import ForgotPasswordPage from './pages/ForgotPasswordPage.jsx';
+const LoginPage = lazy(() => import('./pages/LoginPage.jsx'));
+const RegisterPage = lazy(() => import('./pages/RegisterPage.jsx'));
+const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage.jsx'));
 import { getCurrentUser, logout } from './js/auth/auth-state.js';
 import { setupDriveUI } from './js/services/drive-ui.js';
 
@@ -98,21 +99,19 @@ function App() {
   };
 
   useEffect(() => {
-    import('./js/firebase/config.js').then(({ auth }) => {
-      const unsubscribe = auth.onAuthStateChanged((user) => {
-        if (user) {
-          setCurrentUserState({
-            uid: user.uid,
-            email: user.email,
-            name: user.displayName || user.email.split('@')[0],
-            picture: user.photoURL || null
-          });
-        } else {
-          setCurrentUserState(null);
-        }
-      });
-      return () => unsubscribe();
-    }).catch(console.error);
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setCurrentUserState({
+          uid: user.uid,
+          email: user.email,
+          name: user.displayName || user.email.split('@')[0],
+          picture: user.photoURL || null
+        });
+      } else {
+        setCurrentUserState(null);
+      }
+    });
+    return () => unsubscribe();
   }, []);
 
 
@@ -320,13 +319,15 @@ function App() {
     <>
 
       {AUTH_ROUTES.includes(route) ? (
-        route === 'login' ? (
-          <LoginPage onLoggedIn={handleLoggedIn} onNavigate={navigate} />
-        ) : route === 'register' ? (
-          <RegisterPage onLoggedIn={handleLoggedIn} onNavigate={navigate} />
-        ) : (
-          <ForgotPasswordPage onNavigate={navigate} />
-        )
+        <Suspense fallback={<div style={{display:'flex',justifyContent:'center',alignItems:'center',height:'100vh',color:'var(--color-text-muted)'}}><Icon name={ICONS.LOADER} className="spin" style={{width: 24, height: 24, marginRight: 8}}/> Đang tải...</div>}>
+          {route === 'login' ? (
+            <LoginPage onLoggedIn={handleLoggedIn} onNavigate={navigate} />
+          ) : route === 'register' ? (
+            <RegisterPage onLoggedIn={handleLoggedIn} onNavigate={navigate} />
+          ) : (
+            <ForgotPasswordPage onNavigate={navigate} />
+          )}
+        </Suspense>
       ) : (
       <div className="container">
 
@@ -671,9 +672,11 @@ function App() {
       </div>
 
       {/* Global Settings Modal */}
-      <GlobalSettingsModal />
-      <CropModal />
-      <ResizeModal />
+      <Suspense fallback={null}>
+        <GlobalSettingsModal />
+        <CropModal />
+        <ResizeModal />
+      </Suspense>
 
     </>
 
