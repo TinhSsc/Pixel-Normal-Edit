@@ -1,10 +1,11 @@
 import { Icon, ICONS } from '../components/icons';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   isAnimationMode as animationModeState,
   toggleAnimationMode,
   initAnimationFromCurrentState,
-  addFrame,
+  insertFrameAt,
+  removeFrame,
   frames,
   activeFrameIndex as activeFrameIndexState,
   setActiveFrameIndex,
@@ -60,13 +61,12 @@ export default function CanvasPanel() {
   // CHƯA đổi giao diện canvas (sẽ làm ở Batch 2.1) — mục tiêu batch này là
   // có nút toggle hoạt động đúng, verify được qua console.log.
   const [isAnimMode, setIsAnimMode] = useState(animationModeState);
-  // Batch 1.3: chỉ cần biết SỐ LƯỢNG frame để trigger re-render và hiển thị
-  // tạm thời (VD: số frame hiện có). Danh sách canvas thật (Animation Strip)
-  // sẽ làm ở Batch 2.1 — batch này chỉ cần nút "+" hoạt động đúng.
-  const [frameCount, setFrameCount] = useState(frames.length);
 
   const [activeIndex, setActiveIndexState] = useState(activeFrameIndexState);
   const [showOnion, setShowOnion] = useState(showOnionSkinState);
+  const [newFrameId, setNewFrameId] = useState(null);
+  const [removingFrameId, setRemovingFrameId] = useState(null);
+  const canvasFadeRef = useRef(null);
 
   const handleToggleOnionSkin = () => {
     setShowOnion(toggleOnionSkin());
@@ -93,6 +93,12 @@ export default function CanvasPanel() {
   const triggerCanvasRedraw = () => {
     setForceFullRender(true);
     renderPixels();
+    const canvasEl = document.getElementById('pixelCanvas');
+    if (canvasEl) {
+      canvasEl.style.transition = 'opacity 150ms ease';
+      canvasEl.style.opacity = '0.3';
+      requestAnimationFrame(() => { canvasEl.style.opacity = '1'; });
+    }
   };
 
   const handleToggleAnimationMode = () => {
@@ -100,18 +106,40 @@ export default function CanvasPanel() {
     if (newValue) {
       // Lần đầu bật Animation Mode: biến ảnh đang vẽ dở thành frame đầu tiên.
       initAnimationFromCurrentState();
-      setFrameCount(frames.length);
     }
     setIsAnimMode(newValue);
     // eslint-disable-next-line no-console
     console.log('[AnimationMode]', newValue ? 'BẬT' : 'TẮT');
   };
 
-  const handleAddFrame = () => {
-    addFrame(GRID_WIDTH, GRID_HEIGHT);
-    setFrameCount(frames.length);
-    // eslint-disable-next-line no-console
-    console.log('[AnimationMode] Tổng số frame:', frames.length);
+  const handleInsertFrame = (atIndex) => {
+    const newFrame = insertFrameAt(atIndex, GRID_WIDTH, GRID_HEIGHT);
+    setActiveIndexState(activeFrameIndexState);
+    triggerCanvasRedraw();
+    setNewFrameId(newFrame.id);
+    setTimeout(() => setNewFrameId(null), 500);
+  };
+
+  const handleRemoveFrame = (index) => {
+    const frame = frames[index];
+    if (!frame) return;
+
+    const hasPixelData = frame.pixelMap && frame.pixelMap.some((v) => v !== 0);
+    const hasHistory = frame.historyState && frame.historyState.undoStack && frame.historyState.undoStack.length > 0;
+
+    if (hasPixelData || hasHistory) {
+      if (!window.confirm('Xóa trang này? Dữ liệu của trang sẽ mất.')) return;
+    }
+
+    setRemovingFrameId(frame.id);
+    setTimeout(() => {
+      const removed = removeFrame(index);
+      if (removed) {
+        setActiveIndexState(activeFrameIndexState);
+        triggerCanvasRedraw();
+      }
+      setRemovingFrameId(null);
+    }, 200);
   };
 
   useEffect(() => {
@@ -139,7 +167,7 @@ export default function CanvasPanel() {
           </button>
         </div>
         {/* Attached Tool Bar (Header) */}
-        <div className={`toolbar-container ${isToolbarCollapsed ? 'collapsed' : ''}`} style={{ position: 'absolute', top: '10px', left: '10px', zIndex: 50, transition: 'all 0.3s ease', pointerEvents: 'none', width: 'auto', height: '32px', display: 'flex', gap: '8px' }}>
+        <div className={`toolbar-container ${isToolbarCollapsed ? 'collapsed' : ''}`} style={{ position: 'absolute', top: '10px', left: '10px', zIndex: 1000, transition: 'all 0.3s ease', pointerEvents: 'none', width: 'auto', height: '32px', display: 'flex', gap: '8px' }}>
           <button
             className="btn collapse-toolbar-btn"
             onClick={() => setIsToolbarCollapsed(!isToolbarCollapsed)}
@@ -207,23 +235,6 @@ export default function CanvasPanel() {
             >
               <Icon name={ICONS.FILM} style={{ width: '16px', height: '16px' }} />
             </button>
-
-            {/* Batch 1.3: nút "+" thêm 1 trang animation (frame) mới, cùng
-                kích thước với canvas hiện tại (VD 32x32). Chỉ hiện khi đang
-                ở Animation Mode. Hiển thị tạm số lượng frame bằng badge nhỏ
-                — layout canvas thật (nằm kế bên nhau) sẽ làm ở Batch 2.1. */}
-            {isAnimMode && (
-              <button
-                id="addAnimationFrameBtn"
-                className="btn"
-                onClick={handleAddFrame}
-                title="Thêm trang animation"
-                style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
-              >
-                <Icon name={ICONS.PLUS} style={{ width: '16px', height: '16px' }} />
-                <span style={{ fontSize: '11px' }}>{frameCount}</span>
-              </button>
-            )}
           </div>
         </div>
         {isAnimMode && showOnion && (
@@ -239,6 +250,10 @@ export default function CanvasPanel() {
             onNextFrame={handleNextFrame}
             showOnionSkin={showOnion}
             onToggleOnionSkin={handleToggleOnionSkin}
+            onInsertFrame={handleInsertFrame}
+            onRemoveFrame={handleRemoveFrame}
+            newFrameId={newFrameId}
+            removingFrameId={removingFrameId}
           />
         )}
         <div id="gridOverlay" style={{ pointerEvents: 'none', position: 'absolute', top: '-1px', left: '-1px', transformOrigin: '0 0' }}>

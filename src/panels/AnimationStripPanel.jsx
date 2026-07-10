@@ -14,8 +14,7 @@ function drawFrameThumbnail(canvasEl, frame) {
   data32.set(pixelMap);
   ctx2d.putImageData(imageData, 0, 0);
 }
-
-function FrameThumbnail({ frame, index, isActive, onClick }) {
+function FrameThumbnail({ frame, index, isActive, onClick, onInsertBefore, onInsertAfter, onRemove, isNew, isRemoving }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -23,18 +22,37 @@ function FrameThumbnail({ frame, index, isActive, onClick }) {
   }, [frame]);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <div
-        className={`animation-strip-frame${isActive ? ' active' : ''}`}
-        onClick={onClick}
-        title={`Trang ${index + 1}`}
-      >
-        <canvas ref={canvasRef} />
+    <div
+      className={`animation-strip-frame-wrap${isRemoving ? ' frame-exit' : ''}`}
+      style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}
+    >
+        <button className="animation-strip-frame-remove-btn" onClick={onRemove} title="Xóa trang này">
+          <Icon name={ICONS.X} style={{ width: '14px', height: '14px' }} />
+        </button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+        {isActive && (
+          <button className="animation-strip-frame-add-btn" onClick={onInsertBefore} title="Chèn trang trước">
+            <Icon name={ICONS.PLUS} style={{ width: '14px', height: '14px' }} />
+          </button>
+        )}
+        <div
+          className={`animation-strip-frame${isActive ? ' active' : ''}${isNew ? ' frame-enter frame-highlight' : ''}`}
+          onClick={onClick}
+          title={`Trang ${index + 1}`}
+        >
+          <canvas ref={canvasRef} />
+        </div>
+        {isActive && (
+          <button className="animation-strip-frame-add-btn" onClick={onInsertAfter} title="Chèn trang sau">
+            <Icon name={ICONS.PLUS} style={{ width: '14px', height: '14px' }} />
+          </button>
+        )}
       </div>
       <span className="animation-strip-frame-label">{index + 1}</span>
     </div>
   );
 }
+
 
 export default function AnimationStripPanel({
   frames,
@@ -44,6 +62,10 @@ export default function AnimationStripPanel({
   onNextFrame,
   showOnionSkin,
   onToggleOnionSkin,
+  onInsertFrame,
+  onRemoveFrame,
+  newFrameId,
+  removingFrameId,
 }) {
   if (!frames || frames.length === 0) return null;
 
@@ -76,6 +98,11 @@ export default function AnimationStripPanel({
             index={index}
             isActive={index === activeFrameIndex}
             onClick={() => onSelectFrame(index)}
+            onInsertBefore={() => onInsertFrame(index)}
+            onInsertAfter={() => onInsertFrame(index + 1)}
+            onRemove={() => onRemoveFrame(index)}
+            isNew={frame.id === newFrameId}
+            isRemoving={frame.id === removingFrameId}
           />
         ))}
       </div>

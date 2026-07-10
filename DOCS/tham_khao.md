@@ -1,5 +1,5 @@
 ## Tham khảo cấu trúc dự án
-
+Lưu ý khi code phải nhớ đến gói lang, và ưu tiên sử dụng tiếng anh
 * Đây chỉ là danh sách thông tin và các đường dẫn tham khảo.
 * Icon được quản lý tập trung tại:
 

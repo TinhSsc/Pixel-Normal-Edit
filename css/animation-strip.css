@@ -3,12 +3,13 @@
   left: 10px;
   right: 10px;
   bottom: 10px;
-  z-index: 40;
+  z-index: 1000;
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 8px;
-  overflow-x: auto;
+  overflow: visible;
+  /* bỏ overflow-x, không còn scroll ở đây nữa */
   background: var(--color-surface);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -35,6 +36,17 @@
   display: flex;
   gap: 6px;
   overflow-x: auto;
+  overflow-y: hidden;
+  padding-top: 14px;
+  height: 80px;
+  /* cố định: 48px (frame) + 14px (padding-top cho nút -) + ~18px cho label */
+  box-sizing: content-box;
+  scrollbar-width: thin;
+  /* Firefox: scrollbar mỏng, không chiếm nhiều không gian */
+}
+
+.animation-strip-frames::-webkit-scrollbar {
+  height: 6px;
 }
 
 .animation-strip-frame {
@@ -67,4 +79,100 @@
   color: var(--color-text-muted);
   text-align: center;
   margin-top: 2px;
+}
+
+.animation-strip-frame-add-btn {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.animation-strip-frame-remove-btn {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #ef4444; /* màu đỏ tươi để nổi bật hơn */
+  border: 2px solid var(--color-surface);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5); /* bóng nổi rõ hơn */
+  color: #fff;
+  cursor: pointer;
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.15s ease;
+}
+
+.animation-strip-frame-wrap:hover .animation-strip-frame-remove-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.animation-strip-frame-remove-btn:hover {
+  background: #dc2626; /* tối lại một chút khi hover */
+  transform: translateX(-50%) scale(1.15); /* phóng to dấu X */
+}
+
+@keyframes frameEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes frameExit {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+}
+
+.animation-strip-frame {
+  transition: border-color 0.15s ease;
+}
+
+.animation-strip-frame.frame-enter {
+  animation: frameEnter 0.25s ease;
+}
+
+.animation-strip-frame.frame-highlight {
+  box-shadow: 0 0 0 2px var(--color-primary);
+}
+
+.animation-strip-frame-wrap.frame-exit {
+  animation: frameExit 0.2s ease forwards;
+  pointer-events: none;
+}
+
+.animation-strip-frame-add-btn {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.animation-strip-frame-add-btn:hover {
+  transform: scale(1.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }

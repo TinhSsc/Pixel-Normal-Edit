@@ -9,6 +9,7 @@ import { getCurrentDirectoryHandle, clearLocalDirectory, pickLocalDirectory } fr
 export default function GlobalSettingsModal() {
   const [currentUser, setCurrentUser] = useState(null);
   const [tabCounterVal, setTabCounterVal] = useState(1);
+  const [activeTab, setActiveTab] = useState('tab-appearance');
   const [autoSaveDest, setAutoSaveDest] = useState(localStorage.getItem('auto_save_destination') || 'drive');
   const [localDirName, setLocalDirName] = useState(null);
 
@@ -55,25 +56,25 @@ export default function GlobalSettingsModal() {
         </div>
 
         <div className="modal-tabs" style={{ flexWrap: 'wrap' }}>
-          <button className="tab-btn active" data-tab="tab-appearance">
+          <button className={`tab-btn ${activeTab === 'tab-appearance' ? 'active' : ''}`} data-tab="tab-appearance" onClick={() => setActiveTab('tab-appearance')}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
               <Icon name={ICONS.PALETTE} style={{ width: '18px', height: '18px' }} />
               <span data-i18n="modal.tabAppearance">Giao diện</span>
             </div>
           </button>
-          <button className="tab-btn" data-tab="tab-draw-tools">
+          <button className={`tab-btn ${activeTab === 'tab-draw-tools' ? 'active' : ''}`} data-tab="tab-draw-tools" onClick={() => setActiveTab('tab-draw-tools')}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
               <Icon name={ICONS.PEN_TOOL} style={{ width: '18px', height: '18px' }} />
               <span data-i18n="modal.tabDrawTools">Công cụ vẽ</span>
             </div>
           </button>
-          <button className="tab-btn" data-tab="tab-edit-tools">
+          <button className={`tab-btn ${activeTab === 'tab-edit-tools' ? 'active' : ''}`} data-tab="tab-edit-tools" onClick={() => setActiveTab('tab-edit-tools')}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
               <Icon name={ICONS.SETTINGS_2} style={{ width: '18px', height: '18px' }} />
               <span data-i18n="modal.tabEditTools">Thao tác</span>
             </div>
           </button>
-          <button className="tab-btn" data-tab="tab-account">
+          <button className={`tab-btn ${activeTab === 'tab-account' ? 'active' : ''}`} data-tab="tab-account" onClick={() => setActiveTab('tab-account')}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
               <Icon name={ICONS.USER} style={{ width: '18px', height: '18px' }} />
               <span data-i18n="modal.tabAccount">Tài khoản</span>
@@ -82,7 +83,7 @@ export default function GlobalSettingsModal() {
         </div>
 
         <div style={{ flex: 1, overflowY: 'auto', padding: '4px' }}>
-          <div className="tab-content active" id="tab-appearance">
+          <div className={`tab-content ${activeTab === 'tab-appearance' ? 'active' : ''}`} id="tab-appearance" style={{ display: activeTab === 'tab-appearance' ? 'block' : 'none' }}>
             <div style={{ background: 'var(--color-bg)', padding: '20px', borderRadius: '12px', border: '1px solid var(--color-border)', marginBottom: '12px' }}>
               <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--color-text-bright)' }} data-i18n="settings.language">Ngôn ngữ (Language)</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -161,7 +162,7 @@ export default function GlobalSettingsModal() {
             </div>
           </div>
 
-          <div className="tab-content" id="tab-account">
+          <div className={`tab-content ${activeTab === 'tab-account' ? 'active' : ''}`} id="tab-account" style={{ display: activeTab === 'tab-account' ? 'block' : 'none' }}>
             <div style={{ background: 'var(--color-bg)', padding: '20px', borderRadius: '12px', border: '1px solid var(--color-border)', marginBottom: '16px' }}>
               <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--color-text-bright)' }} data-i18n="settings.accountTitle">Tài khoản Pixel Normal Edit</div>
               <div className="setting-group" style={{ marginBottom: '0' }}>
@@ -272,11 +273,11 @@ export default function GlobalSettingsModal() {
             </div>
           </div>
 
-          <div className="tab-content" id="tab-draw-tools">
+          <div className={`tab-content ${activeTab === 'tab-draw-tools' ? 'active' : ''}`} id="tab-draw-tools" style={{ display: activeTab === 'tab-draw-tools' ? 'block' : 'none' }}>
             <DrawToolsTab />
           </div>
 
-          <div className="tab-content" id="tab-edit-tools">
+          <div className={`tab-content ${activeTab === 'tab-edit-tools' ? 'active' : ''}`} id="tab-edit-tools" style={{ display: activeTab === 'tab-edit-tools' ? 'block' : 'none' }}>
             <EditToolsTab />
           </div>
         </div>

@@ -134,7 +134,8 @@
 .show-btn-names .action-btn.active svg {
   background: var(--color-primary);
   border-color: var(--color-primary);
-  color: var(--color-bg); /* Dark icon on primary background */
+  color: var(--color-bg);
+  /* Dark icon on primary background */
 }
 
 .show-btn-names .tool-btn::after,
@@ -174,7 +175,7 @@
   box-sizing: border-box;
   margin-bottom: 4px;
   padding: 0 10px;
-  z-index: 10;
+  z-index: 1000;
 }
 
 .grid-size-wrapper {

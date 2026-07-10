@@ -49,18 +49,18 @@ export let isAnimationMode = false;
 export let showOnionSkin = false;
 
 export function setOnionSkin(value) {
-  showOnionSkin = !!value;
-  return showOnionSkin;
+    showOnionSkin = !!value;
+    return showOnionSkin;
 }
 
 export function toggleOnionSkin() {
-  return setOnionSkin(!showOnionSkin);
+    return setOnionSkin(!showOnionSkin);
 }
 
 /** Lấy frame liền trước frame đang active, hoặc null nếu là frame đầu tiên. */
 export function getPreviousFrame() {
-  if (activeFrameIndex <= 0) return null;
-  return frames[activeFrameIndex - 1] ?? null;
+    if (activeFrameIndex <= 0) return null;
+    return frames[activeFrameIndex - 1] ?? null;
 }
 
 let frameIdCounter = 0;
@@ -210,18 +210,18 @@ export function loadFrameToCurrentState(index) {
  * rồi mới load dữ liệu frame mới vào state.js — để không mất nét vẽ.
  */
 export function prevFrame() {
-  if (activeFrameIndex <= 0) return activeFrameIndex;
-  syncCurrentStateToFrame();
-  loadFrameToCurrentState(activeFrameIndex - 1);
-  return activeFrameIndex;
+    if (activeFrameIndex <= 0) return activeFrameIndex;
+    syncCurrentStateToFrame();
+    loadFrameToCurrentState(activeFrameIndex - 1);
+    return activeFrameIndex;
 }
 
 /** Chuyển sang frame kế tiếp — cùng nguyên tắc như prevFrame(). */
 export function nextFrame() {
-  if (activeFrameIndex >= frames.length - 1) return activeFrameIndex;
-  syncCurrentStateToFrame();
-  loadFrameToCurrentState(activeFrameIndex + 1);
-  return activeFrameIndex;
+    if (activeFrameIndex >= frames.length - 1) return activeFrameIndex;
+    syncCurrentStateToFrame();
+    loadFrameToCurrentState(activeFrameIndex + 1);
+    return activeFrameIndex;
 }
 
 /**
@@ -230,9 +230,44 @@ export function nextFrame() {
  * khi load.
  */
 export function goToFrame(index) {
-  if (index === activeFrameIndex) return activeFrameIndex;
-  if (index < 0 || index >= frames.length) return activeFrameIndex;
-  syncCurrentStateToFrame();
-  loadFrameToCurrentState(index);
-  return activeFrameIndex;
+    if (index === activeFrameIndex) return activeFrameIndex;
+    if (index < 0 || index >= frames.length) return activeFrameIndex;
+    syncCurrentStateToFrame();
+    loadFrameToCurrentState(index);
+    return activeFrameIndex;
+}
+
+/**
+ * Chèn 1 frame trắng mới vào vị trí `index`, rồi chuyển active sang frame đó.
+ */
+export function insertFrameAt(index, width = GRID_WIDTH, height = GRID_HEIGHT) {
+    const newFrame = {
+        id: createFrameId(),
+        pixelMap: new Uint32Array(width * height),
+        groupMap: new Map(),
+        offscreenImageData: null,
+        offscreenData32: null,
+        width,
+        height,
+        historyState: { undoStack: [], redoStack: [], currentStroke: null },
+    };
+
+    syncCurrentStateToFrame();
+    frames.splice(index, 0, newFrame);
+    loadFrameToCurrentState(index);
+    return newFrame;
+}
+
+/**
+ * Xóa frame tại `index`. Không cho xóa nếu chỉ còn 1 frame.
+ * Sau khi xóa, active chuyển về frame liền trước (hoặc frame 0).
+ */
+export function removeFrame(index) {
+    if (frames.length <= 1) return false;
+    if (index < 0 || index >= frames.length) return false;
+
+    frames.splice(index, 1);
+    const newIndex = Math.max(0, Math.min(index, frames.length - 1));
+    loadFrameToCurrentState(newIndex);
+    return true;
 }
