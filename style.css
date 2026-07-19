@@ -1,14 +1,14 @@
-@import url('./css/theme.css');
-@import url('./css/base.css');
-@import url('./css/animations.css');
-@import url('./css/components.css');
-@import url('./css/layout.css');
-@import url('./css/toolbar.css');
-@import url('./css/canvas.css');
-@import url('./css/panels.css');
-@import url('./css/tabs.css');
-@import url('./css/modals.css');
-@import url('./css/tool-popup.css');
-@import url('./css/animation-strip.css');
+@import url('./src/styles/theme.css');
+@import url('./src/styles/base.css');
+@import url('./src/styles/animations.css');
+@import url('./src/styles/global/components.css');
+@import url('./src/styles/layout.css');
+@import url('./src/styles/global/toolbar.css');
+@import url('./src/styles/global/canvas.css');
+@import url('./src/styles/global/panels.css');
+@import url('./src/styles/global/tabs.css');
+@import url('./src/styles/global/modals.css');
+@import url('./src/styles/global/tool-popup.css');
+@import url('./src/styles/animation-strip.css');
 .spin { animation: spin 1.5s linear infinite; } 
 @keyframes spin { 100% { transform: rotate(360deg); } }
