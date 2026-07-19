@@ -32,7 +32,7 @@ export default function ForgotPasswordPage({ onNavigate }) {
 
         {step === 'email' && (
           <>
-            <p style={{ fontSize: '14px', color: 'var(--color-text-muted)', marginBottom: '16px' }} data-i18n="auth.forgotDesc">
+            <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: '16px' }} data-i18n="auth.forgotDesc">
               Nhập email tài khoản của bạn, chúng tôi sẽ gửi một liên kết để đặt lại mật khẩu.
             </p>
             <div className="auth-field">

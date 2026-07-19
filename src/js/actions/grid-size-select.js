@@ -8,6 +8,7 @@ import { resetHistory } from '../core/history.js';
 import { setStatus } from '../core/state.js';
 import { debouncedSaveWorkspace, saveCurrentTabState } from '../core/tab-manager.js';
 import { debounceExtractCanvasColors } from '../core/color-palette.js';
+import { isAnimationMode, resizeAnimation } from '../core/animation-state.js';
 
 import { pixelMap } from '../core/state.js';
 
@@ -47,6 +48,11 @@ export function setGridSize(w, h, mode = 'clear', dx = 0, dy = 0) {
     resetMaps();
   } else {
     resetMaps(new Uint32Array(newData32), new Map());
+  }
+  
+  if (isAnimationMode) {
+    // If animation is on, scale all frames so they don't break when we switch to them later
+    resizeAnimation(w, h, mode, dx, dy);
   }
 
   setForceFullRender(true);

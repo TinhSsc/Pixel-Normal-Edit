@@ -59,7 +59,8 @@ export async function saveWorkspace(tabs, activeTabId) {
       bg: tab.bg,
       autoBackupDrive: tab.autoBackupDrive,
       storage: tab.storage || { type: null, id: null, handle: null, name: null },
-      format: tab.format || 'png'
+      format: tab.format || 'png',
+      animation: tab.animation || null
     }));
 
     await set('workspace', {
@@ -99,7 +100,8 @@ export async function loadWorkspace() {
         bg: tab.bg,
         autoBackupDrive: tab.autoBackupDrive || false,
         storage: tab.storage || (tab.driveFileId ? { type: 'drive', id: tab.driveFileId, handle: null, name: tab.name } : { type: null, id: null, handle: null, name: null }),
-        format: tab.format || 'png'
+        format: tab.format || 'png',
+        animation: tab.animation || null
       };
     });
 

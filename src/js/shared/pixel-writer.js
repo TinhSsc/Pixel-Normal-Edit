@@ -9,6 +9,7 @@ let mirrorModeActive = false;
 let gradientDirection = 'vertical';
 
 export function setGradientModeActive(v) { gradientModeActive = v; }
+export function isGradientModeActive()   { return gradientModeActive; }
 export function setMirrorModeActive(v)   { mirrorModeActive = v; }
 export function isMirrorModeActive()     { return mirrorModeActive; }
 export function setGradientDirection(v)  { gradientDirection = v; }

@@ -12,9 +12,9 @@ export default function GoogleButton({ onCredential }) {
         padding: '10px', 
         fontSize: '14px', 
         gap: '8px',
-        border: '1px solid var(--color-border)',
-        background: 'var(--color-surface)',
-        color: 'var(--color-text-bright)'
+        border: '1px solid var(--border)',
+        background: 'var(--surface-2)',
+        color: 'var(--text-primary)'
       }}
     >
       <Icon name={ICONS.CHROME} style={{ width: '18px', height: '18px' }} />

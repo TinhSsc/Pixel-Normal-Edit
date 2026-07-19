@@ -26,7 +26,7 @@ export default function EditToolsTab() {
   };
 
   return (
-    <div style={{ background: 'var(--color-bg)', padding: '20px', borderRadius: '12px', border: '1px solid var(--color-border)' }}>
+    <div style={{ background: 'var(--bg)', padding: '20px', borderRadius: '12px', border: '1px solid var(--border)' }}>
       <div className="nested-tabs" style={{ flexWrap: 'wrap' }}>
         {groups.map((group, idx) => (
           <button 
@@ -52,11 +52,11 @@ export default function EditToolsTab() {
             if (tool) {
               const isHidden = hiddenEdits.includes(tool.id);
               return (
-                <div key={toolId} style={{ marginBottom: '16px', padding: '12px', background: 'var(--color-surface-alt)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div key={toolId} style={{ marginBottom: '16px', padding: '12px', background: 'var(--surface-1)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px', opacity: isHidden ? 0.5 : 1, transition: 'opacity 0.2s' }}>
-                    <Icon name={tool.icon} style={{ width: '20px', height: '20px', color: 'var(--color-text-bright)' }} />
+                    <Icon name={tool.icon} style={{ width: '20px', height: '20px', color: 'var(--text-primary)' }} />
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
-                      <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-text-bright)' }} data-i18n={tool.tooltipKey}>{toolId}</span>
+                      <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }} data-i18n={tool.tooltipKey}>{toolId}</span>
                     </div>
                   </div>
                   <button 
@@ -64,9 +64,9 @@ export default function EditToolsTab() {
                     title={isHidden ? "Hiện công cụ này" : "Ẩn công cụ này"}
                     style={{ 
                       padding: '8px', 
-                      background: isHidden ? 'transparent' : 'var(--color-primary)', 
-                      border: isHidden ? '1px solid var(--color-border)' : 'none',
-                      color: isHidden ? 'var(--color-text-muted)' : '#fff',
+                      background: isHidden ? 'transparent' : 'var(--accent)', 
+                      border: isHidden ? '1px solid var(--border)' : 'none',
+                      color: isHidden ? 'var(--text-muted)' : '#fff',
                       transition: 'all 0.2s'
                     }}
                     onClick={() => toggleEdit(tool.id)}

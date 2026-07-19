@@ -6,6 +6,7 @@ import { setSourceImage } from '../../actions/set-background.js';
 import { t } from '../../lang/i18n.js';
 import { parseColorToUint32 } from '../../core/color-utils.js';
 import { syncGridSizeUI } from '../../actions/grid-size-select.js';
+import { handleZipFile, handleSpriteSheet } from './upload-animation.js';
 export function setupUploadModal() {
   const modal = document.getElementById('uploadModal');
   const openBtn = document.getElementById('openUploadModalBtn');
@@ -46,7 +47,7 @@ export function setupUploadModal() {
     });
   });
 
-  // Image upload
+  // Image & ZIP upload
   imageDropZone?.addEventListener('click', () => imageInput?.click());
   imageDropZone?.addEventListener('dragover', e => { e.preventDefault(); imageDropZone.classList.add('dragover'); });
   imageDropZone?.addEventListener('dragleave', () => imageDropZone.classList.remove('dragover'));
@@ -54,11 +55,23 @@ export function setupUploadModal() {
     e.preventDefault();
     imageDropZone.classList.remove('dragover');
     const file = e.dataTransfer.files[0];
-    if (file) handleImageFile(file, autoSizeCheck?.checked);
+    if (file) {
+      if (file.name.endsWith('.zip')) {
+        handleZipFile(file);
+      } else {
+        handleImageFile(file, autoSizeCheck?.checked);
+      }
+    }
   });
   imageInput?.addEventListener('change', () => {
     const file = imageInput.files[0];
-    if (file) handleImageFile(file, autoSizeCheck?.checked);
+    if (file) {
+      if (file.name.endsWith('.zip')) {
+        handleZipFile(file);
+      } else {
+        handleImageFile(file, autoSizeCheck?.checked);
+      }
+    }
   });
 
   // JSON upload
@@ -86,7 +99,19 @@ export function handleImageFile(file, autoSize = true) {
   const src = URL.createObjectURL(file);
   const img = new Image();
   img.onload = () => {
-    if (img.naturalWidth * img.naturalHeight > 1000000) {
+    const w = img.naturalWidth;
+    const h = img.naturalHeight;
+    
+    // Check if it looks like a horizontal Sprite Sheet
+    if (w > h && w % h === 0 && w / h > 1) {
+      const numFrames = w / h;
+      if (window.confirm(`Phát hiện Sprite Sheet gồm ${numFrames} khung hình ngang. Bạn có muốn tải lên thành dạng Ảnh động (Animation) không?`)) {
+        handleSpriteSheet(img, numFrames);
+        return;
+      }
+    }
+
+    if (w * h > 1000000) {
       if (!window.confirm(t('status.largeImgWarning'))) {
         document.getElementById('uploadModal').style.display = 'none';
         URL.revokeObjectURL(src);

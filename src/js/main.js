@@ -1,5 +1,4 @@
-import { resizeCanvas, fitToScreen } from './core/viewport.js';
-import { renderPixels } from './core/render.js';
+import { initMainCanvasLayout, bindMainCanvasEvents } from './core/main-canvas-manager.js';
 import { els, setStatus, setCurrentTool, initEls } from './core/state.js';
 import { getTabs, getActiveTabId, initTabs, performQuickSave, syncToDrive } from './core/tab-manager.js';
 
@@ -8,7 +7,6 @@ import { setupMirrorMode } from './modes/mirror-mode.js';
 import { setupShowGrid } from './modes/show-grid.js';
 
 import { setupUndo, setupRedo } from './actions/undo-redo.js';
-import { setupZoomActions } from './actions/zoom.js';
 import { setupSwapColors } from './actions/swap-colors.js';
 import { setupSetBackground } from './actions/set-background.js';
 import { setupTrim } from './actions/trim.js';
@@ -26,14 +24,12 @@ import { exportJpeg, generateWorkspaceJpegBlob } from './io/export/export-jpeg.j
 import { exportJson, generateWorkspaceJsonBlob } from './io/export/export-json.js';
 import { exportPng, generateWorkspacePngBlob } from './io/export/export-png.js';
 import { exportWebp, generateWorkspaceWebpBlob } from './io/export/export-webp.js';
+import { generateSpriteSheetBlob, generateZipBlob, exportSpriteSheet, exportZip } from './io/export/export-animation.js';
 import { getCurrentDirectoryHandle, saveFileToLocalDrive, initLocalDrive } from './services/local-drive.js';
 import { exportToDrive, showNotification } from './services/drive-ui.js';
 
 import { initCustomTooltip } from './ui/tooltip.js';
 import { initMobilePopups } from './ui/mobile-popups.js';
-import { initFloatingNav } from './ui/floating-nav.js';
-
-import { setupCanvasEvents } from './canvas-events.js';
 import { initToolPopup } from './tool-popup/index.js';
 import { updateDOM, toggleLang, t } from './lang/i18n.js';
 
@@ -51,9 +47,7 @@ export function initEditor() {
   if (window.lucide) window.lucide.createIcons();
 
   // Initialize Canvas
-  resizeCanvas();
-  fitToScreen();
-  renderPixels();
+  initMainCanvasLayout();
 
   // Setup Modes
   setupGradientMode();
@@ -226,9 +220,14 @@ export function initEditor() {
                   await saveFileToLocalDrive(`${namePrefix}.webp`, await generateWorkspaceWebpBlob(tab));
                 } else if (format === 'json') {
                   await saveFileToLocalDrive(`${namePrefix}.json`, generateWorkspaceJsonBlob(tab));
+                } else if (format === 'spritesheet') {
+                  await saveFileToLocalDrive(`${namePrefix}-spritesheet.png`, await generateSpriteSheetBlob(tab));
+                } else if (format === 'zip') {
+                  await saveFileToLocalDrive(`${namePrefix}.zip`, await generateZipBlob(tab));
                 }
                 // Save As thành công: Cập nhật storage sang Local
-                tab.storage = { type: 'local', id: null, handle: null, name: `${namePrefix}.${format === 'jpeg' ? 'jpg' : format}` };
+                const extension = format === 'jpeg' ? 'jpg' : (format === 'spritesheet' ? 'png' : format);
+                tab.storage = { type: 'local', id: null, handle: null, name: `${namePrefix}.${extension}` };
                 tab.format = format;
               } catch (saveErr) {
                 console.warn('Local drive save failed, falling back to download', saveErr);
@@ -236,12 +235,16 @@ export function initEditor() {
                 else if (format === 'jpeg') exportJpeg(tab);
                 else if (format === 'webp') exportWebp(tab);
                 else if (format === 'json') exportJson(tab);
+                else if (format === 'spritesheet') exportSpriteSheet(tab);
+                else if (format === 'zip') exportZip(tab);
               }
             } else {
               if (format === 'png') exportPng(tab);
               else if (format === 'jpeg') exportJpeg(tab);
               else if (format === 'webp') exportWebp(tab);
               else if (format === 'json') exportJson(tab);
+              else if (format === 'spritesheet') exportSpriteSheet(tab);
+              else if (format === 'zip') exportZip(tab);
             }
             successCount++;
           } else if (dest === 'drive') {
@@ -353,9 +356,7 @@ window.addEventListener('canvas-mounted', async () => {
   
   initTabs(savedData);
   
-  setupCanvasEvents();
-  setupZoomActions();
-  initFloatingNav();
+  bindMainCanvasEvents();
 });
 
 window.addEventListener('settings-mounted', () => {

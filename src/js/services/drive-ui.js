@@ -15,15 +15,15 @@ function showNotification(msg, isError = false) {
     toast.id = 'drive-toast';
     toast.style.cssText = `
       position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px);
-      background: var(--color-surface); color: var(--color-text-bright);
-      padding: 12px 24px; border-radius: 8px; box-shadow: 0 4px 12px var(--color-shadow-lg);
+      background: var(--surface-2); color: var(--text-primary);
+      padding: 12px 24px; border-radius: 8px; box-shadow: 0 4px 12px ;
       font-size: 14px; font-weight: 500; z-index: 999999;
       transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      border: 1px solid var(--color-border);
+      border: 1px solid var(--border);
     `;
     document.body.appendChild(toast);
   }
-  toast.style.borderLeft = isError ? '4px solid #ff4444' : '4px solid var(--color-success)';
+  toast.style.borderLeft = isError ? '4px solid #ff4444' : '4px solid var(--success)';
   toast.textContent = msg;
   toast.style.transform = 'translateX(-50%) translateY(0)';
   
@@ -74,11 +74,11 @@ export function setupDriveUI() {
 
     if (driveStatusText) {
       driveStatusText.innerHTML = (t('status.driveConnected') || "Đã kết nối Google Drive") + 
-                                  (driveUserEmail ? `<br><span style="font-size:12px; color:var(--color-text-bright);">${driveUserEmail}</span>` : "");
-      driveStatusText.style.color = 'var(--color-success)';
+                                  (driveUserEmail ? `<br><span style="font-size:12px; color:var(--text-primary);">${driveUserEmail}</span>` : "");
+      driveStatusText.style.color = 'var(--success)';
     }
     if (driveHeaderIcon) {
-      driveHeaderIcon.style.color = 'var(--color-success)';
+      driveHeaderIcon.style.color = 'var(--success)';
     }
     if (driveHeaderStatus) {
       driveHeaderStatus.title = driveUserEmail ? `Google Drive Connected (${driveUserEmail})` : `Google Drive Connected`;
@@ -99,10 +99,10 @@ export function setupDriveUI() {
     driveUserEmail = "";
     if (driveStatusText) {
       driveStatusText.textContent = t('status.driveDisconnected') || "Chưa kết nối";
-      driveStatusText.style.color = 'var(--color-text-muted)';
+      driveStatusText.style.color = 'var(--text-muted)';
     }
     if (driveHeaderIcon) {
-      driveHeaderIcon.style.color = 'var(--color-text-muted)';
+      driveHeaderIcon.style.color = 'var(--text-muted)';
     }
     if (driveHeaderStatus) {
       driveHeaderStatus.title = `Chưa kết nối Google Drive`;
@@ -114,7 +114,7 @@ export function setupDriveUI() {
     const driveUploadList = document.getElementById('driveUploadList');
     if (driveUploadList) {
       driveUploadList.innerHTML = `
-        <div style="text-align: center; padding: 30px 20px; color: var(--color-text-muted); background: var(--color-surface-alt); border-radius: 8px; border: 1px dashed var(--color-border);">
+        <div style="text-align: center; padding: 30px 20px; color: var(--text-muted); background: var(--surface-1); border-radius: 8px; border: 1px dashed var(--border);">
            <i data-lucide="hard-drive" style="width: 36px; height: 36px; margin-bottom: 12px; opacity: 0.5;"></i>
            <div style="margin-bottom: 12px;">Bạn cần đăng nhập Google Drive để chọn ảnh</div>
            <button id="uploadDriveLoginBtn" class="btn btn-primary" style="padding: 8px 16px;">Kết nối Drive</button>
@@ -143,12 +143,12 @@ export function setupDriveUI() {
       sourceBtns.forEach(b => {
         b.classList.remove('active');
         b.style.background = 'transparent';
-        b.style.color = 'var(--color-text-muted)';
+        b.style.color = 'var(--text-muted)';
       });
       const targetBtn = e.currentTarget;
       targetBtn.classList.add('active');
-      targetBtn.style.background = 'var(--color-surface-alt)';
-      targetBtn.style.color = 'var(--color-text-bright)';
+      targetBtn.style.background = 'var(--surface-1)';
+      targetBtn.style.color = 'var(--text-primary)';
 
       const source = targetBtn.dataset.source;
       
@@ -248,12 +248,12 @@ export function setupDriveUI() {
     }
 
     try {
-      driveUploadList.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--color-text-muted);"><i data-lucide="loader-2" class="spin"></i> Đang tải danh sách...</div>`;
+      driveUploadList.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--text-muted);"><i data-lucide="loader-2" class="spin"></i> Đang tải danh sách...</div>`;
       if (window.lucide) window.lucide.createIcons();
       
       const files = await listDriveFiles();
       if (files.length === 0) {
-        driveUploadList.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--color-text-muted);">${t('drive.noFiles') || "Không tìm thấy file nào trên Drive"}</div>`;
+        driveUploadList.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--text-muted);">${t('drive.noFiles') || "Không tìm thấy file nào trên Drive"}</div>`;
         return;
       }
 
@@ -266,10 +266,10 @@ export function setupDriveUI() {
         const item = document.createElement('div');
         item.style.cssText = `
           display: flex; flex-direction: column; align-items: center; 
-          padding: 8px; border: 1px solid var(--color-border); border-radius: 8px; cursor: pointer;
+          padding: 8px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer;
           transition: background 0.2s; position: relative;
         `;
-        item.onmouseover = () => item.style.background = 'var(--color-surface-alt)';
+        item.onmouseover = () => item.style.background = 'var(--surface-1)';
         item.onmouseout = () => item.style.background = 'transparent';
         
         const date = new Date(file.modifiedTime).toLocaleDateString();
@@ -280,16 +280,16 @@ export function setupDriveUI() {
         let imgHtml;
         if (file.thumbnailLink && !isJson) {
           imgHtml = `<img src="${file.thumbnailLink}" referrerpolicy="no-referrer"
-            onerror="this.onerror=null; this.outerHTML='<div style=\\'width: 100%; aspect-ratio: 1; background: var(--color-surface-alt); display: flex; align-items: center; justify-content: center; margin-bottom: 8px; border-radius: 4px;\\'><i data-lucide=\\'${defaultIcon}\\' style=\\'color: var(--color-text-muted);\\'></i></div>'; if(window.lucide) window.lucide.createIcons();" 
-            style="width: 100%; aspect-ratio: 1; object-fit: contain; margin-bottom: 8px; border-radius: 4px; background: var(--color-surface-alt);" />`;
+            onerror="this.onerror=null; this.outerHTML='<div style=\\'width: 100%; aspect-ratio: 1; background: var(--surface-1); display: flex; align-items: center; justify-content: center; margin-bottom: 8px; border-radius: 4px;\\'><i data-lucide=\\'${defaultIcon}\\' style=\\'color: var(--text-muted);\\'></i></div>'; if(window.lucide) window.lucide.createIcons();" 
+            style="width: 100%; aspect-ratio: 1; object-fit: contain; margin-bottom: 8px; border-radius: 4px; background: var(--surface-1);" />`;
         } else {
-          imgHtml = `<div style="width: 100%; aspect-ratio: 1; background: var(--color-surface-alt); display: flex; align-items: center; justify-content: center; margin-bottom: 8px; border-radius: 4px;"><i data-lucide="${defaultIcon}" style="color: var(--color-text-muted); width: 32px; height: 32px;"></i></div>`;
+          imgHtml = `<div style="width: 100%; aspect-ratio: 1; background: var(--surface-1); display: flex; align-items: center; justify-content: center; margin-bottom: 8px; border-radius: 4px;"><i data-lucide="${defaultIcon}" style="color: var(--text-muted); width: 32px; height: 32px;"></i></div>`;
         }
           
         item.innerHTML = `
           ${imgHtml}
-          <div style="font-size: 12px; font-weight: 500; color: var(--color-text-bright); text-align: center; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${file.name}</div>
-          <div style="font-size: 10px; color: var(--color-text-muted); text-align: center;">${date}</div>
+          <div style="font-size: 12px; font-weight: 500; color: var(--text-primary); text-align: center; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${file.name}</div>
+          <div style="font-size: 10px; color: var(--text-muted); text-align: center;">${date}</div>
         `;
         
         item.addEventListener('click', async () => {
@@ -352,12 +352,12 @@ export function setupDriveUI() {
     }
 
     try {
-      localDirUploadList.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--color-text-muted);"><i data-lucide="loader-2" class="spin"></i> Đang tải danh sách...</div>`;
+      localDirUploadList.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--text-muted);"><i data-lucide="loader-2" class="spin"></i> Đang tải danh sách...</div>`;
       if (window.lucide) window.lucide.createIcons();
       
       const files = await listLocalFiles();
       if (files.length === 0) {
-        localDirUploadList.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--color-text-muted);">Không tìm thấy ảnh hoặc project nào trong Thư mục cục bộ</div>`;
+        localDirUploadList.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--text-muted);">Không tìm thấy ảnh hoặc project nào trong Thư mục cục bộ</div>`;
         return;
       }
 
@@ -370,22 +370,22 @@ export function setupDriveUI() {
         const item = document.createElement('div');
         item.style.cssText = `
           display: flex; flex-direction: column; align-items: center; 
-          padding: 8px; border: 1px solid var(--color-border); border-radius: 8px; cursor: pointer;
+          padding: 8px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer;
           transition: background 0.2s; position: relative;
         `;
-        item.onmouseover = () => item.style.background = 'var(--color-surface-alt)';
+        item.onmouseover = () => item.style.background = 'var(--surface-1)';
         item.onmouseout = () => item.style.background = 'transparent';
         
         const date = new Date(file.lastModified).toLocaleDateString();
         const defaultIcon = file.isJson ? 'file-json-2' : 'image';
         
         const imgContainerId = 'local-img-' + Math.random().toString(36).substr(2, 9);
-        const imgHtml = `<div id="${imgContainerId}" style="width: 100%; aspect-ratio: 1; background: var(--color-surface-alt); display: flex; align-items: center; justify-content: center; margin-bottom: 8px; border-radius: 4px;"><i data-lucide="${defaultIcon}" style="color: var(--color-text-muted); width: 32px; height: 32px;"></i></div>`;
+        const imgHtml = `<div id="${imgContainerId}" style="width: 100%; aspect-ratio: 1; background: var(--surface-1); display: flex; align-items: center; justify-content: center; margin-bottom: 8px; border-radius: 4px;"><i data-lucide="${defaultIcon}" style="color: var(--text-muted); width: 32px; height: 32px;"></i></div>`;
           
         item.innerHTML = `
           ${imgHtml}
-          <div style="font-size: 12px; font-weight: 500; color: var(--color-text-bright); text-align: center; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${file.name}">${file.name}</div>
-          <div style="font-size: 10px; color: var(--color-text-muted); text-align: center;">${date}</div>
+          <div style="font-size: 12px; font-weight: 500; color: var(--text-primary); text-align: center; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${file.name}">${file.name}</div>
+          <div style="font-size: 10px; color: var(--text-muted); text-align: center;">${date}</div>
         `;
         
         item.addEventListener('click', async () => {

@@ -1,4 +1,4 @@
-import { setMirrorModeActive } from '../shared/pixel-writer.js';
+import { ModeManager } from '../core/mode-manager.js';
 
 let isSetup = false;
 export function setupMirrorMode() {
@@ -7,7 +7,7 @@ export function setupMirrorMode() {
 
   document.body.addEventListener('change', (e) => {
     if (e.target.id === 'mirrorMode') {
-      setMirrorModeActive(e.target.checked);
+      ModeManager.setMirror(e.target.checked);
       document.getElementById('mirrorModeLabel')?.classList.toggle('active', e.target.checked);
       
       const mirrorLine = document.getElementById('mirrorLine');

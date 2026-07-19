@@ -1,4 +1,5 @@
 import { ctx, GRID_WIDTH, GRID_HEIGHT, pixelMap, previewPixels, offscreenData32 } from './state.js';
+import { updatePreviewTransform } from '../preview/preview-group-manager.js';
 
 let zoom = 1;
 let panX = 0;
@@ -114,6 +115,21 @@ export function applyTransform(canvas) {
   canvas.style.transform = `translate(${panX}px, ${panY}px)`;
   canvas.style.setProperty('--canvas-zoom', zoom);
 
+  const onionCanvas = document.getElementById("onionSkinCanvas");
+  if (onionCanvas) {
+    onionCanvas.style.width = `${GRID_WIDTH * zoom}px`;
+    onionCanvas.style.height = `${GRID_HEIGHT * zoom}px`;
+    onionCanvas.style.transform = `translate(${panX}px, ${panY}px)`;
+  }
+
+  const bgCanvas = document.getElementById("canvasBackground");
+  if (bgCanvas) {
+    bgCanvas.style.width = `${GRID_WIDTH * zoom}px`;
+    bgCanvas.style.height = `${GRID_HEIGHT * zoom}px`;
+    bgCanvas.style.transform = `translate(${panX}px, ${panY}px)`;
+    bgCanvas.style.setProperty('--canvas-zoom', zoom);
+  }
+
   const gridOverlay = document.getElementById('gridOverlay');
   if (gridOverlay) {
     gridOverlay.style.transform = `translate(${panX}px, ${panY}px)`;
@@ -146,6 +162,9 @@ export function applyTransform(canvas) {
       mirrorLine.style.transform = `translateX(-1px)`;
     }
   }
+  
+  const showGridFlag = document.getElementById('showGrid')?.checked;
+  updatePreviewTransform(panX, panY, zoom, GRID_WIDTH, GRID_HEIGHT, showGridFlag);
 }
 
 export function getCellPx(clientX, clientY) {

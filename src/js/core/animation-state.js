@@ -23,6 +23,17 @@ import {
     setGridSizeParams,
 } from "./state.js";
 import { getHistoryState, setHistoryState } from './history.js';
+import {
+    getPreviewItems,
+    syncPreviewsWithFrames,
+    subscribeLayoutChange,
+    forceRedrawAllPreviews
+} from '../preview/preview-group-manager.js';
+import { clearSelection } from '../tools/select.js';
+
+function syncPreviews() {
+    syncPreviewsWithFrames(frames, activeFrameIndex, isAnimationMode);
+}
 
 /**
  * Danh sách các frame của animation hiện tại.
@@ -31,13 +42,87 @@ import { getHistoryState, setHistoryState } from './history.js';
  *   id: string,
  *   pixelMap: Uint32Array,
  *   groupMap: Map,
- *   offscreenImageData: ImageData | null,
- *   offscreenData32: Uint32Array | null,
+ *   id: string,
+ *   pixelMap: Uint32Array,
+ *   groupMap: Map,
  *   width: number,
  *   height: number,
  * }
  */
 export let frames = [];
+
+let frameIdCounter = 0;
+let listeners = [];
+
+export function subscribeAnimationState(callback) {
+    listeners.push(callback);
+    return () => {
+        listeners = listeners.filter(cb => cb !== callback);
+    };
+}
+
+function notifyListeners() {
+    listeners.forEach(cb => cb({
+        frames: [...frames],
+        activeFrameIndex,
+        isAnimationMode,
+        showOnionSkin
+    }));
+}
+
+export function getAnimationState() {
+    if (frames.length === 0) return null;
+    syncCurrentStateToFrame();
+    return {
+        frames: frames.map(f => ({
+            id: f.id,
+            pixelMap: new Uint32Array(f.pixelMap),
+            groupMap: Array.from(f.groupMap.entries()),
+            width: f.width,
+            height: f.height,
+            historyState: f.historyState
+        })),
+        activeFrameIndex,
+        isAnimationMode,
+        showOnionSkin
+    };
+}
+
+export function setAnimationState(state) {
+    if (!state) {
+        frames = [];
+        activeFrameIndex = 0;
+        isAnimationMode = false;
+        showOnionSkin = false;
+        syncPreviews();
+        notifyListeners();
+        return;
+    }
+    
+    let maxId = 0;
+    frames = state.frames.map(f => {
+        const parsedId = parseInt(f.id.replace('frame_', ''), 10);
+        if (!isNaN(parsedId) && parsedId > maxId) maxId = parsedId;
+
+        return {
+            id: f.id,
+            pixelMap: new Uint32Array(f.pixelMap),
+            groupMap: new Map(f.groupMap),
+            width: f.width,
+            height: f.height,
+            historyState: f.historyState
+        };
+    });
+    frameIdCounter = Math.max(frameIdCounter, maxId);
+    
+    activeFrameIndex = state.activeFrameIndex || 0;
+    isAnimationMode = state.isAnimationMode || false;
+    showOnionSkin = state.showOnionSkin || false;
+    
+    forceRedrawAllPreviews();
+    syncPreviews();
+    notifyListeners();
+}
 
 /** Index của frame đang được chỉnh sửa / hiển thị active. */
 export let activeFrameIndex = 0;
@@ -50,6 +135,7 @@ export let showOnionSkin = false;
 
 export function setOnionSkin(value) {
     showOnionSkin = !!value;
+    notifyListeners();
     return showOnionSkin;
 }
 
@@ -63,12 +149,12 @@ export function getPreviousFrame() {
     return frames[activeFrameIndex - 1] ?? null;
 }
 
-let frameIdCounter = 0;
-
 function createFrameId() {
     frameIdCounter += 1;
     return `frame_${frameIdCounter}`;
 }
+
+
 
 /**
  * Bật/tắt Animation Mode.
@@ -77,6 +163,8 @@ function createFrameId() {
  */
 export function setAnimationMode(value) {
     isAnimationMode = !!value;
+    syncPreviews();
+    notifyListeners();
     return isAnimationMode;
 }
 
@@ -93,23 +181,27 @@ export function toggleAnimationMode() {
  */
 export function initAnimationFromCurrentState() {
     if (frames.length > 0) {
-        return frames;
+        if (activeFrameIndex >= frames.length) {
+            loadFrameToCurrentState(frames.length - 1);
+        } else {
+            loadFrameToCurrentState(activeFrameIndex);
+        }
+    } else {
+        frames = [
+            {
+                id: createFrameId(),
+                pixelMap: pixelMap.slice(),
+                groupMap: new Map(groupMap),
+                width: GRID_WIDTH,
+                height: GRID_HEIGHT,
+                historyState: getHistoryState(),
+            },
+        ];
+        activeFrameIndex = 0;
+        
+        syncPreviews();
+        notifyListeners();
     }
-
-    frames = [
-        {
-            id: createFrameId(),
-            pixelMap: pixelMap.slice(),
-            groupMap: new Map(groupMap),
-            offscreenImageData: offscreenImageData,
-            offscreenData32: offscreenData32,
-            width: GRID_WIDTH,
-            height: GRID_HEIGHT,
-            historyState: getHistoryState(),
-        },
-    ];
-    activeFrameIndex = 0;
-
     return frames;
 }
 
@@ -126,14 +218,14 @@ export function addFrame(width = GRID_WIDTH, height = GRID_HEIGHT) {
         id: createFrameId(),
         pixelMap: new Uint32Array(width * height),
         groupMap: new Map(),
-        offscreenImageData: null,
-        offscreenData32: null,
         width,
         height,
         historyState: { undoStack: [], redoStack: [], currentStroke: null },
     };
 
     frames.push(newFrame);
+    syncPreviews();
+    notifyListeners();
     return newFrame;
 }
 
@@ -153,6 +245,7 @@ export function setActiveFrameIndex(index) {
     if (frames.length === 0) return activeFrameIndex;
     const clamped = Math.max(0, Math.min(index, frames.length - 1));
     activeFrameIndex = clamped;
+    notifyListeners();
     return activeFrameIndex;
 }
 
@@ -162,17 +255,24 @@ export function setActiveFrameIndex(index) {
  * đang dang dở của frame hiện tại.
  */
 export function syncCurrentStateToFrame() {
-    const frame = frames[activeFrameIndex];
-    if (!frame) return null;
+    clearSelection(); // Commit any active floating selection before saving
+    const oldFrame = frames[activeFrameIndex];
+    if (!oldFrame) return null;
 
-    frame.pixelMap = pixelMap.slice();
+    const frame = { ...oldFrame };
+    if (frame.pixelMap.length === pixelMap.length) {
+        frame.pixelMap.set(pixelMap);
+    } else {
+        frame.pixelMap = pixelMap.slice();
+    }
     frame.groupMap = new Map(groupMap);
-    frame.offscreenImageData = offscreenImageData;
-    frame.offscreenData32 = offscreenData32;
     frame.width = GRID_WIDTH;
     frame.height = GRID_HEIGHT;
     frame.historyState = getHistoryState();
+    
+    frames[activeFrameIndex] = frame;
 
+    notifyListeners();
     return frame;
 }
 
@@ -190,17 +290,12 @@ export function loadFrameToCurrentState(index) {
     if (!frame) return null;
 
     setActiveFrameIndex(index);
-    setGridSizeParams(
-        frame.width,
-        frame.height,
-        frame.offscreenImageData,
-        frame.offscreenData32
-    );
-    resetMaps(frame.pixelMap.slice(), new Map(frame.groupMap));
+    resetMaps(frame.pixelMap, new Map(frame.groupMap));
     setHistoryState(
         frame.historyState || { undoStack: [], redoStack: [], currentStroke: null }
     );
-
+    
+    syncPreviews();
     return frame;
 }
 
@@ -245,8 +340,6 @@ export function insertFrameAt(index, width = GRID_WIDTH, height = GRID_HEIGHT) {
         id: createFrameId(),
         pixelMap: new Uint32Array(width * height),
         groupMap: new Map(),
-        offscreenImageData: null,
-        offscreenData32: null,
         width,
         height,
         historyState: { undoStack: [], redoStack: [], currentStroke: null },
@@ -254,7 +347,8 @@ export function insertFrameAt(index, width = GRID_WIDTH, height = GRID_HEIGHT) {
 
     syncCurrentStateToFrame();
     frames.splice(index, 0, newFrame);
-    loadFrameToCurrentState(index);
+    loadFrameToCurrentState(index); 
+    notifyListeners();
     return newFrame;
 }
 
@@ -269,5 +363,67 @@ export function removeFrame(index) {
     frames.splice(index, 1);
     const newIndex = Math.max(0, Math.min(index, frames.length - 1));
     loadFrameToCurrentState(newIndex);
+    notifyListeners();
     return true;
+}
+
+/**
+ * Thay đổi kích thước toàn bộ các frames trong animation.
+ * Gọi từ grid-size-select.js khi người dùng đổi size canvas.
+ */
+export function resizeAnimation(w, h, mode = 'clear', dx = 0, dy = 0) {
+    if (frames.length === 0) return;
+    
+    // Sync current state first to ensure active frame is updated with latest pixels
+    syncCurrentStateToFrame();
+
+    for (let i = 0; i < frames.length; i++) {
+        const frame = frames[i];
+        const oldW = frame.width;
+        const oldH = frame.height;
+        const oldData32 = frame.pixelMap;
+
+        const offscreenCanvas = document.createElement('canvas');
+        offscreenCanvas.width = w;
+        offscreenCanvas.height = h;
+        const newCtx = offscreenCanvas.getContext('2d', { willReadFrequently: true });
+        
+        if (mode === 'keep' || mode === 'scale') {
+            const tmpCanvas = document.createElement('canvas');
+            tmpCanvas.width = oldW;
+            tmpCanvas.height = oldH;
+            const tmpCtx = tmpCanvas.getContext('2d');
+            const oldImgData = new ImageData(oldW, oldH);
+            new Uint32Array(oldImgData.data.buffer).set(oldData32);
+            tmpCtx.putImageData(oldImgData, 0, 0);
+            
+            if (mode === 'scale') {
+                newCtx.imageSmoothingEnabled = false;
+                newCtx.drawImage(tmpCanvas, 0, 0, w, h);
+            } else {
+                newCtx.drawImage(tmpCanvas, dx, dy);
+            }
+        }
+
+        const newData = newCtx.getImageData(0, 0, w, h);
+        const newData32 = new Uint32Array(newData.data.buffer);
+        
+        frame.width = w;
+        frame.height = h;
+        
+        if (mode === 'clear') {
+            frame.pixelMap = new Uint32Array(w * h);
+            frame.groupMap = new Map();
+        } else {
+            frame.pixelMap = new Uint32Array(newData32);
+            frame.groupMap = new Map(); // Actually, scaling groups is tricky, so clearing group mapping is safer during resize
+        }
+    }
+    
+    // Load the active frame back into the canvas to reflect new size/pixels
+    loadFrameToCurrentState(activeFrameIndex);
+    
+    // Force redraw previews with new size
+    forceRedrawAllPreviews();
+    notifyListeners();
 }

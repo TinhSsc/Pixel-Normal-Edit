@@ -86,7 +86,7 @@ export default function ColorPalette() {
               backgroundColor: item.hex, 
               borderRadius: '4px', 
               cursor: 'pointer',
-              border: '1px solid var(--color-border)',
+              border: '1px solid var(--border)',
               position: 'relative',
               boxSizing: 'border-box'
             }}
@@ -133,9 +133,9 @@ export default function ColorPalette() {
               justifyContent: 'center',
               borderRadius: '4px', 
               cursor: 'pointer',
-              background: 'var(--color-surface-alt)',
-              color: 'var(--color-text-muted)',
-              border: '1px solid var(--color-border)'
+              background: 'var(--surface-1)',
+              color: 'var(--text-muted)',
+              border: '1px solid var(--border)'
             }}
             onClick={() => setIsExpanded(!isExpanded)}
             title={isExpanded ? "Thu gọn" : "Xem thêm"}

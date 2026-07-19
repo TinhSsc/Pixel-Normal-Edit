@@ -48,3 +48,35 @@ Lưu ý khi code phải nhớ đến gói lang, và ưu tiên sử dụng tiến
 * Định dạng Giao diện (CSS):
 
   * [layout.css](file:///c:/Users/ADMIN/Downloads/aitaoanh/css/layout.css) (CSS điều khiển hiển thị Menu di động, chống tràn Tool-popup, thêm thanh cuộn cho thanh nav)
+
+### Mode Manager
+
+- `src/js/core/mode-manager.js`
+  - Facade quản lý tập trung các chế độ của Canvas.
+  - API: `get/set/toggle` cho `Gradient`, `Mirror`, `Grid`, `Animation`, `Onion Skin`.
+- `src/js/shared/pixel-writer.js`
+  - `isGradientModeActive()`
+- `src/js/core/render.js`
+  - `isShowGrid()`
+- Các module UI (`gradient-mode.js`, `mirror-mode.js`, `show-grid.js`) đều truy cập thông qua `ModeManager`.
+
+Luồng hiển thị preview pixel:
+
+CanvasPanel.jsx: Render các <canvas> preview từ getPreviewItems().
+preview-group-manager.js: Quản lý danh sách preview và dùng syncPreviewPixels() để copy ảnh từ canvas chính sang canvas preview.
+render.js: Sau mỗi lần vẽ hoặc cập nhật previewPixels, renderPixels() gọi syncPreviewPixels() để đồng bộ ngay preview.
+
+Các file chính của Main Canvas:
+CanvasPanel.jsx: Tạo <canvas id="pixelCanvas"> và các lớp overlay.
+render.js: Vẽ pixelMap và previewPixels lên canvas (renderPixels()).
+viewport.js: Quản lý zoom, pan và transform của canvas.
+canvas-events.js: Xử lý sự kiện chuột, touch, wheel.
+state.js: Lưu pixelCanvas và ctx để các module dùng chung.
+
+### Main Canvas Manager
+
+- `src/js/core/main-canvas-manager.js`
+  - Facade khởi tạo Main Canvas.
+  - API: `initMainCanvasLayout()`, `bindMainCanvasEvents()`.
+- `main.js`
+  - Thay các lệnh khởi tạo Canvas riêng lẻ bằng 2 API trên, giúp code gọn và dễ quản lý.

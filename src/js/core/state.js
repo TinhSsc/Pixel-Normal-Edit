@@ -45,7 +45,7 @@ let statusTimeout = null;
 export function setStatus(msg, isError = false) {
   if (!els.status) return;
   els.status.textContent = msg;
-  els.status.style.color = isError ? "#ff4d4f" : "var(--color-text-bright)";
+  els.status.style.color = isError ? "#ff4d4f" : "var(--text-primary)";
   
   const container = document.getElementById('toastContainer');
   if (container) container.classList.add('show');
@@ -97,7 +97,19 @@ export function setGridSizeParams(w, h, imageData, data32) {
 }
 
 export function resetMaps(newPixelMap = null, newGroupMap = new Map()) {
-  pixelMap = newPixelMap ?? new Uint32Array(GRID_WIDTH * GRID_HEIGHT);
+  if (newPixelMap) {
+    if (pixelMap.length === newPixelMap.length) {
+      pixelMap.set(newPixelMap);
+    } else {
+      pixelMap = new Uint32Array(newPixelMap);
+    }
+  } else {
+    if (pixelMap.length === GRID_WIDTH * GRID_HEIGHT) {
+      pixelMap.fill(0);
+    } else {
+      pixelMap = new Uint32Array(GRID_WIDTH * GRID_HEIGHT);
+    }
+  }
   groupMap = newGroupMap;
 }
 

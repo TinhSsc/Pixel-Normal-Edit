@@ -1,5 +1,6 @@
 import { Icon, ICONS } from '../components/icons';
 import React, { useEffect, useRef, useState } from 'react';
+import { getPreviewItems, subscribeLayoutChange, updatePreviewTransform } from '../js/preview/preview-group-manager.js';
 import {
   isAnimationMode as animationModeState,
   toggleAnimationMode,
@@ -15,10 +16,12 @@ import {
   showOnionSkin as showOnionSkinState,
   toggleOnionSkin,
   getPreviousFrame,
+  subscribeAnimationState
 } from '../js/core/animation-state.js';
 import AnimationStripPanel from './AnimationStripPanel.jsx';
 import { GRID_WIDTH, GRID_HEIGHT } from '../js/core/state.js';
 import { renderPixels, setForceFullRender } from '../js/core/render.js';
+import { getZoom, getPan, setPan, applyTransform } from '../js/core/viewport.js';
 
 function OnionSkinLayer({ frame }) {
   const ref = React.useRef(null);
@@ -33,19 +36,23 @@ function OnionSkinLayer({ frame }) {
     const data32 = new Uint32Array(imageData.data.buffer);
     data32.set(pixelMap);
     ctx2d.putImageData(imageData, 0, 0);
+
+    const mainCanvas = document.getElementById('pixelCanvas');
+    if (mainCanvas) {
+      applyTransform(mainCanvas);
+    }
   }, [frame]);
 
   if (!frame) return null;
 
   return (
     <canvas
+      id="onionSkinCanvas"
       ref={ref}
       style={{
         position: 'absolute',
         top: 0,
         left: 0,
-        width: '100%',
-        height: '100%',
         opacity: 0.35,
         pointerEvents: 'none',
         imageRendering: 'pixelated',
@@ -61,6 +68,24 @@ export default function CanvasPanel() {
   // CHƯA đổi giao diện canvas (sẽ làm ở Batch 2.1) — mục tiêu batch này là
   // có nút toggle hoạt động đúng, verify được qua console.log.
   const [isAnimMode, setIsAnimMode] = useState(animationModeState);
+  const [framesState, setFramesState] = useState(frames);
+  const [previews, setPreviews] = useState(getPreviewItems);
+
+  useEffect(() => {
+    return subscribeLayoutChange((newItems) => {
+      setPreviews(newItems);
+    });
+  }, []);
+
+  useEffect(() => {
+    // This runs after React has rendered the preview canvases
+    const pan = getPan();
+    const zoom = getZoom();
+    const showGridFlag = document.getElementById('showGrid')?.checked;
+    updatePreviewTransform(pan.x, pan.y, zoom, GRID_WIDTH, GRID_HEIGHT, showGridFlag);
+    setForceFullRender(true);
+    renderPixels();
+  }, [previews]);
 
   const [activeIndex, setActiveIndexState] = useState(activeFrameIndexState);
   const [showOnion, setShowOnion] = useState(showOnionSkinState);
@@ -68,24 +93,54 @@ export default function CanvasPanel() {
   const [removingFrameId, setRemovingFrameId] = useState(null);
   const canvasFadeRef = useRef(null);
 
+  useEffect(() => {
+    return subscribeAnimationState((newState) => {
+      setIsAnimMode(newState.isAnimationMode);
+      setActiveIndexState(newState.activeFrameIndex);
+      setShowOnion(newState.showOnionSkin);
+      setFramesState(newState.frames);
+    });
+  }, []);
+
   const handleToggleOnionSkin = () => {
     setShowOnion(toggleOnionSkin());
   };
 
+  const shiftPanForFrameChange = (oldIndex, newIndex) => {
+    if (oldIndex === newIndex) return;
+    const zoom = getZoom();
+    const pan = getPan();
+    const GAP = 32;
+    const offsetIndex = newIndex - oldIndex;
+    const offsetX = offsetIndex * (GRID_WIDTH * zoom + GAP);
+    
+    setPan(pan.x + offsetX, pan.y);
+    const canvasEl = document.getElementById('pixelCanvas');
+    if (canvasEl) {
+      applyTransform(canvasEl);
+    }
+  };
+
   const handleSelectFrame = (index) => {
+    const oldIndex = activeIndex;
     const newIndex = goToFrame(index);
+    if (newIndex !== oldIndex) shiftPanForFrameChange(oldIndex, newIndex);
     setActiveIndexState(newIndex);
     triggerCanvasRedraw();
   };
 
   const handlePrevFrame = () => {
+    const oldIndex = activeIndex;
     const newIndex = prevFrame();
+    if (newIndex !== oldIndex) shiftPanForFrameChange(oldIndex, newIndex);
     setActiveIndexState(newIndex);
     triggerCanvasRedraw();
   };
 
   const handleNextFrame = () => {
+    const oldIndex = activeIndex;
     const newIndex = nextFrame();
+    if (newIndex !== oldIndex) shiftPanForFrameChange(oldIndex, newIndex);
     setActiveIndexState(newIndex);
     triggerCanvasRedraw();
   };
@@ -93,12 +148,6 @@ export default function CanvasPanel() {
   const triggerCanvasRedraw = () => {
     setForceFullRender(true);
     renderPixels();
-    const canvasEl = document.getElementById('pixelCanvas');
-    if (canvasEl) {
-      canvasEl.style.transition = 'opacity 150ms ease';
-      canvasEl.style.opacity = '0.3';
-      requestAnimationFrame(() => { canvasEl.style.opacity = '1'; });
-    }
   };
 
   const handleToggleAnimationMode = () => {
@@ -171,7 +220,7 @@ export default function CanvasPanel() {
           <button
             className="btn collapse-toolbar-btn"
             onClick={() => setIsToolbarCollapsed(!isToolbarCollapsed)}
-            style={{ width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: 'var(--color-surface)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderRadius: '6px', border: '1px solid var(--color-border)', pointerEvents: 'auto', color: 'var(--color-text-bright)' }}
+            style={{ width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: 'var(--surface-2)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderRadius: '6px', border: '1px solid var(--border)', pointerEvents: 'auto', color: 'var(--text-primary)' }}
             title="Toggle Toolbar"
           >
             <span style={{ display: isToolbarCollapsed ? 'none' : 'block' }}><Icon name={ICONS.MINUS} style={{ width: '16px', height: '16px' }} /></span>
@@ -187,27 +236,27 @@ export default function CanvasPanel() {
               <div id="resizePopover" style={{ display: 'none', position: 'absolute', top: '100%', left: '0', marginTop: '6px', background: 'rgba(30, 30, 35, 0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '16px', width: '240px', boxShadow: '0 8px 24px rgba(0,0,0,0.4)', zIndex: 60, backdropFilter: 'blur(12px)', transition: 'all 0.2s ease' }}>
 
                 <div style={{ fontSize: '12px', fontWeight: 600, color: '#fff', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Icon name={ICONS.MAXIMIZE} style={{ width: '14px', height: '14px', color: 'var(--color-primary)' }} />
+                  <Icon name={ICONS.MAXIMIZE} style={{ width: '14px', height: '14px', color: 'var(--accent)' }} />
                   <span data-i18n="resizePopover.canvasSize">Kích thước Canvas</span>
                 </div>
 
                 <div style={{ display: 'flex', gap: '10px', marginBottom: '12px' }}>
                   <div style={{ flex: 1 }}>
-                    <label style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--color-text-muted)', marginBottom: '4px', display: 'block' }} data-i18n="resizePopover.width">Width</label>
+                    <label style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-muted)', marginBottom: '4px', display: 'block' }} data-i18n="resizePopover.width">Width</label>
                     <input type="number" id="resizeWidth" defaultValue="32" min="1" max="256" style={{ width: '100%', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.05)', color: '#fff', padding: '6px 8px', borderRadius: '4px', fontSize: '13px', outline: 'none', transition: 'border 0.2s' }} />
                   </div>
                   <div style={{ flex: 1 }}>
-                    <label style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--color-text-muted)', marginBottom: '4px', display: 'block' }} data-i18n="resizePopover.height">Height</label>
+                    <label style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-muted)', marginBottom: '4px', display: 'block' }} data-i18n="resizePopover.height">Height</label>
                     <input type="number" id="resizeHeight" defaultValue="32" min="1" max="256" style={{ width: '100%', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.05)', color: '#fff', padding: '6px 8px', borderRadius: '4px', fontSize: '13px', outline: 'none', transition: 'border 0.2s' }} />
                   </div>
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', padding: '6px 8px', background: 'rgba(0,0,0,0.15)', borderRadius: '4px' }}>
-                  <input type="checkbox" id="resizeLockRatio" defaultChecked style={{ accentColor: 'var(--color-primary)', cursor: 'pointer' }} />
+                  <input type="checkbox" id="resizeLockRatio" defaultChecked style={{ accentColor: 'var(--accent)', cursor: 'pointer' }} />
                   <label htmlFor="resizeLockRatio" style={{ fontSize: '11px', cursor: 'pointer', userSelect: 'none', color: '#ddd' }} data-i18n="resizePopover.lockRatio">Khóa tỷ lệ (Lock Ratio)</label>
                 </div>
 
-                <div style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--color-text-muted)', marginBottom: '6px' }} data-i18n="resizePopover.presets">Presets (Vuông)</div>
+                <div style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-muted)', marginBottom: '6px' }} data-i18n="resizePopover.presets">Presets (Vuông)</div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '4px', marginBottom: '16px' }}>
                   <button className="btn resize-preset-btn" data-size="16" style={{ padding: '4px 0', fontSize: '11px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.05)' }}>16</button>
                   <button className="btn resize-preset-btn" data-size="32" style={{ padding: '4px 0', fontSize: '11px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.05)' }}>32</button>
@@ -215,8 +264,8 @@ export default function CanvasPanel() {
                   <button className="btn resize-preset-btn" data-size="64" style={{ padding: '4px 0', fontSize: '11px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.05)' }}>64</button>
                 </div>
 
-                <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', marginBottom: '12px', textAlign: 'center', padding: '8px 0', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-                  <span data-i18n="resizePopover.afterResize">Canvas after resize:</span> <span id="resizePreviewText" style={{ color: 'var(--color-primary)', fontWeight: 'bold', fontSize: '13px' }}>32 × 32</span>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '12px', textAlign: 'center', padding: '8px 0', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                  <span data-i18n="resizePopover.afterResize">Canvas after resize:</span> <span id="resizePreviewText" style={{ color: 'var(--accent)', fontWeight: 'bold', fontSize: '13px' }}>32 × 32</span>
                 </div>
 
                 <button id="resizeApplyBtn" className="btn btn-primary" style={{ width: '100%', padding: '8px 0', fontSize: '13px', fontWeight: 600, borderRadius: '6px', boxShadow: '0 2px 8px rgba(0,0,0,0.2)' }} data-i18n="resizePopover.apply">Áp dụng (Apply)</button>
@@ -231,19 +280,26 @@ export default function CanvasPanel() {
               className="btn"
               onClick={handleToggleAnimationMode}
               title={isAnimMode ? 'Xem Source Image' : 'Xem Animation'}
-              style={isAnimMode ? { background: 'var(--color-primary)', color: '#fff' } : undefined}
+              style={isAnimMode ? { background: 'var(--accent)', color: '#fff' } : undefined}
             >
               <Icon name={ICONS.FILM} style={{ width: '16px', height: '16px' }} />
             </button>
           </div>
         </div>
+        <div id="canvasBackground" className={isAnimMode ? 'is-animating' : ''}></div>
         {isAnimMode && showOnion && (
           <OnionSkinLayer frame={getPreviousFrame()} />
         )}
-        <canvas id="pixelCanvas"></canvas>
+        <canvas id="pixelCanvas" className={isAnimMode ? 'is-animating' : ''}></canvas>
+        {previews.map(p => (
+          <div key={p.id} id={`group-${p.id}`} style={{ pointerEvents: 'none', position: 'absolute', top: 0, left: 0, zIndex: 1 }}>
+            <canvas id={p.id} className="preview-canvas" style={{ position: 'absolute', top: 0, left: 0 }}></canvas>
+            <div id={`grid-${p.id}`} style={{ position: 'absolute', top: '-1px', left: '-1px', transformOrigin: '0 0' }}></div>
+          </div>
+        ))}
         {isAnimMode && (
           <AnimationStripPanel
-            frames={frames}
+            frames={framesState}
             activeFrameIndex={activeIndex}
             onSelectFrame={handleSelectFrame}
             onPrevFrame={handlePrevFrame}
@@ -256,7 +312,7 @@ export default function CanvasPanel() {
             removingFrameId={removingFrameId}
           />
         )}
-        <div id="gridOverlay" style={{ pointerEvents: 'none', position: 'absolute', top: '-1px', left: '-1px', transformOrigin: '0 0' }}>
+        <div id="gridOverlay" style={{ pointerEvents: 'none', position: 'absolute', top: '-1px', left: '-1px', transformOrigin: '0 0', zIndex: 10 }}>
           <div id="mirrorLine" style={{ display: 'none', position: 'absolute', left: '50%', top: 0, bottom: 0, background: 'rgba(255, 60, 60, 0.8)', zIndex: 10 }}></div>
           <div id="selectionOverlay" style={{ display: 'none', position: 'absolute', pointerEvents: 'none', border: '1px dashed white', boxShadow: '0 0 0 1px black', zIndex: 20 }}></div>
         </div>

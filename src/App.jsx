@@ -319,7 +319,7 @@ function App() {
     <>
 
       {AUTH_ROUTES.includes(route) ? (
-        <Suspense fallback={<div style={{display:'flex',justifyContent:'center',alignItems:'center',height:'100vh',color:'var(--color-text-muted)'}}><Icon name={ICONS.LOADER} className="spin" style={{width: 24, height: 24, marginRight: 8}}/> Đang tải...</div>}>
+        <Suspense fallback={<div style={{display:'flex',justifyContent:'center',alignItems:'center',height:'100vh',color:'var(--text-muted)'}}><Icon name={ICONS.LOADER} className="spin" style={{width: 24, height: 24, marginRight: 8}}/> Đang tải...</div>}>
           {route === 'login' ? (
             <LoginPage onLoggedIn={handleLoggedIn} onNavigate={navigate} />
           ) : route === 'register' ? (
@@ -336,18 +336,18 @@ function App() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h1 style={{ margin: 0, fontSize: '24px', color: 'var(--color-text-bright)' }} data-i18n="app.title">Pixel Normal Edit</h1>
+              <h1 style={{ margin: 0, fontSize: '24px', color: 'var(--text-primary)' }} data-i18n="app.title">Pixel Normal Edit</h1>
               <button 
                 className="btn" 
                 style={{ background: 'transparent', border: 'none', padding: '4px', display: 'flex', alignItems: 'center' }} 
                 onClick={() => document.getElementById('globalSettingsModal').style.display = 'flex'}
                 title="Cài đặt"
               >
-                <Icon name={ICONS.SETTINGS} style={{ width: '20px', height: '20px', color: 'var(--color-text-muted)' }} />
+                <Icon name={ICONS.SETTINGS} style={{ width: '20px', height: '20px', color: 'var(--text-muted)' }} />
               </button>
             </div>
 
-            <span style={{ fontSize: '13px', color: 'var(--color-text-muted)', display: 'none' }} data-i18n="app.desc">Pixel Normal Edit</span>
+            <span style={{ fontSize: '13px', color: 'var(--text-muted)', display: 'none' }} data-i18n="app.desc">Pixel Normal Edit</span>
 
           </div>
 
@@ -371,12 +371,12 @@ function App() {
             </button>
 
 
-            <button id="openDownloadModalBtn" className="btn btn-primary" style={{ background: 'var(--color-success)' }} data-i18n="btn.saveAs" onClick={() => { document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none'); document.getElementById('downloadModal').style.display = 'flex'; }}>
+            <button id="openDownloadModalBtn" className="btn btn-primary" style={{ background: 'var(--success)' }} data-i18n="btn.saveAs" onClick={() => { document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none'); document.getElementById('downloadModal').style.display = 'flex'; }}>
               <Icon name={ICONS.DOWNLOAD} style={{ width: '18px', height: '18px' }} />
               <span data-i18n="btn.saveAs">Lưu dưới dạng...</span>
             </button>
             
-            <div id="saveStatusIndicator" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: 'var(--color-text-muted)', marginLeft: '8px', opacity: 0.7 }}>
+            <div id="saveStatusIndicator" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: 'var(--text-muted)', marginLeft: '8px', opacity: 0.7 }}>
               {/* Status will be updated via JS */}
             </div>
 
@@ -410,7 +410,7 @@ function App() {
 
               <img src={currentUser?.picture || undefined} alt="" className="avatar-img" style={{ display: (currentUser && currentUser.picture) ? 'block' : 'none' }} />
               <div className="avatar-placeholder" style={{ display: (currentUser && currentUser.picture) ? 'none' : 'flex' }}>
-                <Icon name={ICONS.USER} style={{ width: '18px', height: '18px', color: 'var(--color-text-bright)' }} />
+                <Icon name={ICONS.USER} style={{ width: '18px', height: '18px', color: 'var(--text-primary)' }} />
               </div>
             </button>
 
@@ -494,22 +494,22 @@ function App() {
                </button>
             </div>
             
-            <label id="autoSizeLabel" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: 'var(--color-text-bright)', cursor: 'pointer', margin: '10px 0 20px', fontWeight: 500 }}>
-              <input type="checkbox" id="autoSizeOnUpload" defaultChecked style={{ width: '16px', height: '16px', accentColor: 'var(--color-primary)' }} />
+            <label id="autoSizeLabel" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: 'var(--text-primary)', cursor: 'pointer', margin: '10px 0 20px', fontWeight: 500 }}>
+              <input type="checkbox" id="autoSizeOnUpload" defaultChecked style={{ width: '16px', height: '16px', accentColor: 'var(--accent)' }} />
               <span data-i18n="modal.autoSize">Tự động chỉnh lưới theo kích thước ảnh</span>
             </label>
             
             <div id="source-local-dir-content" style={{ minHeight: '180px' }}>
               <div id="imageDropZone" className="drag-drop-zone" style={{ marginBottom: '16px', padding: '16px', minHeight: 'auto', borderStyle: 'solid', borderWidth: '1px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                  <Icon name={ICONS.UPLOAD_CLOUD} style={{ width: '20px', height: '20px', color: 'var(--color-primary)' }} />
-                  <span style={{ fontSize: '14px', fontWeight: 500, color: 'var(--color-text-bright)' }} data-i18n="modal.clickToSelect">Nhấp hoặc kéo thả file để tải lên</span>
+                  <Icon name={ICONS.UPLOAD_CLOUD} style={{ width: '20px', height: '20px', color: 'var(--accent)' }} />
+                  <span style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)' }} data-i18n="modal.clickToSelect">Nhấp hoặc kéo thả file để tải lên</span>
                 </div>
                 <input type="file" id="imageUploadModal" accept="image/*" style={{ display: 'none' }} />
               </div>
 
               <div id="localDirUploadList" style={{ width: '100%', height: '100%', maxHeight: '45vh', overflowY: 'auto', paddingRight: '8px' }}>
-                <div style={{ textAlign: 'center', padding: '30px 20px', color: 'var(--color-text-muted)', background: 'var(--color-surface-alt)', borderRadius: '8px', border: '1px dashed var(--color-border)' }}>
+                <div style={{ textAlign: 'center', padding: '30px 20px', color: 'var(--text-muted)', background: 'var(--surface-1)', borderRadius: '8px', border: '1px dashed var(--border)' }}>
                    <Icon name={ICONS.FOLDER} style={{ width: '36px', height: '36px', marginBottom: '12px', opacity: 0.5 }} />
                    <div style={{ marginBottom: '12px' }} data-i18n="settings.noDirectorySelected">Bạn chưa cấu hình Thư mục cục bộ</div>
                    <button className="btn btn-primary" style={{ padding: '8px 16px' }} onClick={() => {
@@ -532,7 +532,7 @@ function App() {
                 </button>
               </div>
               <div id="driveUploadList" style={{ width: '100%', height: '100%', maxHeight: '45vh', overflowY: 'auto', paddingRight: '8px' }}>
-                <div style={{ textAlign: 'center', padding: '30px 20px', color: 'var(--color-text-muted)', background: 'var(--color-surface-alt)', borderRadius: '8px', border: '1px dashed var(--color-border)' }}>
+                <div style={{ textAlign: 'center', padding: '30px 20px', color: 'var(--text-muted)', background: 'var(--surface-1)', borderRadius: '8px', border: '1px dashed var(--border)' }}>
                    <Icon name={ICONS.CLOUD} style={{ width: '36px', height: '36px', marginBottom: '12px', opacity: 0.5 }} />
                    <div style={{ marginBottom: '12px' }}>Bạn cần đăng nhập Google Drive để chọn ảnh</div>
                    <button id="uploadDriveLoginBtn" className="btn btn-primary" style={{ padding: '8px 16px' }}>Kết nối Drive</button>
@@ -543,9 +543,9 @@ function App() {
 
           <div className="tab-content" id="tab-json">
             <textarea id="jsonInputText" data-i18n="modal.jsonPlaceholder" placeholder="Dán mã JSON (hoặc nội dung file .txt) vào đây..."
-              style={{ width: '100%', height: '140px', background: 'var(--color-bg)', border: '1px solid var(--color-border)', color: 'var(--color-text-bright)', borderRadius: '8px', padding: '16px', fontFamily: 'monospace', resize: 'vertical', marginBottom: '16px', fontSize: '13px', outline: 'none', transition: 'border-color 0.2s' }}
-              onFocus={(e) => e.target.style.borderColor = 'var(--color-primary)'}
-              onBlur={(e) => e.target.style.borderColor = 'var(--color-border)'}
+              style={{ width: '100%', height: '140px', background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text-primary)', borderRadius: '8px', padding: '16px', fontFamily: 'monospace', resize: 'vertical', marginBottom: '16px', fontSize: '13px', outline: 'none', transition: 'border-color 0.2s' }}
+              onFocus={(e) => e.target.style.borderColor = 'var(--accent)'}
+              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
             ></textarea>
             
             <button id="parseJsonTextBtn" className="btn btn-primary" style={{ width: '100%', marginBottom: '24px', padding: '12px', fontSize: '15px', fontWeight: 500 }}>
@@ -554,8 +554,8 @@ function App() {
             </button>
 
             <div id="jsonDropZone" className="drag-drop-zone" style={{ padding: '30px 20px' }}>
-              <Icon name={ICONS.FILE_JSON} style={{ width: '36px', height: '36px', color: 'var(--color-success)', marginBottom: '12px' }} />
-              <div style={{ fontSize: '15px', fontWeight: 500, color: 'var(--color-text-bright)' }} data-i18n="modal.dropJson">Hoặc kéo thả file .json vào đây</div>
+              <Icon name={ICONS.FILE_JSON} style={{ width: '36px', height: '36px', color: 'var(--success)', marginBottom: '12px' }} />
+              <div style={{ fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }} data-i18n="modal.dropJson">Hoặc kéo thả file .json vào đây</div>
               <input type="file" id="jsonUploadModal" accept=".json, .txt, application/json, text/plain" style={{ display: 'none' }} />
             </div>
           </div>
@@ -573,15 +573,15 @@ function App() {
             
             {/* Bước 1: Chọn Canvas */}
             <div className="download-section" style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '10px' }} data-i18n="download.step1">1. Chọn tệp (Canvas)</label>
-              <div id="downloadCanvasList" className="download-canvas-list" style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '150px', overflowY: 'auto', background: 'var(--color-surface-alt)', padding: '10px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
+              <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '10px' }} data-i18n="download.step1">1. Chọn tệp (Canvas)</label>
+              <div id="downloadCanvasList" className="download-canvas-list" style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '150px', overflowY: 'auto', background: 'var(--surface-1)', padding: '10px', borderRadius: '8px', border: '1px solid var(--border)' }}>
                 {/* Checkboxes will be injected here via JS */}
               </div>
             </div>
             
             {/* Bước 2: Chọn Định dạng */}
             <div className="download-section" style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '10px' }} data-i18n="download.step2">2. Định dạng xuất</label>
+              <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '10px' }} data-i18n="download.step2">2. Định dạng xuất</label>
               <div className="download-options-grid format-selector" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
                 <button className="dl-format-btn select-btn active" data-format="png" style={{ flexDirection: 'column', padding: '12px 8px', alignItems: 'center' }}>
                   <Icon name={ICONS.IMAGE} style={{ width: '24px', height: '24px', marginBottom: '4px' }} />
@@ -599,12 +599,20 @@ function App() {
                   <Icon name={ICONS.FILE_JSON} style={{ width: '24px', height: '24px', marginBottom: '4px' }} />
                   <span style={{ fontSize: '13px', fontWeight: 600 }}>JSON</span>
                 </button>
+                <button className="dl-format-btn select-btn anim-format" data-format="spritesheet" style={{ flexDirection: 'column', padding: '12px 8px', alignItems: 'center', gridColumn: 'span 2' }}>
+                  <Icon name={ICONS.LAYOUT_GRID} style={{ width: '24px', height: '24px', marginBottom: '4px' }} />
+                  <span style={{ fontSize: '13px', fontWeight: 600 }}>Sprite Sheet</span>
+                </button>
+                <button className="dl-format-btn select-btn anim-format" data-format="zip" style={{ flexDirection: 'column', padding: '12px 8px', alignItems: 'center', gridColumn: 'span 2' }}>
+                  <Icon name={ICONS.FILE_ARCHIVE} style={{ width: '24px', height: '24px', marginBottom: '4px' }} />
+                  <span style={{ fontSize: '13px', fontWeight: 600 }}>ZIP Frames</span>
+                </button>
               </div>
             </div>
 
             {/* Bước 3: Nơi lưu */}
             <div className="download-section" style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: 'var(--color-text-muted)', marginBottom: '10px' }} data-i18n="download.step3">3. Nơi lưu trữ</label>
+              <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '10px' }} data-i18n="download.step3">3. Nơi lưu trữ</label>
               <div className="download-options-grid dest-selector" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
                 <button className="dl-dest-btn select-btn active" data-dest="local" style={{ padding: '12px', justifyContent: 'center' }}>
                   <Icon name={ICONS.MONITOR_DOWN} style={{ width: '20px', height: '20px' }} />
@@ -618,7 +626,7 @@ function App() {
             </div>
 
             {/* Bước 4: Action */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '16px', borderTop: '1px solid var(--color-border)' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '16px', borderTop: '1px solid var(--border)' }}>
                <button id="executeDownloadBtn" className="btn btn-primary" style={{ padding: '10px 24px', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                  <Icon name={ICONS.DOWNLOAD} style={{ width: '18px', height: '18px' }} />
                  <span style={{ fontWeight: 600 }} data-i18n="download.execute">Tiến hành tải xuống</span>
@@ -643,27 +651,27 @@ function App() {
             </button>
           </div>
           <div style={{ padding: '20px' }}>
-            <p style={{ fontSize: '14px', color: 'var(--color-text)', marginBottom: '16px' }}><span data-i18n="resizeModal.questionPrefix">Bạn muốn xử lý ảnh hiện tại như thế nào khi chuyển sang </span><span id="newGridSizeLabel" style={{ fontWeight: 'bold' }}></span>?</p>
+            <p style={{ fontSize: '14px', color: 'var(--text-primary)', marginBottom: '16px' }}><span data-i18n="resizeModal.questionPrefix">Bạn muốn xử lý ảnh hiện tại như thế nào khi chuyển sang </span><span id="newGridSizeLabel" style={{ fontWeight: 'bold' }}></span>?</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <button id="resizeKeepBtn" className="btn select-btn" style={{ padding: '12px', justifyContent: 'flex-start', alignItems: 'center', gap: '12px', height: 'auto' }}>
-                <Icon name={ICONS.CROP} style={{ width: '20px', height: '20px', color: 'var(--color-text-bright)' }} />
+                <Icon name={ICONS.CROP} style={{ width: '20px', height: '20px', color: 'var(--text-primary)' }} />
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', textAlign: 'left' }}>
-                  <span style={{ fontWeight: 600, color: 'var(--color-text-bright)' }} data-i18n="resizeModal.keepTitle">Giữ nguyên ảnh</span>
-                  <span style={{ fontSize: '12px', color: 'var(--color-text-muted)', lineHeight: 1.4 }} data-i18n="resizeModal.keepDesc">Mở rộng hoặc cắt bớt không gian, không làm biến dạng ảnh</span>
+                  <span style={{ fontWeight: 600, color: 'var(--text-primary)' }} data-i18n="resizeModal.keepTitle">Giữ nguyên ảnh</span>
+                  <span style={{ fontSize: '12px', color: 'var(--text-muted)', lineHeight: 1.4 }} data-i18n="resizeModal.keepDesc">Mở rộng hoặc cắt bớt không gian, không làm biến dạng ảnh</span>
                 </div>
               </button>
               <button id="resizeScaleBtn" className="btn select-btn" style={{ padding: '12px', justifyContent: 'flex-start', alignItems: 'center', gap: '12px', height: 'auto' }}>
-                <Icon name={ICONS.MAXIMIZE} style={{ width: '20px', height: '20px', color: 'var(--color-text-bright)' }} />
+                <Icon name={ICONS.MAXIMIZE} style={{ width: '20px', height: '20px', color: 'var(--text-primary)' }} />
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', textAlign: 'left' }}>
-                  <span style={{ fontWeight: 600, color: 'var(--color-text-bright)' }} data-i18n="resizeModal.scaleTitle">Thu phóng ảnh</span>
-                  <span style={{ fontSize: '12px', color: 'var(--color-text-muted)', lineHeight: 1.4 }} data-i18n="resizeModal.scaleDesc">Co giãn toàn bộ hình ảnh cho vừa khít với kích thước mới</span>
+                  <span style={{ fontWeight: 600, color: 'var(--text-primary)' }} data-i18n="resizeModal.scaleTitle">Thu phóng ảnh</span>
+                  <span style={{ fontSize: '12px', color: 'var(--text-muted)', lineHeight: 1.4 }} data-i18n="resizeModal.scaleDesc">Co giãn toàn bộ hình ảnh cho vừa khít với kích thước mới</span>
                 </div>
               </button>
               <button id="resizeClearBtn" className="btn select-btn" style={{ padding: '12px', justifyContent: 'flex-start', alignItems: 'center', gap: '12px', height: 'auto' }}>
                 <Icon name={ICONS.TRASH_2} style={{ width: '20px', height: '20px', color: 'var(--color-danger)' }} />
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', textAlign: 'left' }}>
                   <span style={{ fontWeight: 600, color: 'var(--color-danger)' }} data-i18n="resizeModal.clearTitle">Xoá mất ảnh</span>
-                  <span style={{ fontSize: '12px', color: 'var(--color-text-muted)', lineHeight: 1.4 }} data-i18n="resizeModal.clearDesc">Tạo một trang giấy trắng hoàn toàn mới</span>
+                  <span style={{ fontSize: '12px', color: 'var(--text-muted)', lineHeight: 1.4 }} data-i18n="resizeModal.clearDesc">Tạo một trang giấy trắng hoàn toàn mới</span>
                 </div>
               </button>
             </div>

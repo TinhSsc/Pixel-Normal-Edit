@@ -1,5 +1,5 @@
 import { applyTransform } from '../core/viewport.js';
-import { setShowGrid } from '../core/render.js';
+import { ModeManager } from '../core/mode-manager.js';
 
 let isSetup = false;
 export function setupShowGrid() {
@@ -9,7 +9,7 @@ export function setupShowGrid() {
   document.body.addEventListener('change', (e) => {
     if (e.target.id === 'showGrid') {
       document.getElementById('showGridLabel')?.classList.toggle('active', e.target.checked);
-      setShowGrid(e.target.checked);
+      ModeManager.setGrid(e.target.checked);
       applyTransform(document.getElementById('pixelCanvas'));
     }
   });

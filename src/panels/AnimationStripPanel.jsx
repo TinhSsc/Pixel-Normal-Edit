@@ -26,9 +26,9 @@ function FrameThumbnail({ frame, index, isActive, onClick, onInsertBefore, onIns
       className={`animation-strip-frame-wrap${isRemoving ? ' frame-exit' : ''}`}
       style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}
     >
-        <button className="animation-strip-frame-remove-btn" onClick={onRemove} title="Xóa trang này">
-          <Icon name={ICONS.X} style={{ width: '14px', height: '14px' }} />
-        </button>
+      <button className="animation-strip-frame-remove-btn" onClick={onRemove} title="Xóa trang này">
+        <Icon name={ICONS.X} style={{ width: '14px', height: '14px' }} />
+      </button>
       <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
         {isActive && (
           <button className="animation-strip-frame-add-btn" onClick={onInsertBefore} title="Chèn trang trước">
@@ -40,7 +40,7 @@ function FrameThumbnail({ frame, index, isActive, onClick, onInsertBefore, onIns
           onClick={onClick}
           title={`Trang ${index + 1}`}
         >
-          <canvas ref={canvasRef} />
+          <canvas id={`thumb-${frame.id}`} ref={canvasRef} />
         </div>
         {isActive && (
           <button className="animation-strip-frame-add-btn" onClick={onInsertAfter} title="Chèn trang sau">
@@ -76,7 +76,7 @@ export default function AnimationStripPanel({
           className="animation-strip-nav-btn"
           onClick={onToggleOnionSkin}
           title="Xem trang trước (onion skin)"
-          style={showOnionSkin ? { background: 'var(--color-primary)', color: '#fff' } : undefined}
+          style={showOnionSkin ? { background: 'var(--accent)', color: '#fff' } : undefined}
         >
           👁
         </button>

@@ -4,6 +4,7 @@ import { debouncedSaveWorkspace } from '../core/tab-manager.js';
 import { beginStroke, recordChange, commitStroke } from '../core/history.js';
 import { uint32ToRgba } from '../core/color-utils.js';
 import { renderPixels } from '../core/render.js';
+import { setPreviewBackground, removePreviewBackground } from '../preview/preview-group-manager.js';
 
 let bgImage = null;
 
@@ -37,8 +38,8 @@ function showFlattenConfirmDialog() {
 
     // Modal container
     const container = document.createElement('div');
-    container.style.backgroundColor = 'var(--color-surface, #1e1e22)';
-    container.style.border = '1px solid var(--color-border, #333)';
+    container.style.backgroundColor = 'var(--surface-2,  #1e1e22)';
+    container.style.border = '1px solid var(--border,  #333)';
     container.style.borderRadius = '12px';
     container.style.padding = '24px';
     container.style.width = '420px';
@@ -46,7 +47,7 @@ function showFlattenConfirmDialog() {
     container.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.5)';
     container.style.transform = 'scale(0.95)';
     container.style.transition = 'transform 0.2s ease-out';
-    container.style.color = 'var(--color-text, #eee)';
+    container.style.color = 'var(--text-primary,  #eee)';
     container.style.fontFamily = 'system-ui, -apple-system, sans-serif';
 
     // Title
@@ -55,7 +56,7 @@ function showFlattenConfirmDialog() {
     title.style.margin = '0 0 12px 0';
     title.style.fontSize = '18px';
     title.style.fontWeight = '600';
-    title.style.color = 'var(--color-text-bright, #fff)';
+    title.style.color = 'var(--text-primary,  #fff)';
 
     // Message
     const message = document.createElement('p');
@@ -65,7 +66,7 @@ function showFlattenConfirmDialog() {
     message.style.margin = '0 0 20px 0';
     message.style.fontSize = '14px';
     message.style.lineHeight = '1.5';
-    message.style.color = 'var(--color-text-muted, #aaa)';
+    message.style.color = 'var(--text-muted,  #aaa)';
 
     // Button container
     const btnContainer = document.createElement('div');
@@ -97,7 +98,7 @@ function showFlattenConfirmDialog() {
     btnTransparent.style.fontWeight = '600';
     btnTransparent.style.cursor = 'pointer';
     btnTransparent.style.textAlign = 'left';
-    btnTransparent.style.backgroundColor = 'var(--color-primary, #5b5bf0)';
+    btnTransparent.style.backgroundColor = 'var(--accent,  #5b5bf0)';
     btnTransparent.style.color = '#fff';
     btnTransparent.style.border = 'none';
     btnTransparent.innerHTML = getCurrentLang() === 'vi'
@@ -179,12 +180,13 @@ export function setupSetBackground() {
       els.imagePreview.style.display = 'block';
     }
 
-    const canvas = document.getElementById('pixelCanvas');
-    if (canvas) {
-      canvas.style.setProperty('--bg-url', `url("${src}")`);
-      canvas.classList.add('has-bg');
+    const mainCanvas = document.getElementById('pixelCanvas');
+    if (mainCanvas) {
+      mainCanvas.style.setProperty('--bg-url', `url("${src}")`);
+      mainCanvas.classList.add('has-bg');
     }
-    
+    setPreviewBackground(src);
+
     setStatus(t('status.bgOn'));
     updateBgButtonsUI();
     // Reset so same file can be picked again
@@ -266,11 +268,12 @@ export function setupSetBackground() {
         }
 
         // Remove background layer styling from canvas (but keep preview intact)
-        const canvasEl = document.getElementById('pixelCanvas');
-        if (canvasEl) {
-          canvasEl.classList.remove('has-bg');
-          canvasEl.style.removeProperty('--bg-url');
+        const mainCanvas = document.getElementById('pixelCanvas');
+        if (mainCanvas) {
+          mainCanvas.classList.remove('has-bg');
+          mainCanvas.style.removeProperty('--bg-url');
         }
+        removePreviewBackground();
 
         setStatus(t('status.bgFlattened'));
         updateBgButtonsUI();

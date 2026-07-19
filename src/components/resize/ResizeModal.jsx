@@ -161,8 +161,8 @@ export default function ResizeModal() {
                 gridTemplateColumns: 'repeat(3, 12px)', 
                 gridTemplateRows: 'repeat(3, 12px)',
                 gap: '2px', 
-                background: 'var(--color-surface)', 
-                border: '1px solid var(--color-border)',
+                background: 'var(--surface-2)', 
+                border: '1px solid var(--border)',
                 padding: '4px', 
                 borderRadius: '4px'
              }}>
@@ -180,7 +180,7 @@ export default function ResizeModal() {
              </div>
           </div>
           
-          <div style={{width: 1, height: 24, background: 'var(--color-border)'}}></div>
+          <div style={{width: 1, height: 24, background: 'var(--border)'}}></div>
 
           <button className="btn select-btn" onClick={fitInside} title="Vừa khít (Giữ toàn bộ ảnh trong khung)">
              <Icon name={ICONS.SHRINK} style={{width: 16, height: 16}}/> <span data-i18n="resizePopover.fit">Fit</span>

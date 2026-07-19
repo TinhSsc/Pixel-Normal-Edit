@@ -5,6 +5,62 @@ import { editConfig } from './edit-manager.js';
 import { navigationConfig } from './navigation-manager.js';
 import { updateDOM } from '../js/lang/i18n.js';
 import ToolButton from '../toolbar/ToolButton';
+import { subscribeAnimationState, getAnimationState } from '../js/core/animation-state.js';
+
+function AnimationPreview() {
+  const [animState, setAnimState] = useState(null);
+  const canvasRef = React.useRef(null);
+  const [playIdx, setPlayIdx] = useState(0);
+  const [fps, setFps] = useState(10); // 10 FPS
+  
+  useEffect(() => {
+    setAnimState(getAnimationState());
+    const unsub = subscribeAnimationState(setAnimState);
+    return unsub;
+  }, []);
+
+  useEffect(() => {
+    if (!animState || !animState.isAnimationMode || animState.frames.length <= 1) return;
+    const interval = setInterval(() => {
+      setPlayIdx(old => (old + 1) % animState.frames.length);
+    }, 1000 / fps);
+    return () => clearInterval(interval);
+  }, [animState, fps]);
+
+  useEffect(() => {
+    if (!animState || !animState.isAnimationMode || animState.frames.length === 0) return;
+    const frame = animState.frames[playIdx % animState.frames.length];
+    if (!frame) return;
+    const canvasEl = canvasRef.current;
+    if (!canvasEl) return;
+    
+    canvasEl.width = frame.width;
+    canvasEl.height = frame.height;
+    const ctx2d = canvasEl.getContext('2d');
+    const imageData = ctx2d.createImageData(frame.width, frame.height);
+    const data32 = new Uint32Array(imageData.data.buffer);
+    data32.set(frame.pixelMap);
+    ctx2d.putImageData(imageData, 0, 0);
+  }, [playIdx, animState]);
+
+  if (!animState || !animState.isAnimationMode) return null;
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '10px' }}>
+      <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: '4px', padding: '8px', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '150px' }}>
+        <canvas ref={canvasRef} style={{ width: '100%', height: '150px', objectFit: 'contain', imageRendering: 'pixelated' }} />
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', color: 'var(--text-muted)' }}>
+        <span>Trang {playIdx % animState.frames.length + 1} / {animState.frames.length}</span>
+        <label style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          Tốc độ: 
+          <input type="number" min="1" max="60" value={fps} onChange={e => setFps(Math.max(1, parseInt(e.target.value) || 10))} style={{ width: '40px', background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text-primary)', borderRadius: '2px', padding: '2px' }} />
+          fps
+        </label>
+      </div>
+    </div>
+  );
+}
 
 export default function EditPanel() {
   const [hiddenEdits, setHiddenEdits] = useState(() => {
@@ -253,8 +309,8 @@ export default function EditPanel() {
                     {btnContent}
                     <div className={`popup-bridge-${tool.popupPosition}`}>
                       <div className="tool-popup" style={tool.type === 'button' ? { width: 'max-content' } : {}}>
-                        <label style={{ fontSize: '11px', color: 'var(--color-text-muted)', fontWeight: 600 }} data-i18n={tool.popupContent.labelKey}>{tool.popupContent.defaultTitle}</label>
-                        <select id={tool.popupContent.selectId} className="btn" style={{ fontSize: '12px', padding: '4px', background: 'var(--color-bg)', border: '1px solid var(--color-border)', color: 'var(--color-text)', borderRadius: '4px' }} data-i18n={tool.popupContent.selectTooltipKey}>
+                        <label style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600 }} data-i18n={tool.popupContent.labelKey}>{tool.popupContent.defaultTitle}</label>
+                        <select id={tool.popupContent.selectId} className="btn" style={{ fontSize: '12px', padding: '4px', background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text-primary)', borderRadius: '4px' }} data-i18n={tool.popupContent.selectTooltipKey}>
                           {tool.popupContent.options.map((opt, idx) => (
                             <option key={idx} value={opt.value} data-i18n={opt.labelKey}>{opt.defaultLabel}</option>
                           ))}
@@ -285,6 +341,7 @@ export default function EditPanel() {
             </button>
           </div>
         </div>
+        <AnimationPreview />
         <img id="imagePreview" style={{ display: 'none' }} alt="" />
       </div>
     </div>

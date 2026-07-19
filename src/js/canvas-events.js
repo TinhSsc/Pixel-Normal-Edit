@@ -157,7 +157,7 @@ function updateBrushCursor(e, cell) {
   // Ruler Mode Logic
   const rulerMode = document.getElementById('rulerMode')?.checked;
   const rulerOption = document.getElementById('rulerOptionSelect')?.value || 'draw';
-  
+
   if (rulerMode && rulerOption === 'draw') {
     if (isDrawing && rulerAnchor && cell) {
       drawRulerOverlay(rulerAnchor, cell);
@@ -503,11 +503,15 @@ export function setupCanvasEvents() {
   const canvas = document.getElementById('pixelCanvas');
   if (!canvas) return;
 
-  canvas.addEventListener('pointerdown', onPointerDown);
   window.addEventListener('pointermove', onPointerMove);
   window.addEventListener('pointerup', onPointerUp);
-  canvas.addEventListener('wheel', onWheel, { passive: false });
-  canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+  const wrap = document.querySelector('.canvas-wrap');
+  if (wrap) {
+    wrap.addEventListener('pointerdown', onPointerDown);
+    wrap.addEventListener('wheel', onWheel, { passive: false });
+    wrap.addEventListener('contextmenu', e => e.preventDefault());
+  }
 
   document.body.addEventListener('change', (e) => {
     if (e.target.id === 'rulerMode') {

@@ -14,6 +14,8 @@ import { uploadToDrive, getDriveToken } from '../services/drive-api.js';
 import { saveFileToLocalDrive, getCurrentDirectoryHandle } from '../services/local-drive.js';
 import { showNotification } from '../services/drive-ui.js';
 import { debounceExtractCanvasColors } from './color-palette.js';
+import { getAnimationState, setAnimationState, loadFrameToCurrentState } from './animation-state.js';
+import { setPreviewBackground, removePreviewBackground } from '../preview/preview-group-manager.js';
 
 let tabs = [];
 let activeTabId = null;
@@ -50,10 +52,10 @@ function setHeaderStatus(statusText) {
   if (indicator) {
     if (statusText === 'saving') {
       indicator.innerHTML = `<i data-lucide="loader-2" class="spin" style="width:12px;height:12px"></i> <span data-i18n="status.saving">${t('status.saving') || 'Đang lưu...'}</span>`;
-      indicator.style.color = 'var(--color-info)';
+      indicator.style.color = 'var(--pixel-blue)';
     } else if (statusText === 'saved') {
       indicator.innerHTML = `<i data-lucide="check" style="width:12px;height:12px"></i> <span data-i18n="status.saved">${t('status.saved') || 'Đã lưu'}</span>`;
-      indicator.style.color = 'var(--color-success)';
+      indicator.style.color = 'var(--success)';
       setTimeout(() => { if (indicator.innerHTML.includes('check')) indicator.innerHTML = ''; }, 3000);
     } else if (statusText === 'error') {
       indicator.innerHTML = `<i data-lucide="x" style="width:12px;height:12px"></i> <span data-i18n="status.syncError">${t('status.syncError') || 'Lỗi đồng bộ'}</span>`;
@@ -264,7 +266,8 @@ export function initTabs(savedData = null) {
       },
       autoBackupDrive: false,
       storage: { type: null, id: null, handle: null, name: null },
-      format: 'png'
+      format: 'png',
+      animation: null
     };
 
     tabs.push(initialTab);
@@ -293,14 +296,11 @@ export function saveCurrentTabState() {
     css: canvas?.style.getPropertyValue('--bg-url') || '',
     hasBg: canvas?.classList.contains('has-bg') || false
   };
+  
+  tab.animation = getAnimationState();
 }
 
 function loadTabState(tab) {
-  resetMaps(new Uint32Array(tab.pixelMap), tab.groupMap);
-  setHistoryState(tab.history);
-  setGridSizeParams(tab.grid.w, tab.grid.h, tab.grid.imgData, tab.grid.data32);
-  syncGridSizeUI(tab.grid.w, tab.grid.h);
-
   setSourceImage(tab.bg.src || null);
 
   const canvas = document.getElementById('pixelCanvas');
@@ -317,7 +317,28 @@ function loadTabState(tab) {
       canvas.style.removeProperty('--bg-url');
     }
   }
+  
+  if (tab.bg.src && tab.bg.hasBg) {
+    setPreviewBackground(tab.bg.src);
+  } else {
+    removePreviewBackground();
+  }
+  
   updateBgButtonsUI();
+  
+  // Pipeline khôi phục: Nếu có Animation, giao quyền quản lý dữ liệu cho Animation
+  if (tab.animation && tab.animation.isAnimationMode) {
+    setGridSizeParams(tab.grid.w, tab.grid.h, tab.grid.imgData, tab.grid.data32);
+    setAnimationState(tab.animation);
+    loadFrameToCurrentState(tab.animation.activeFrameIndex || 0);
+  } else {
+    // Không có Animation, nạp dữ liệu lưới mặc định
+    resetMaps(new Uint32Array(tab.pixelMap), tab.groupMap);
+    setHistoryState(tab.history);
+    setGridSizeParams(tab.grid.w, tab.grid.h, tab.grid.imgData, tab.grid.data32);
+    setAnimationState(tab.animation || null);
+  }
+  syncGridSizeUI(tab.grid.w, tab.grid.h);
 }
 
 export function switchTab(id) {
@@ -330,6 +351,11 @@ export function switchTab(id) {
   saveCurrentTabState();
 
   activeTabId = id;
+
+  // Update UI immediately to prevent perceived delay
+  if (targetTab.grid) {
+    syncGridSizeUI(targetTab.grid.w, targetTab.grid.h);
+  }
 
   const canvasWrap = document.querySelector('.canvas-wrap');
   if (canvasWrap) {
@@ -377,7 +403,8 @@ export function createNewTab() {
       bg: { src: '', css: '', hasBg: false },
       autoBackupDrive: false,
       storage: { type: null, id: null, handle: null, name: null },
-      format: 'png'
+      format: 'png',
+      animation: null
     };
 
     const tmpCanvas = document.createElement('canvas');
@@ -470,7 +497,7 @@ function renderTabsUI() {
     toggleAutoBackupBtn.id = 'autobackup_btn_' + tab.id;
     toggleAutoBackupBtn.className = `tab-autobackup-btn ${tab.autoBackupDrive ? 'active' : ''}`;
     toggleAutoBackupBtn.title = tab.autoBackupDrive ? 'Tắt tự động lưu lên Drive' : 'Bật tự động lưu lên Drive';
-    toggleAutoBackupBtn.innerHTML = `<i data-lucide="${tab.autoBackupDrive ? 'cloud-check' : 'cloud-upload'}" style="width: 14px; height: 14px; color: ${tab.autoBackupDrive ? 'var(--color-success)' : 'var(--color-text-muted)'};"></i>`;
+    toggleAutoBackupBtn.innerHTML = `<i data-lucide="${tab.autoBackupDrive ? 'cloud-check' : 'cloud-upload'}" style="width: 14px; height: 14px; color: ${tab.autoBackupDrive ? 'var(--success)' : 'var(--text-muted)'};"></i>`;
     toggleAutoBackupBtn.style.cssText = 'background: transparent; border: none; padding: 2px; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 4px;';
     toggleAutoBackupBtn.addEventListener('click', (e) => {
       e.stopPropagation();

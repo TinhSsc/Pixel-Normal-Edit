@@ -56,4 +56,6 @@ export const ICONS = {
   REPLACE: 'replace',
   RULER: 'ruler',
   FILM: 'film',
+  LAYOUT_GRID: 'layout-grid',
+  FILE_ARCHIVE: 'file-archive',
 };

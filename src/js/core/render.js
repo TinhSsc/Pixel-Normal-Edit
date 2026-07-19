@@ -1,5 +1,7 @@
 import { ctx, GRID_WIDTH, GRID_HEIGHT, pixelMap, previewPixels, offscreenImageData, offscreenData32, selectionBox, floatingSelection } from './state.js';
 import { getZoom, getPan, applyTransform } from './viewport.js';
+import { getCellPx } from './viewport.js';
+import { syncPreviewPixels } from '../preview/preview-group-manager.js';
 import { parseColorToUint32 } from './color-utils.js';
 import { bresenhamLine } from '../shared/line-algo.js';
 import { circlePoints } from '../shared/circle-algo.js';
@@ -9,6 +11,10 @@ let showGridFlag = true;
 
 export function setShowGrid(val) {
   showGridFlag = val;
+}
+
+export function isShowGrid() {
+  return showGridFlag;
 }
 
 let lastPreviewRect = null;
@@ -133,6 +139,9 @@ export function renderPixels(isPreviewOnly = false) {
     const selRect2 = floatingSelection ? { x: floatingSelection.x - 1, y: floatingSelection.y - 1, w: floatingSelection.width + 2, h: floatingSelection.height + 2 } : null;
     lastPreviewRect = mergeRects(computeBoundingRect(previewPixels), selRect1, selRect2);
     forceFullRender = false;
+    
+    const mainCanvas = document.getElementById('pixelCanvas');
+    syncPreviewPixels(mainCanvas, GRID_WIDTH, GRID_HEIGHT);
     return;
   }
 
@@ -189,6 +198,9 @@ export function renderPixels(isPreviewOnly = false) {
   drawStampedPreview();
 
   lastPreviewRect = newPreviewRect;
+
+  const mainCanvas = document.getElementById('pixelCanvas');
+  syncPreviewPixels(mainCanvas, GRID_WIDTH, GRID_HEIGHT);
 }
 
 function drawFloatingSelection() {
