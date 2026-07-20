@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Icon, ICONS } from '../../shared/ui/icons';
+import { CustomDropdown } from '../../shared/ui/CustomDropdown';
 import DrawToolsTab from '../editor/ui/toolbar/DrawToolsTab.jsx';
 import EditToolsTab from '../editor/ui/edit-panel/EditToolsTab.jsx';
 import { t, getCurrentLang, setLang } from '../../i18n/i18n.js';
@@ -219,7 +220,7 @@ export default function GlobalSettingsModal() {
       <div className="modal-content" style={{ maxWidth: '800px', width: '90%', height: '80vh', display: 'flex', flexDirection: 'column' }}>
         <div className="modal-header">
           <h3 style={{ margin: 0, fontSize: '18px' }} data-i18n="modal.settingsTitle">Cài đặt chung</h3>
-          <button className="btn" style={{ background: 'transparent', border: 'none', padding: '4px' }} onClick={() => document.getElementById('globalSettingsModal').style.display = 'none'}>
+          <button className="btn" style={{ padding: '4px' }} onClick={() => document.getElementById('globalSettingsModal').style.display = 'none'}>
             <Icon name={ICONS.X} />
           </button>
         </div>
@@ -250,43 +251,40 @@ export default function GlobalSettingsModal() {
             </div>
           </button>
         </div>
-
-        <div style={{ flex: 1, overflowY: 'auto', padding: '4px' }}>
+        <div className="custom-scrollbar" style={{ flex: 1, overflowY: 'auto', padding: '4px', paddingRight: '8px' }}>
           <div className={`tab-content ${activeTab === 'tab-appearance' ? 'active' : ''}`} id="tab-appearance" style={{ display: activeTab === 'tab-appearance' ? 'block' : 'none' }}>
-            <div style={{ background: 'var(--bg)', padding: '20px', borderRadius: '12px', border: '1px solid var(--border)', marginBottom: '12px' }}>
+            <div style={{ background: 'var(--color-surface)', padding: '20px', borderRadius: '12px', border: '1px solid var(--color-border)', marginBottom: '12px' }}>
               <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }} data-i18n="settings.language">Ngôn ngữ (Language)</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <div style={{ position: 'relative' }}>
-                  <select 
-                    id="languageSelect" 
-                    className="select-dropdown" 
-                    defaultValue={getCurrentLang()}
-                    onChange={(e) => {
-                      setLang(e.target.value);
-                      window.location.reload();
-                    }}
-                  >
-                    <option value="vi">Tiếng Việt</option>
-                    <option value="en">English</option>
-                  </select>
-                  <Icon name={ICONS.CHEVRON_DOWN} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: 'var(--text-muted)', pointerEvents: 'none' }} />
-                </div>
+                <CustomDropdown
+                  id="languageSelect"
+                  defaultValue={getCurrentLang()}
+                  onChange={(e) => {
+                    setLang(e.target.value);
+                    window.location.reload();
+                  }}
+                  options={[
+                    { value: 'vi', label: 'Tiếng Việt' },
+                    { value: 'en', label: 'English' }
+                  ]}
+                />
               </div>
             </div>
 
-            <div style={{ background: 'var(--bg)', padding: '20px', borderRadius: '12px', border: '1px solid var(--border)' }}>
+            <div style={{ background: 'var(--color-surface)', padding: '20px', borderRadius: '12px', border: '1px solid var(--color-border)' }}>
               <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }} data-i18n="theme.title">Giao diện (Theme)</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <div style={{ position: 'relative' }}>
-                  <select id="themeSelect" className="select-dropdown">
-                    <option value="dark" data-i18n="theme.dark">Tối (Dark)</option>
-                    <option value="light" data-i18n="theme.light">Sáng (Light)</option>
-                    <option value="custom" data-i18n="theme.custom">Tùy chỉnh (Custom)</option>
-                  </select>
-                  <Icon name={ICONS.CHEVRON_DOWN} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: 'var(--text-muted)', pointerEvents: 'none' }} />
-                </div>
+                <CustomDropdown
+                  id="themeSelect"
+                  defaultValue={localStorage.getItem('pixel-edit-theme') || 'dark'}
+                  options={[
+                    { value: 'dark', label: t('theme.dark') || 'Tối (Dark)' },
+                    { value: 'light', label: t('theme.light') || 'Sáng (Light)' },
+                    { value: 'custom', label: t('theme.custom') || 'Tùy chỉnh (Custom)' }
+                  ]}
+                />
 
-                <div id="customThemeSettings" style={{ display: 'none', padding: '16px', background: 'var(--surface-2)', borderRadius: '8px', border: '1px dashed var(--border)', marginTop: '8px' }}>
+                <div id="customThemeSettings" style={{ display: 'none', padding: '16px', background: 'var(--color-surface-alt)', borderRadius: '8px', border: '1px dashed var(--color-border)', marginTop: '8px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                     <label style={{ fontSize: '13px', color: 'var(--text-muted)', cursor: 'pointer' }} htmlFor="customBgColor" data-i18n="theme.bg">Nền (Bg)</label>
                     <input type="color" id="customBgColor" defaultValue="#191920" style={{ width: '32px', height: '32px', padding: 0, border: 'none', borderRadius: '6px', cursor: 'pointer', background: 'transparent' }} />
@@ -303,28 +301,29 @@ export default function GlobalSettingsModal() {
               </div>
             </div>
 
-            <div style={{ background: 'var(--bg)', padding: '20px', borderRadius: '12px', border: '1px solid var(--border)', marginTop: '12px' }}>
+            <div style={{ background: 'var(--color-surface)', padding: '20px', borderRadius: '12px', border: '1px solid var(--color-border)', marginTop: '12px' }}>
               <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }} data-i18n="settings.penShapeTitle">Hình dạng bút vẽ</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <div style={{ position: 'relative' }}>
-                  <select id="globalPenShape" className="select-dropdown" defaultValue="circle">
-                    <option value="circle" data-i18n="label.shapeCircle">Tròn (Circle)</option>
-                    <option value="square" data-i18n="label.shapeSquare">Vuông (Square)</option>
-                  </select>
-                  <Icon name={ICONS.CHEVRON_DOWN} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: 'var(--text-muted)', pointerEvents: 'none' }} />
-                </div>
+                <CustomDropdown
+                  id="globalPenShape"
+                  defaultValue="circle"
+                  options={[
+                    { value: 'circle', label: t('label.shapeCircle') || 'Tròn (Circle)' },
+                    { value: 'square', label: t('label.shapeSquare') || 'Vuông (Square)' }
+                  ]}
+                />
               </div>
             </div>
 
-            <div style={{ background: 'var(--bg)', padding: '20px', borderRadius: '12px', border: '1px solid var(--border)', marginTop: '12px' }}>
+            <div style={{ background: 'var(--color-surface)', padding: '20px', borderRadius: '12px', border: '1px solid var(--color-border)', marginTop: '12px' }}>
               <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }} data-i18n="settings.display">Hiển thị</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: 'var(--text-primary)', cursor: 'pointer' }}>
-                  <input type="checkbox" id="showBtnNamesToggle" style={{ width: '16px', height: '16px', accentColor: 'var(--accent)' }} />
+                  <input type="checkbox" id="showBtnNamesToggle" className="check" />
                   <span data-i18n="settings.showBtnNames">Hiển thị tên công cụ dưới biểu tượng</span>
                 </label>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: 'var(--text-primary)', cursor: 'pointer' }}>
-                  <input type="checkbox" id="animationsToggle" defaultChecked style={{ width: '16px', height: '16px', accentColor: 'var(--accent)' }} />
+                  <input type="checkbox" id="animationsToggle" defaultChecked className="check" />
                   <span data-i18n="settings.animations">Bật hiệu ứng chuyển động (Animations)</span>
                 </label>
               </div>
@@ -332,10 +331,10 @@ export default function GlobalSettingsModal() {
           </div>
 
           <div className={`tab-content ${activeTab === 'tab-account' ? 'active' : ''}`} id="tab-account" style={{ display: activeTab === 'tab-account' ? 'block' : 'none' }}>
-            <div style={{ background: 'var(--bg)', padding: '20px', borderRadius: '12px', border: '1px solid var(--border)', marginBottom: '16px' }}>
+            <div style={{ background: 'var(--color-surface)', padding: '20px', borderRadius: '12px', border: '1px solid var(--color-border)', marginBottom: '16px' }}>
               <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }} data-i18n="settings.accountTitle">Tài khoản Pixel Normal Edit</div>
               <div className="setting-group" style={{ marginBottom: '0' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--surface-1)', borderRadius: '8px', flexWrap: 'wrap', gap: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--color-surface-alt)', borderRadius: '8px', flexWrap: 'wrap', gap: '12px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }} id="pixelAccountInfo">
                     <img src={currentUser?.picture || undefined} alt="" style={{ display: (currentUser && currentUser.picture) ? 'block' : 'none', width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }} />
                     <div style={{ display: (currentUser && currentUser.picture) ? 'none' : 'block' }}>
@@ -356,11 +355,11 @@ export default function GlobalSettingsModal() {
               </div>
             </div>
 
-            <div style={{ background: 'var(--bg)', padding: '20px', borderRadius: '12px', border: '1px solid var(--border)' }}>
+            <div style={{ background: 'var(--color-surface)', padding: '20px', borderRadius: '12px', border: '1px solid var(--color-border)' }}>
               <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }} data-i18n="group.backupSync">Lưu trữ & Đồng bộ</div>
               <div className="setting-group" style={{ marginBottom: '0' }}>
                 <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', color: 'var(--text-primary)' }}>Google Drive</h4>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--surface-1)', borderRadius: '8px', flexWrap: 'wrap', gap: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--color-surface-alt)', borderRadius: '8px', flexWrap: 'wrap', gap: '12px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <Icon name={ICONS.CLOUD} style={{ color: 'var(--text-muted)' }} />
                     <span id="driveStatusText" style={{ fontSize: '13px', color: 'var(--text-muted)' }} data-i18n="status.driveDisconnected">Chưa kết nối</span>
@@ -375,7 +374,7 @@ export default function GlobalSettingsModal() {
                 <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '12px' }} data-i18n="settings.localDirectoryDesc">
                   Cấp quyền để ứng dụng lưu file trực tiếp vào máy mà không cần hộp thoại tải xuống.
                 </p>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--surface-1)', borderRadius: '8px', flexWrap: 'wrap', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--color-surface-alt)', borderRadius: '8px', flexWrap: 'wrap', gap: '8px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden' }}>
                     <Icon name={ICONS.FOLDER} style={{ color: 'var(--text-muted)' }} />
                     <span style={{ fontSize: '13px', color: localDirName ? 'var(--success)' : 'var(--text-muted)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', maxWidth: '200px' }}>
@@ -408,23 +407,23 @@ export default function GlobalSettingsModal() {
                 <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '12px' }} data-i18n="settings.autoSaveDestDesc">
                   Hệ thống sẽ tự động đồng bộ file của bạn theo chu kỳ 5 giây mỗi khi có thay đổi.
                 </p>
-                <select 
-                  value={autoSaveDest} 
+                <CustomDropdown
+                  value={autoSaveDest}
                   onChange={(e) => {
                     const val = e.target.value;
                     setAutoSaveDest(val);
                     localStorage.setItem('auto_save_destination', val);
                   }}
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid var(--border)', background: 'var(--surface-2)', color: 'var(--text-primary)', fontSize: '13px', outline: 'none' }}
-                >
-                  <option value="none" data-i18n="settings.autoSaveDest.none">Tắt tự động lưu ngoại tuyến</option>
-                  <option value="local" data-i18n="settings.autoSaveDest.local">Chỉ lưu vào Thư mục cục bộ</option>
-                  <option value="drive" data-i18n="settings.autoSaveDest.drive">Chỉ lưu vào Google Drive</option>
-                  <option value="both" data-i18n="settings.autoSaveDest.both">Lưu vào cả Thư mục cục bộ và Google Drive</option>
-                </select>
+                  options={[
+                    { value: 'none', label: t('settings.autoSaveDest.none') || 'Tắt tự động lưu ngoại tuyến' },
+                    { value: 'local', label: t('settings.autoSaveDest.local') || 'Chỉ lưu vào Thư mục cục bộ' },
+                    { value: 'drive', label: t('settings.autoSaveDest.drive') || 'Chỉ lưu vào Google Drive' },
+                    { value: 'both', label: t('settings.autoSaveDest.both') || 'Lưu vào cả Thư mục cục bộ và Google Drive' }
+                  ]}
+                />
               </div>
             </div>
-            <div style={{ background: 'var(--bg)', padding: '20px', borderRadius: '12px', border: '1px solid var(--border)', marginTop: '16px' }}>
+            <div style={{ background: 'var(--color-surface)', padding: '20px', borderRadius: '12px', border: '1px solid var(--color-border)', marginTop: '16px' }}>
               <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--color-danger)' }} data-i18n="troubleshoot.title">Khắc phục sự cố</div>
               <div className="setting-group" style={{ marginBottom: '0' }}>
                 <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '12px', lineHeight: '1.5' }} data-i18n="troubleshoot.desc">
@@ -454,3 +453,5 @@ export default function GlobalSettingsModal() {
     </div>
   );
 }
+
+

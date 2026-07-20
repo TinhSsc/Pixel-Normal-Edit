@@ -176,3 +176,148 @@
   transform: scale(1.15);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
+.animation-strip {
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.animation-strip.collapsed {
+  transform: translate(-50%, 24px) scale(0.95);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.animation-strip-expand-btn {
+  position: absolute;
+  bottom: 28px;
+  right: 0;
+  z-index: 1050;
+  width: 48px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-right: none;
+  border-radius: 16px 0 0 16px;
+  color: var(--color-text);
+  box-shadow: -12px 0 30px rgba(0,0,0,0.35);
+  cursor: pointer;
+  transition: all 0.5s ease;
+}
+
+.animation-strip-expand-btn:hover {
+  background: var(--color-surface-hover);
+  color: var(--accent);
+}
+
+.animation-strip-expand-btn.hidden {
+  transform: translateX(100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+
+.animation-strip {
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.animation-strip.collapsed {
+  transform: translate(-50%, 24px) scale(0.95);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.animation-strip-expand-btn {
+  position: absolute;
+  bottom: 28px;
+  right: 0;
+  z-index: 1050;
+  width: 48px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-right: none;
+  border-radius: 16px 0 0 16px;
+  color: var(--color-text);
+  box-shadow: -12px 0 30px rgba(0,0,0,0.35);
+  cursor: pointer;
+  transition: all 0.5s ease;
+}
+
+.animation-strip-expand-btn:hover {
+  background: var(--color-surface-hover);
+  color: var(--accent);
+}
+
+.animation-strip-expand-btn.hidden {
+  transform: translateX(100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+
+/* ------ Anim Eye Container ------ */
+.anim-eye-container {
+  --color: #a5a5b0;
+  --size: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+  width: var(--size);
+  height: var(--size);
+  user-select: none;
+  color: var(--color);
+  margin-right: 8px;
+}
+
+.anim-eye-container:hover {
+  color: var(--color-text-bright);
+}
+
+.anim-eye-container .eye,
+.anim-eye-container .eye-slash {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  animation: keyframes-fill .5s;
+}
+
+.anim-eye-container .eye-slash {
+  display: none;
+}
+
+/* ------ On check event ------ */
+.anim-eye-container input:checked ~ .eye {
+  display: none;
+}
+
+.anim-eye-container input:checked ~ .eye-slash {
+  display: block;
+  color: var(--accent);
+}
+
+/* ------ Hide the default checkbox ------ */
+.anim-eye-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* ------ Animation ------ */
+@keyframes keyframes-fill {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}

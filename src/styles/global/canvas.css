@@ -13,6 +13,17 @@
 #pixelCanvas {
   image-rendering: pixelated;
   background-color: var(--color-surface);
+  box-shadow: 0 8px 24px var(--color-shadow), 0 0 0 2px var(--color-primary), 0 0 25px 2px color-mix(in srgb, var(--color-primary) 60%, transparent);
+  cursor: crosshair;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+}
+
+.preview-canvas {
+  image-rendering: pixelated;
+  background-color: var(--color-surface);
   box-shadow: 0 8px 24px var(--color-shadow);
   cursor: crosshair;
   position: absolute;
@@ -21,7 +32,7 @@
   transform-origin: 0 0;
 }
 
-#pixelCanvas.has-bg {
+#pixelCanvas.has-bg, .preview-canvas.has-bg {
 }
 
 
@@ -73,7 +84,7 @@
 }
 
 /* Checkerboard background for the pixel canvas */
-#pixelCanvas {
+#pixelCanvas, .preview-canvas {
   background-image: conic-gradient(
     var(--color-canvas-checker) 90deg,
     transparent 90deg 180deg,
@@ -84,7 +95,7 @@
   background-position: 0 0;
 }
 
-#pixelCanvas.has-bg {
+#pixelCanvas.has-bg, .preview-canvas.has-bg {
   background-image:
     linear-gradient(var(--color-overlay), var(--color-overlay)),
     var(--bg-url),

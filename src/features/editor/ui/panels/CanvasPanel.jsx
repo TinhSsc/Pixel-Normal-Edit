@@ -7,6 +7,7 @@ import {
   initAnimationFromCurrentState,
   insertFrameAt,
   removeFrame,
+  reorderFrame,
   frames,
   activeFrameIndex as activeFrameIndexState,
   setActiveFrameIndex,
@@ -20,6 +21,7 @@ import {
 } from '../../engine/core/animation-state.js';
 import AnimationStripPanel from './AnimationStripPanel.jsx';
 import { GRID_WIDTH, GRID_HEIGHT } from '../../engine/core/state.js';
+import CanvasSettingsModal from '../resize/CanvasSettingsModal.jsx';
 import { renderPixels, setForceFullRender } from '../../engine/core/render.js';
 import { getZoom, getPan, setPan, applyTransform } from '../../engine/core/viewport.js';
 
@@ -90,7 +92,9 @@ export default function CanvasPanel() {
   const [activeIndex, setActiveIndexState] = useState(activeFrameIndexState);
   const [showOnion, setShowOnion] = useState(showOnionSkinState);
   const [newFrameId, setNewFrameId] = useState(null);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [removingFrameId, setRemovingFrameId] = useState(null);
+  const [isNavCollapsed, setIsNavCollapsed] = useState(false);
   const canvasFadeRef = useRef(null);
 
   useEffect(() => {
@@ -150,6 +154,11 @@ export default function CanvasPanel() {
     renderPixels();
   };
 
+  const handleReorderFrame = (fromIndex, toIndex) => {
+    reorderFrame(fromIndex, toIndex);
+    triggerCanvasRedraw();
+  };
+
   const handleToggleAnimationMode = () => {
     const newValue = toggleAnimationMode();
     if (newValue) {
@@ -195,12 +204,45 @@ export default function CanvasPanel() {
     window.dispatchEvent(new CustomEvent('canvas-mounted'));
   }, []);
 
+  const mainAreaRef = useRef(null);
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!mainAreaRef.current) return;
+      const rect = mainAreaRef.current.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      mainAreaRef.current.style.setProperty('--mouse-x', `${x}px`);
+      mainAreaRef.current.style.setProperty('--mouse-y', `${y}px`);
+    };
+    
+    const el = mainAreaRef.current;
+    if (el) {
+      el.addEventListener('mousemove', handleMouseMove);
+      return () => el.removeEventListener('mousemove', handleMouseMove);
+    }
+  }, []);
+
   useEffect(() => {
     if (window.lucide) window.lucide.createIcons();
   });
 
+  const navTools = (
+    <>
+      <button className="btn action-btn mobile-only undo-btn-action" data-i18n="tooltip.undo"><Icon name={ICONS.UNDO} /></button>
+      <button className="btn action-btn mobile-only redo-btn-action" data-i18n="tooltip.redo"><Icon name={ICONS.REDO} /></button>
+      <button className="tool-btn mobile-only" data-tool="cut" data-i18n="tooltip.cut" title="Cut (Ctrl+X)"><Icon name={ICONS.SCISSORS} /></button>
+      <button className="tool-btn mobile-only" data-tool="copy" data-i18n="tooltip.copy" title="Copy (Ctrl+C)"><Icon name={ICONS.COPY} /></button>
+      <button className="tool-btn mobile-only" data-tool="paste" data-i18n="tooltip.paste" title="Paste (Ctrl+V)"><Icon name={ICONS.CLIPBOARD_PASTE} /></button>
+      <button className="tool-btn" data-tool="pan" data-i18n="tool.pan"><Icon name={ICONS.HAND} /></button>
+      <button className="btn action-btn" id="zoomInBtn" data-i18n="tooltip.zoomIn"><Icon name={ICONS.ZOOM_IN} /></button>
+      <button className="btn action-btn" id="zoomOutBtn" data-i18n="tooltip.zoomOut"><Icon name={ICONS.ZOOM_OUT} /></button>
+      <button className="btn action-btn" id="zoomResetBtn" data-i18n="tooltip.zoomReset"><Icon name={ICONS.MAXIMIZE} /></button>
+    </>
+  );
+
   return (
-    <div className="main-area" style={{ width: '100%', height: '100%' }}>
+    <div ref={mainAreaRef} className="main-area" style={{ width: '100%', height: '100%' }}>
       <div id="canvasTabsContainer" className="canvas-tabs-container"></div>
       <div className="canvas-wrap" style={{ position: 'relative', overflow: 'hidden' }}>
         {/* Toast Notification Container */}
@@ -216,60 +258,32 @@ export default function CanvasPanel() {
           </button>
         </div>
         {/* Attached Tool Bar (Header) */}
-        <div className={`toolbar-container ${isToolbarCollapsed ? 'collapsed' : ''}`} style={{ position: 'absolute', top: '10px', left: '10px', zIndex: 1000, transition: 'all 0.3s ease', pointerEvents: 'none', width: 'auto', height: '32px', display: 'flex', gap: '8px' }}>
+        <div className={`toolbar-container ${isToolbarCollapsed ? 'collapsed' : ''}`} style={{ position: 'absolute', top: '10px', left: '10px', zIndex: 1000, transition: 'all 0.3s ease', width: 'auto', height: '32px', display: 'flex', gap: '8px' }}>
           <button
             className="btn collapse-toolbar-btn"
             onClick={() => setIsToolbarCollapsed(!isToolbarCollapsed)}
-            style={{ width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: 'var(--surface-2)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderRadius: '6px', border: '1px solid var(--border)', pointerEvents: 'auto', color: 'var(--text-primary)' }}
-            title="Toggle Toolbar"
+            style={{ width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: 'var(--color-surface-alt)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderRadius: '6px', border: '1px solid var(--color-border)', pointerEvents: 'auto', color: 'var(--color-text-bright)' }}
+            title="Thu gọn / Mở rộng"
           >
             <span style={{ display: isToolbarCollapsed ? 'none' : 'block' }}><Icon name={ICONS.MINUS} style={{ width: '16px', height: '16px' }} /></span>
             <span style={{ display: isToolbarCollapsed ? 'block' : 'none' }}><Icon name={ICONS.PLUS} style={{ width: '16px', height: '16px' }} /></span>
           </button>
           <div className="toolbar-content" style={{ display: 'flex', height: '100%', gap: '8px', overflow: isToolbarCollapsed ? 'hidden' : 'visible', maxWidth: isToolbarCollapsed ? '0px' : '500px', opacity: isToolbarCollapsed ? 0 : 1, transition: 'max-width 0.3s ease, opacity 0.3s ease', whiteSpace: 'nowrap', pointerEvents: isToolbarCollapsed ? 'none' : 'auto' }}>
-            <div className="grid-size-wrapper">
-              <button id="gridSizeSelectBtn" className="btn" data-i18n="tooltip.gridSize">
+            <div className="grid-size-wrapper" style={{ position: 'relative' }}>
+              <button 
+                id="gridSizeSelectBtn" 
+                className="btn" 
+                data-i18n="tooltip.gridSize"
+                onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+              >
                 <span id="currentGridSizeText">32x32</span>
                 <Icon name={ICONS.CHEVRON_DOWN} />
               </button>
-
-              <div id="resizePopover" style={{ display: 'none', position: 'absolute', top: '100%', left: '0', marginTop: '6px', background: 'rgba(30, 30, 35, 0.95)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '16px', width: '240px', boxShadow: '0 8px 24px rgba(0,0,0,0.4)', zIndex: 60, backdropFilter: 'blur(12px)', transition: 'all 0.2s ease' }}>
-
-                <div style={{ fontSize: '12px', fontWeight: 600, color: '#fff', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Icon name={ICONS.MAXIMIZE} style={{ width: '14px', height: '14px', color: 'var(--accent)' }} />
-                  <span data-i18n="resizePopover.canvasSize">Kích thước Canvas</span>
-                </div>
-
-                <div style={{ display: 'flex', gap: '10px', marginBottom: '12px' }}>
-                  <div style={{ flex: 1 }}>
-                    <label style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-muted)', marginBottom: '4px', display: 'block' }} data-i18n="resizePopover.width">Width</label>
-                    <input type="number" id="resizeWidth" defaultValue="32" min="1" max="256" style={{ width: '100%', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.05)', color: '#fff', padding: '6px 8px', borderRadius: '4px', fontSize: '13px', outline: 'none', transition: 'border 0.2s' }} />
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <label style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-muted)', marginBottom: '4px', display: 'block' }} data-i18n="resizePopover.height">Height</label>
-                    <input type="number" id="resizeHeight" defaultValue="32" min="1" max="256" style={{ width: '100%', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.05)', color: '#fff', padding: '6px 8px', borderRadius: '4px', fontSize: '13px', outline: 'none', transition: 'border 0.2s' }} />
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', padding: '6px 8px', background: 'rgba(0,0,0,0.15)', borderRadius: '4px' }}>
-                  <input type="checkbox" id="resizeLockRatio" defaultChecked style={{ accentColor: 'var(--accent)', cursor: 'pointer' }} />
-                  <label htmlFor="resizeLockRatio" style={{ fontSize: '11px', cursor: 'pointer', userSelect: 'none', color: '#ddd' }} data-i18n="resizePopover.lockRatio">Khóa tỷ lệ (Lock Ratio)</label>
-                </div>
-
-                <div style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-muted)', marginBottom: '6px' }} data-i18n="resizePopover.presets">Presets (Vuông)</div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '4px', marginBottom: '16px' }}>
-                  <button className="btn resize-preset-btn" data-size="16" style={{ padding: '4px 0', fontSize: '11px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.05)' }}>16</button>
-                  <button className="btn resize-preset-btn" data-size="32" style={{ padding: '4px 0', fontSize: '11px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.05)' }}>32</button>
-                  <button className="btn resize-preset-btn" data-size="48" style={{ padding: '4px 0', fontSize: '11px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.05)' }}>48</button>
-                  <button className="btn resize-preset-btn" data-size="64" style={{ padding: '4px 0', fontSize: '11px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.05)' }}>64</button>
-                </div>
-
-                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '12px', textAlign: 'center', padding: '8px 0', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-                  <span data-i18n="resizePopover.afterResize">Canvas after resize:</span> <span id="resizePreviewText" style={{ color: 'var(--accent)', fontWeight: 'bold', fontSize: '13px' }}>32 × 32</span>
-                </div>
-
-                <button id="resizeApplyBtn" className="btn btn-primary" style={{ width: '100%', padding: '8px 0', fontSize: '13px', fontWeight: 600, borderRadius: '6px', boxShadow: '0 2px 8px rgba(0,0,0,0.2)' }} data-i18n="resizePopover.apply">Áp dụng (Apply)</button>
-              </div>
+              
+              <CanvasSettingsModal 
+                isOpen={isSettingsOpen} 
+                onClose={() => setIsSettingsOpen(false)} 
+              />
             </div>
 
             {/* Batch 1.2: nút toggle Animation Mode. Khi bật, sẽ chuyển sang
@@ -308,9 +322,12 @@ export default function CanvasPanel() {
             onToggleOnionSkin={handleToggleOnionSkin}
             onInsertFrame={handleInsertFrame}
             onRemoveFrame={handleRemoveFrame}
+            onReorderFrame={handleReorderFrame}
             newFrameId={newFrameId}
             removingFrameId={removingFrameId}
-          />
+          >
+            {navTools}
+          </AnimationStripPanel>
         )}
         <div id="gridOverlay" style={{ pointerEvents: 'none', position: 'absolute', top: '-1px', left: '-1px', transformOrigin: '0 0', zIndex: 10 }}>
           <div id="mirrorLine" style={{ display: 'none', position: 'absolute', left: '50%', top: 0, bottom: 0, background: 'rgba(255, 60, 60, 0.8)', zIndex: 10 }}></div>
@@ -326,23 +343,19 @@ export default function CanvasPanel() {
       </div>
 
       {/* Floating Navigation */}
-      <div className="floating-nav" id="floatingNav">
-        <div className="floating-nav-header">
-          <span data-i18n="group.nav">Điều hướng</span>
-          <button id="toggleNavBtn" data-i18n="tooltip.toggleNav"><Icon name={ICONS.CHEVRON_DOWN} /></button>
+      {!isAnimMode && (
+        <div className={`floating-nav ${isNavCollapsed ? 'collapsed' : ''}`} id="floatingNav">
+          <div className="floating-nav-header">
+            <span data-i18n="group.nav">Điều hướng</span>
+            <button id="toggleNavBtn" onClick={() => setIsNavCollapsed(!isNavCollapsed)} data-i18n="tooltip.toggleNav">
+              <Icon name={ICONS.CHEVRON_DOWN} style={isNavCollapsed ? { transform: 'rotate(90deg)' } : {}} />
+            </button>
+          </div>
+          <div className="floating-nav-content" id="floatingNavContent">
+            {navTools}
+          </div>
         </div>
-        <div className="floating-nav-content" id="floatingNavContent">
-          <button className="btn action-btn mobile-only undo-btn-action" data-i18n="tooltip.undo"><Icon name={ICONS.UNDO} /></button>
-          <button className="btn action-btn mobile-only redo-btn-action" data-i18n="tooltip.redo"><Icon name={ICONS.REDO} /></button>
-          <button className="tool-btn mobile-only" data-tool="cut" data-i18n="tooltip.cut" title="Cut (Ctrl+X)"><Icon name={ICONS.SCISSORS} /></button>
-          <button className="tool-btn mobile-only" data-tool="copy" data-i18n="tooltip.copy" title="Copy (Ctrl+C)"><Icon name={ICONS.COPY} /></button>
-          <button className="tool-btn mobile-only" data-tool="paste" data-i18n="tooltip.paste" title="Paste (Ctrl+V)"><Icon name={ICONS.CLIPBOARD_PASTE} /></button>
-          <button className="tool-btn" data-tool="pan" data-i18n="tool.pan"><Icon name={ICONS.HAND} /></button>
-          <button className="btn action-btn" id="zoomInBtn" data-i18n="tooltip.zoomIn"><Icon name={ICONS.ZOOM_IN} /></button>
-          <button className="btn action-btn" id="zoomOutBtn" data-i18n="tooltip.zoomOut"><Icon name={ICONS.ZOOM_OUT} /></button>
-          <button className="btn action-btn" id="zoomResetBtn" data-i18n="tooltip.zoomReset"><Icon name={ICONS.MAXIMIZE} /></button>
-        </div>
-      </div>
+      )}
     </div>
   );
 }

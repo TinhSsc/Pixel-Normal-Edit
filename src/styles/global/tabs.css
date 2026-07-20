@@ -2,19 +2,25 @@
   flex: 1;
   background: transparent;
   color: var(--color-text-muted);
-  border: none;
-  border-radius: 6px;
-  padding: 10px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 10px 16px;
   font-size: 14px;
   cursor: pointer;
   font-weight: 600;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .tab-btn.active {
   background: var(--color-surface);
   color: var(--color-primary);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
 }
 
 .tab-btn:hover:not(.active) {
@@ -28,7 +34,18 @@
 
 .tab-content.active {
   display: block;
-  animation: fadeIn 0.3s ease-out;
+  animation: tabSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes tabSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(15px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 /* Upload Modal Source Tabs */
@@ -49,51 +66,51 @@
 /* Canvas Tabs Styles */
 .canvas-tabs-container {
   display: flex;
-  align-items: center;
+  align-items: flex-end; /* Align tabs to the bottom edge */
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
-  padding: 4px 4px 0 4px;
-  overflow-x: auto;
+  padding: 0 4px 0 4px;
+  height: 35px; /* Match --dv-tabs-and-actions-container-height */
+  overflow: visible; /* Prevent vertical clipping */
   gap: 2px;
-}
-
-.canvas-tabs-container {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+  box-sizing: border-box;
 }
 
 .tab-list {
   display: flex;
   gap: 2px;
+  height: 100%;
 }
 
 .canvas-tab {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 6px;
-  background: var(--color-bg);
+  padding: 0 12px;
+  background: var(--color-surface);
   color: var(--color-text-muted);
   border: 1px solid var(--color-border);
   border-bottom: none;
-  border-radius: 6px 6px 0 0;
+  border-radius: 10px 10px 0 0;
   cursor: pointer;
   font-size: 13px;
+  height: 100%;
   min-width: 100px;
   max-width: 200px;
   user-select: none;
   transition: all 0.2s;
+  box-sizing: border-box;
 }
 
 .canvas-tab:hover {
-  background: #2a2a35;
+  background: var(--color-surface-alt);
   color: var(--color-text-bright);
 }
 
 .canvas-tab.active {
-  background: var(--color-primary);
-  color: #fff;
-  border-color: var(--color-primary);
+  background: var(--color-bg);
+  color: var(--color-text-bright);
+  border-color: var(--color-border);
 }
 
 .tab-name {

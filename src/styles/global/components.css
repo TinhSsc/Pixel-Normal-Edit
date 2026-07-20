@@ -1,7 +1,7 @@
 .btn {
-  background: var(--color-border);
+  background: var(--color-surface-alt);
   color: var(--color-text-bright);
-  border: none;
+  border: 1px solid var(--color-border);
   border-radius: 6px;
   padding: 8px 12px;
   font-size: 14px;
@@ -15,15 +15,19 @@
 }
 
 .btn:hover {
-  background: var(--color-border-hover);
+  background: var(--color-border);
+  border-color: var(--color-text-muted);
 }
 
 .btn-primary {
   background: var(--color-primary);
+  border-color: var(--color-primary-hover);
+  color: #fff;
 }
 
 .btn-primary:hover {
   background: var(--color-primary-hover);
+  border-color: var(--color-primary);
 }
 
 input[type="color"] {
@@ -222,4 +226,383 @@ input[type="color"] {
   display: flex;
   align-items: center;
   justify-content: center;
+}.ui-bookmark {
+  --icon-size: 24px;
+  --icon-secondary-color: var(--color-text-muted, rgb(77, 77, 77));
+  --icon-hover-color: var(--color-text-bright, rgb(97, 97, 97));
+  --icon-primary-color: var(--color-primary, gold);
+  --icon-circle-border: 1px solid var(--icon-primary-color);
+  --icon-circle-size: 35px;
+  --icon-anmt-duration: 0.3s;
+}
+
+.ui-bookmark input {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  display: none;
+}
+
+.ui-bookmark .bookmark {
+  width: var(--icon-size);
+  height: auto;
+  fill: var(--icon-secondary-color);
+  cursor: pointer;
+  -webkit-transition: 0.2s;
+  -o-transition: 0.2s;
+  transition: 0.2s;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  position: relative;
+  -webkit-transform-origin: top;
+  -ms-transform-origin: top;
+  transform-origin: top;
+}
+
+.bookmark::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  -webkit-box-shadow: 0 30px 0 -4px var(--icon-primary-color),
+    30px 0 0 -4px var(--icon-primary-color),
+    0 -30px 0 -4px var(--icon-primary-color),
+    -30px 0 0 -4px var(--icon-primary-color),
+    -22px 22px 0 -4px var(--icon-primary-color),
+    -22px -22px 0 -4px var(--icon-primary-color),
+    22px -22px 0 -4px var(--icon-primary-color),
+    22px 22px 0 -4px var(--icon-primary-color);
+  box-shadow: 0 30px 0 -4px var(--icon-primary-color),
+    30px 0 0 -4px var(--icon-primary-color),
+    0 -30px 0 -4px var(--icon-primary-color),
+    -30px 0 0 -4px var(--icon-primary-color),
+    -22px 22px 0 -4px var(--icon-primary-color),
+    -22px -22px 0 -4px var(--icon-primary-color),
+    22px -22px 0 -4px var(--icon-primary-color),
+    22px 22px 0 -4px var(--icon-primary-color);
+  border-radius: 50%;
+  -webkit-transform: scale(0);
+  -ms-transform: scale(0);
+  transform: scale(0);
+}
+
+.bookmark::before {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  border: var(--icon-circle-border);
+  opacity: 0;
+}
+
+.ui-bookmark:hover .bookmark {
+  fill: var(--icon-hover-color);
+}
+
+.ui-bookmark input:checked + .bookmark::after {
+  -webkit-animation: circles var(--icon-anmt-duration)
+    cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  animation: circles var(--icon-anmt-duration)
+    cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  -webkit-animation-delay: var(--icon-anmt-duration);
+  animation-delay: var(--icon-anmt-duration);
+}
+
+.ui-bookmark input:checked + .bookmark {
+  fill: var(--icon-primary-color);
+  -webkit-animation: bookmark var(--icon-anmt-duration) forwards;
+  animation: bookmark var(--icon-anmt-duration) forwards;
+  -webkit-transition-delay: 0.3s;
+  -o-transition-delay: 0.3s;
+  transition-delay: 0.3s;
+}
+
+.ui-bookmark input:checked + .bookmark::before {
+  -webkit-animation: circle var(--icon-anmt-duration)
+    cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  animation: circle var(--icon-anmt-duration)
+    cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  -webkit-animation-delay: var(--icon-anmt-duration);
+  animation-delay: var(--icon-anmt-duration);
+}
+
+@-webkit-keyframes bookmark {
+  50% {
+    -webkit-transform: scaleY(0.6);
+    transform: scaleY(0.6);
+  }
+
+  100% {
+    -webkit-transform: scaleY(1);
+    transform: scaleY(1);
+  }
+}
+
+@keyframes bookmark {
+  50% {
+    -webkit-transform: scaleY(0.6);
+    transform: scaleY(0.6);
+  }
+
+  100% {
+    -webkit-transform: scaleY(1);
+    transform: scaleY(1);
+  }
+}
+
+@-webkit-keyframes circle {
+  from {
+    width: 0;
+    height: 0;
+    opacity: 0;
+  }
+
+  90% {
+    width: var(--icon-circle-size);
+    height: var(--icon-circle-size);
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes circle {
+  from {
+    width: 0;
+    height: 0;
+    opacity: 0;
+  }
+
+  90% {
+    width: var(--icon-circle-size);
+    height: var(--icon-circle-size);
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@-webkit-keyframes circles {
+  from {
+    -webkit-transform: scale(0);
+    transform: scale(0);
+  }
+
+  40% {
+    opacity: 1;
+  }
+
+  to {
+    -webkit-transform: scale(0.8);
+    transform: scale(0.8);
+    opacity: 0;
+  }
+}
+
+@keyframes circles {
+  from {
+    -webkit-transform: scale(0);
+    transform: scale(0);
+  }
+
+  40% {
+    opacity: 1;
+  }
+
+  to {
+    -webkit-transform: scale(0.8);
+    transform: scale(0.8);
+    opacity: 0;
+  }
+}
+/* Mac Illusion Scrollbar (Toàn cục) */
+::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-border);
+  border-radius: 10px;
+  border: 4px solid transparent;
+  background-clip: padding-box;
+  transition: background-color 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-text-muted);
+}
+
+/* Custom Dropdown (Checkbox Trick) */
+.custom-css-dropdown {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  transition: all 300ms;
+  display: flex;
+  flex-direction: column;
+  min-height: 38px;
+  background: var(--color-surface);
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.custom-css-dropdown input[type="checkbox"]:checked ~ .dropdown-list {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: all 350ms cubic-bezier(0.34, 1.15, 0.64, 1); /* Softer Bouncy effect */
+  max-height: 200px;
+  padding: 4px 8px;
+  margin-bottom: 8px;
+}
+
+.custom-css-dropdown input[type="checkbox"]:not(:checked) ~ .dropdown-list {
+  opacity: 0;
+  transform: translateY(-0.5rem) scale(0.98);
+  max-height: 0px;
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-bottom: 0;
+  user-select: none;
+  pointer-events: none;
+  transition: all 300ms ease-out;
+}
+
+.dropdown-trigger {
+  cursor: pointer;
+  user-select: none;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  height: 38px;
+  position: relative;
+  z-index: 99;
+  border-radius: inherit;
+  background: var(--color-surface);
+}
+
+.custom-css-dropdown input[type="checkbox"]:checked + .dropdown-trigger {
+  border-bottom: 1px dashed var(--color-border);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.trigger-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 16px;
+  height: 16px;
+  transition: transform 300ms cubic-bezier(0.34, 1.15, 0.64, 1);
+  color: var(--color-text-muted);
+}
+
+.custom-css-dropdown input[type="checkbox"]:checked + .dropdown-trigger .trigger-icon {
+  transform: rotate(-180deg);
+}
+
+.dropdown-list {
+  height: max-content;
+  max-height: 200px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  gap: 4px;
+  padding: 0 8px;
+  margin: 0;
+}
+
+.dropdown-listitem {
+  width: 100%;
+  list-style: none;
+  cursor: pointer;
+}
+
+.dropdown-article {
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  width: 100%;
+  display: inline-block;
+  background: transparent;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.dropdown-listitem:hover .dropdown-article {
+  background: var(--color-surface-alt);
+}
+
+.dropdown-listitem.selected .dropdown-article {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+/* Custom Checkbox (Animated) */
+.check {
+ position: relative;
+ width: 20px;
+ height: 20px;
+ border-radius: 4px;
+ appearance: none;
+ background-color: var(--color-surface-alt);
+ border: 1px solid var(--color-border);
+ transition: all .3s;
+ cursor: pointer;
+}
+
+.check::before {
+ content: '';
+ position: absolute;
+ border: solid var(--color-bg);
+ display: block;
+ width: .3em;
+ height: .6em;
+ border-width: 0 .2em .2em 0;
+ z-index: 1;
+ opacity: 0;
+ right: calc(50% - .3em);
+ top: calc(50% - .6em);
+ transform: rotate(0deg);
+ transition: all .3s;
+ transform-origin: center center;
+}
+
+.check:checked {
+ animation: checkAnim .3s ease-in forwards;
+ background-color: var(--color-primary);
+ border-color: var(--color-primary);
+}
+
+.check:checked::before {
+ opacity: 1;
+ transform: rotate(405deg);
+}
+
+@keyframes checkAnim {
+ 0% { opacity: 1; transform: scale(1) rotateY(0deg); }
+ 50% { opacity: 0; transform: scale(.8) rotateY(180deg); }
+ 100% { opacity: 1; transform: scale(1) rotateY(360deg); }
 }

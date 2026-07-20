@@ -58,4 +58,6 @@ export const ICONS = {
   FILM: 'film',
   LAYOUT_GRID: 'layout-grid',
   FILE_ARCHIVE: 'file-archive',
+  EYE: 'eye',
+  EYE_OFF: 'eye-off',
 };

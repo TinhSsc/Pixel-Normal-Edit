@@ -1,12 +1,16 @@
 import { initMainCanvasLayout, bindMainCanvasEvents } from './core/main-canvas-manager.js';
-import { els, setStatus, setCurrentTool, initEls } from './core/state.js';
-import { getTabs, getActiveTabId, initTabs, performQuickSave, syncToDrive } from './core/tab-manager.js';
+import { els, setStatus, setCurrentTool, initEls, pixelMap } from './core/state.js';
+import { getTabs, getActiveTabId, initTabs, performQuickSave, syncToDrive, debouncedSaveWorkspace } from './core/tab-manager.js';
 
 import { setupGradientMode } from './modes/gradient-mode.js';
 import { setupMirrorMode } from './modes/mirror-mode.js';
 import { setupShowGrid } from './modes/show-grid.js';
 
 import { setupUndo, setupRedo } from './actions/undo-redo.js';
+import { undo, redo } from './core/history.js';
+import { renderPixels } from './core/render.js';
+import { zoomIn, zoomOut, fitToScreen } from './core/viewport.js';
+import { handleSelectUndo } from './tools/select.js';
 import { setupSwapColors } from './actions/swap-colors.js';
 import { setupSetBackground } from './actions/set-background.js';
 import { setupTrim } from './actions/trim.js';
@@ -303,6 +307,45 @@ window.addEventListener('toolbar-mounted', () => {
       setCurrentTool(toolId);
       setStatus(`${t("status.toolSelected")} ${btn.getAttribute("data-tooltip") || btn.title}`);
       saveToolbarState();
+    }
+
+    // Event delegation for zoom buttons (may be dynamically added by React)
+    const zoomBtn = e.target.closest('#zoomInBtn, #zoomOutBtn, #zoomResetBtn');
+    if (zoomBtn) {
+      const id = zoomBtn.id;
+      if (id === 'zoomInBtn') {
+        zoomIn();
+        setStatus(`${t('status.zoom')} In`);
+      } else if (id === 'zoomOutBtn') {
+        zoomOut();
+        setStatus(`${t('status.zoom')} Out`);
+      } else if (id === 'zoomResetBtn') {
+        fitToScreen();
+        setStatus(t('status.zoomFit'));
+      }
+      return;
+    }
+
+    // Event delegation for undo/redo buttons (may be dynamically added by React)
+    const undoBtn = e.target.closest('.undo-btn-action');
+    if (undoBtn) {
+      if (handleSelectUndo()) return;
+      const did = undo(pixelMap, renderPixels);
+      if (did) {
+        setStatus(t('status.undo'));
+        debouncedSaveWorkspace();
+      }
+      return;
+    }
+
+    const redoBtn = e.target.closest('.redo-btn-action');
+    if (redoBtn) {
+      const did = redo(pixelMap, renderPixels);
+      if (did) {
+        setStatus(t('status.redo'));
+        debouncedSaveWorkspace();
+      }
+      return;
     }
   });
 

@@ -339,11 +339,11 @@ function App() {
               <h1 style={{ margin: 0, fontSize: '24px', color: 'var(--text-primary)' }} data-i18n="app.title">Pixel Normal Edit</h1>
               <button 
                 className="btn" 
-                style={{ background: 'transparent', border: 'none', padding: '4px', display: 'flex', alignItems: 'center' }} 
+                style={{ padding: '4px', display: 'flex', alignItems: 'center' }} 
                 onClick={() => document.getElementById('globalSettingsModal').style.display = 'flex'}
                 title="Cài đặt"
               >
-                <Icon name={ICONS.SETTINGS} style={{ width: '20px', height: '20px', color: 'var(--text-muted)' }} />
+                <Icon name={ICONS.SETTINGS} style={{ width: '20px', height: '20px', color: 'var(--color-text-muted)' }} />
               </button>
             </div>
 
@@ -466,7 +466,7 @@ function App() {
         <div className="modal-content">
           <div className="modal-header">
             <h3 style={{ margin: 0, fontSize: '18px' }} data-i18n="modal.uploadTitle">Tải dữ liệu lên</h3>
-            <button id="closeUploadModalBtn" className="btn" style={{ background: 'transparent', border: 'none', padding: '4px' }}><Icon name={ICONS.X} /></button>
+            <button id="closeUploadModalBtn" className="btn" style={{ padding: '4px' }}><Icon name={ICONS.X} /></button>
           </div>
 
           <div className="modal-tabs">
@@ -567,7 +567,7 @@ function App() {
         <div className="modal-content" style={{ maxWidth: '500px' }}>
           <div className="modal-header">
             <h3 style={{ margin: 0, fontSize: '18px' }} data-i18n="modal.downloadTitle">Tải xuống</h3>
-            <button id="closeDownloadModalBtn" className="btn" style={{ background: 'transparent', border: 'none', padding: '4px' }}><Icon name={ICONS.X} /></button>
+            <button id="closeDownloadModalBtn" className="btn" style={{ padding: '4px' }}><Icon name={ICONS.X} /></button>
           </div>
           <div style={{ padding: '20px' }}>
             
@@ -640,44 +640,6 @@ function App() {
 
 
       <div id="custom-tooltip"></div>
-
-      {/* Grid Resize Prompt Modal */}
-      <div id="gridResizeModal" className="modal-overlay" style={{ display: 'none', zIndex: 999999 }}>
-        <div className="modal-content" style={{ maxWidth: '400px' }}>
-          <div className="modal-header">
-            <h3 style={{ margin: 0, fontSize: '18px' }} data-i18n="resizePopover.title">Thay đổi kích thước</h3>
-            <button className="btn" style={{ background: 'transparent', border: 'none', padding: '4px' }} onClick={() => document.getElementById('gridResizeModal').style.display = 'none'}>
-              <Icon name={ICONS.X} />
-            </button>
-          </div>
-          <div style={{ padding: '20px' }}>
-            <p style={{ fontSize: '14px', color: 'var(--text-primary)', marginBottom: '16px' }}><span data-i18n="resizeModal.questionPrefix">Bạn muốn xử lý ảnh hiện tại như thế nào khi chuyển sang </span><span id="newGridSizeLabel" style={{ fontWeight: 'bold' }}></span>?</p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <button id="resizeKeepBtn" className="btn select-btn" style={{ padding: '12px', justifyContent: 'flex-start', alignItems: 'center', gap: '12px', height: 'auto' }}>
-                <Icon name={ICONS.CROP} style={{ width: '20px', height: '20px', color: 'var(--text-primary)' }} />
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', textAlign: 'left' }}>
-                  <span style={{ fontWeight: 600, color: 'var(--text-primary)' }} data-i18n="resizeModal.keepTitle">Giữ nguyên ảnh</span>
-                  <span style={{ fontSize: '12px', color: 'var(--text-muted)', lineHeight: 1.4 }} data-i18n="resizeModal.keepDesc">Mở rộng hoặc cắt bớt không gian, không làm biến dạng ảnh</span>
-                </div>
-              </button>
-              <button id="resizeScaleBtn" className="btn select-btn" style={{ padding: '12px', justifyContent: 'flex-start', alignItems: 'center', gap: '12px', height: 'auto' }}>
-                <Icon name={ICONS.MAXIMIZE} style={{ width: '20px', height: '20px', color: 'var(--text-primary)' }} />
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', textAlign: 'left' }}>
-                  <span style={{ fontWeight: 600, color: 'var(--text-primary)' }} data-i18n="resizeModal.scaleTitle">Thu phóng ảnh</span>
-                  <span style={{ fontSize: '12px', color: 'var(--text-muted)', lineHeight: 1.4 }} data-i18n="resizeModal.scaleDesc">Co giãn toàn bộ hình ảnh cho vừa khít với kích thước mới</span>
-                </div>
-              </button>
-              <button id="resizeClearBtn" className="btn select-btn" style={{ padding: '12px', justifyContent: 'flex-start', alignItems: 'center', gap: '12px', height: 'auto' }}>
-                <Icon name={ICONS.TRASH_2} style={{ width: '20px', height: '20px', color: 'var(--color-danger)' }} />
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', textAlign: 'left' }}>
-                  <span style={{ fontWeight: 600, color: 'var(--color-danger)' }} data-i18n="resizeModal.clearTitle">Xoá mất ảnh</span>
-                  <span style={{ fontSize: '12px', color: 'var(--text-muted)', lineHeight: 1.4 }} data-i18n="resizeModal.clearDesc">Tạo một trang giấy trắng hoàn toàn mới</span>
-                </div>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* Global Settings Modal */}
       <Suspense fallback={null}>

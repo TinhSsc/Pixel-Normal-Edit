@@ -37,7 +37,6 @@
   height: 100%;
   width: 100%;
   margin: 0 auto;
-  width: 100%;
 }
 
 .header {
@@ -78,13 +77,47 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: var(--color-bg);
+  background-color: var(--color-bg);
   position: relative;
   min-width: 0;
   min-height: 0;
   user-select: none;
   -webkit-user-select: none;
   border-radius: 0 0 11px 11px;
+}
+
+/* Mouse Hover Grid Spotlight Effect */
+.main-area::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border-radius: inherit;
+  
+  /* The dot pattern - brighter since it's only a spotlight */
+  background-image: radial-gradient(rgba(150, 150, 150, 0.4) 1.5px, transparent 0);
+  background-size: 30px 30px;
+  background-position: 0px 0px;
+  
+  /* Spotlight mask following the mouse */
+  -webkit-mask-image: radial-gradient(
+    circle 250px at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    black 0%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    circle 250px at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    black 0%,
+    transparent 100%
+  );
+  
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.main-area:hover::before {
+  opacity: 1;
 }
 
 #status {
@@ -268,45 +301,20 @@
   display: flex;
   gap: 6px;
   transition: all 0.3s ease;
-  overflow: hidden;
+  overflow: visible; /* Prevent animation clipping */
 }
 
-.floating-nav.collapsed .floating-nav-content {
-  height: 0;
-  width: 0;
-  padding: 0;
-  margin: 0;
-  opacity: 0;
-  pointer-events: none;
-}
 
-.floating-nav.collapsed .floating-nav-header {
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  justify-content: center;
-}
 
-.floating-nav.collapsed .floating-nav-header span {
-  display: none;
-}
 
-.floating-nav.collapsed {
-  padding: 0;
-  width: 42px;
-  height: 42px;
-  justify-content: center;
-  align-items: center;
-}
 
-.floating-nav.collapsed #toggleNavBtn {
-  width: 100%;
-  height: 100%;
-}
 
-.floating-nav.collapsed #toggleNavBtn i {
-  transform: rotate(180deg);
-}
+
+
+
+
+
+
 
 /* Mobile Responsive Layout */
 @media (max-width: 768px) {
@@ -1033,4 +1041,42 @@
 .toast-container.show {
   transform: translateX(0);
   opacity: 1;
+}
+
+
+
+.floating-nav {
+  transition: width 0.3s ease, height 0.3s ease;
+  overflow: hidden;
+}
+
+.floating-nav.collapsed {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.floating-nav.collapsed .floating-nav-header span {
+  display: none;
+}
+
+.floating-nav.collapsed .floating-nav-content {
+  display: none;
+}
+
+.floating-nav.collapsed .floating-nav-header {
+  padding: 0;
+  border-bottom: none;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+}
+
+.floating-nav.collapsed #toggleNavBtn {
+  margin: 0;
+  width: 32px;
+  height: 32px;
 }

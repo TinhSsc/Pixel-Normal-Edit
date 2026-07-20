@@ -1,4 +1,3 @@
-
 :root,
 :root[data-theme="dark"] {
   /* Design Tokens - Sizing Scale */
@@ -16,56 +15,56 @@
   --size-56: 56px;
   --size-64: 64px;
 
-  --color-bg: #191920;
-  --color-surface: #2a2a33;
-  --color-surface-alt: #202028;
-  --color-border: #3e3e4a;
-  --color-border-hover: #4a4a58;
-  --color-primary: #5b5bf0;
-  --color-primary-hover: #0e0eff;
-  --color-primary-light: #8888ff;
-  --color-success: #28a745;
-  --color-text: #e4e4ed;
-  --color-text-muted: #9292a3;
-  --color-text-bright: #f0f0f8;
-  --color-canvas-checker: #32323e;
-  --color-shadow: rgba(15, 15, 20, 0.6);
-  --color-shadow-md: rgba(15, 15, 20, 0.5);
-  --color-shadow-lg: rgba(15, 15, 20, 0.8);
-  --color-overlay: rgba(15, 15, 20, 0.8);
-  --color-overlay-sm: rgba(15, 15, 20, 0.4);
-  --color-nav-bg: rgba(42, 42, 51, 0.9);
-  --color-primary-tint: rgba(91, 91, 240, 0.1);
-  --color-grid-line: rgba(255, 255, 255, 0.2);
-  --color-info: #60a5fa;
-  --color-sync: #818cf8;
+  --color-bg: #0d1117;
+  --color-surface: #161b22;
+  --color-surface-alt: #21262d;
+  --color-border: #30363d;
+  --color-border-hover: #8b949e;
+  --color-primary: #63b3ed;
+  --color-primary-hover: #4299e1;
+  --color-primary-light: #90cdf4;
+  --color-success: #2ea043;
+  --color-text: #c9d1d9;
+  --color-text-muted: #8b949e;
+  --color-text-bright: #ffffff;
+  --color-canvas-checker: #21262d;
+  --color-shadow: rgba(1, 4, 9, 0.6);
+  --color-shadow-md: rgba(1, 4, 9, 0.5);
+  --color-shadow-lg: rgba(1, 4, 9, 0.8);
+  --color-overlay: rgba(1, 4, 9, 0.8);
+  --color-overlay-sm: rgba(1, 4, 9, 0.4);
+  --color-nav-bg: rgba(22, 27, 34, 0.9);
+  --color-primary-tint: rgba(99, 179, 237, 0.1);
+  --color-grid-line: rgba(255, 255, 255, 0.05);
+  --color-info: #63b3ed;
+  --color-sync: #8957e5;
 }
 
 :root[data-theme="light"] {
   /* The Digital Workbench - Light Mode */
-  --color-bg: #e2e4ea;
+  --color-bg: #f6f8fa;
   --color-surface: #ffffff;
-  --color-surface-alt: #f0f2f5;
-  --color-border: #d0d3db;
-  --color-border-hover: #b0b4c0;
-  --color-primary: #2563eb;
-  --color-primary-hover: #1d4ed8;
-  --color-primary-light: #60a5fa;
-  --color-success: #16a34a;
-  --color-text: #1e293b;
-  --color-text-muted: #64748b;
+  --color-surface-alt: #f3f4f6;
+  --color-border: #d0d7de;
+  --color-border-hover: #afb8c1;
+  --color-primary: #63b3ed;
+  --color-primary-hover: #4299e1;
+  --color-primary-light: #90cdf4;
+  --color-success: #2da44e;
+  --color-text: #24292f;
+  --color-text-muted: #57606a;
   --color-text-bright: #0f172a;
-  --color-canvas-checker: #d0d3db;
+  --color-canvas-checker: #d0d7de;
   --color-shadow: rgba(0, 0, 0, 0.1);
   --color-shadow-md: rgba(0, 0, 0, 0.12);
   --color-shadow-lg: rgba(0, 0, 0, 0.2);
   --color-overlay: rgba(0, 0, 0, 0.5);
   --color-overlay-sm: rgba(0, 0, 0, 0.08);
   --color-nav-bg: rgba(255, 255, 255, 0.9);
-  --color-primary-tint: rgba(37, 99, 235, 0.1);
-  --color-grid-line: rgba(0, 0, 0, 0.2);
-  --color-info: #3b82f6;
-  --color-sync: #6366f1;
+  --color-primary-tint: rgba(99, 179, 237, 0.1);
+  --color-grid-line: rgba(0, 0, 0, 0.04);
+  --color-info: #63b3ed;
+  --color-sync: #8957e5;
 }
 
 :root .dockview-theme-dark .dv-tabs-and-actions-container,

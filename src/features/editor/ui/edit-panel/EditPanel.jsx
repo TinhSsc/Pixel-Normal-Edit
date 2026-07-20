@@ -3,7 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { bindPopups } from '../../engine/core/popup-manager.js';
 import { editConfig } from './edit-manager.js';
 import { navigationConfig } from './navigation-manager.js';
-import { updateDOM } from '../../../../i18n/i18n.js';
+import { updateDOM, t } from '../../../../i18n/i18n.js';
+import { CustomDropdown } from '../../../../shared/ui/CustomDropdown';
 import ToolButton from '../toolbar/ToolButton';
 import { subscribeAnimationState, getAnimationState } from '../../engine/core/animation-state.js';
 
@@ -143,11 +144,14 @@ export default function EditPanel() {
                     <div className={`popup-bridge-${tool.popupPosition}`}>
                       <div className="tool-popup" style={tool.type === 'button' ? { width: 'max-content' } : {}}>
                         <label style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600 }} data-i18n={tool.popupContent.labelKey}>{tool.popupContent.defaultTitle}</label>
-                        <select id={tool.popupContent.selectId} className="btn" style={{ fontSize: '12px', padding: '4px', background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text-primary)', borderRadius: '4px' }} data-i18n={tool.popupContent.selectTooltipKey}>
-                          {tool.popupContent.options.map((opt, idx) => (
-                            <option key={idx} value={opt.value} data-i18n={opt.labelKey}>{opt.defaultLabel}</option>
-                          ))}
-                        </select>
+                        <CustomDropdown 
+                          id={tool.popupContent.selectId}
+                          style={{ minWidth: '100px' }}
+                          options={tool.popupContent.options.map((opt) => ({
+                            value: opt.value,
+                            label: t(opt.labelKey) || opt.defaultLabel
+                          }))}
+                        />
                       </div>
                     </div>
                   </div>

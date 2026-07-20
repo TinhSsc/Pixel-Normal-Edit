@@ -427,3 +427,29 @@ export function resizeAnimation(w, h, mode = 'clear', dx = 0, dy = 0) {
     forceRedrawAllPreviews();
     notifyListeners();
 }
+
+/**
+ * Đổi vị trí 2 frame bằng cách kéo thả.
+ */
+export function reorderFrame(fromIndex, toIndex) {
+    if (fromIndex < 0 || fromIndex >= frames.length || toIndex < 0 || toIndex >= frames.length) return false;
+    if (fromIndex === toIndex) return false;
+
+    syncCurrentStateToFrame();
+
+    const [movedFrame] = frames.splice(fromIndex, 1);
+    frames.splice(toIndex, 0, movedFrame);
+
+    let newActiveIndex = activeFrameIndex;
+    if (activeFrameIndex === fromIndex) {
+        newActiveIndex = toIndex;
+    } else if (activeFrameIndex > fromIndex && activeFrameIndex <= toIndex) {
+        newActiveIndex--;
+    } else if (activeFrameIndex < fromIndex && activeFrameIndex >= toIndex) {
+        newActiveIndex++;
+    }
+
+    loadFrameToCurrentState(newActiveIndex);
+    notifyListeners();
+    return true;
+}

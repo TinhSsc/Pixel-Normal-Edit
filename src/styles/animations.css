@@ -52,27 +52,45 @@
 
 /* UI Animations - Toggled via .animations-enabled class */
 html.animations-enabled .btn,
-html.animations-enabled .tool-btn,
 html.animations-enabled .tab-btn,
 html.animations-enabled .source-btn,
 html.animations-enabled .dl-format-btn,
 html.animations-enabled .dl-dest-btn,
 html.animations-enabled .select-btn {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 0 var(--color-border);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+html.animations-enabled .btn:hover,
+html.animations-enabled .tab-btn:hover,
+html.animations-enabled .source-btn:hover,
+html.animations-enabled .dl-format-btn:hover,
+html.animations-enabled .dl-dest-btn:hover,
+html.animations-enabled .select-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 3px 0 var(--color-border);
 }
 
 html.animations-enabled .btn:active,
-html.animations-enabled .tool-btn:active,
 html.animations-enabled .tab-btn:active,
 html.animations-enabled .source-btn:active,
 html.animations-enabled .dl-format-btn:active,
 html.animations-enabled .dl-dest-btn:active,
 html.animations-enabled .select-btn:active {
-  transform: scale(0.95);
+  transform: translateY(0);
+  box-shadow: 0 0 0 var(--color-border);
 }
 
-html.animations-enabled .tool-btn.active {
-  transform: scale(1.05);
+/* Tool Buttons animation based on reference (only translates down on active) */
+html.animations-enabled .tool-btn,
+html.animations-enabled .action-btn {
+  transform: translateY(0);
+}
+
+html.animations-enabled .tool-btn.active,
+html.animations-enabled .action-btn.active {
+  transform: translateY(2px);
 }
 
 html.animations-enabled .modal-content {

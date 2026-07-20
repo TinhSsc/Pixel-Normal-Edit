@@ -497,7 +497,7 @@ function renderTabsUI() {
     toggleAutoBackupBtn.id = 'autobackup_btn_' + tab.id;
     toggleAutoBackupBtn.className = `tab-autobackup-btn ${tab.autoBackupDrive ? 'active' : ''}`;
     toggleAutoBackupBtn.title = tab.autoBackupDrive ? 'Tắt tự động lưu lên Drive' : 'Bật tự động lưu lên Drive';
-    toggleAutoBackupBtn.innerHTML = `<i data-lucide="${tab.autoBackupDrive ? 'cloud-check' : 'cloud-upload'}" style="width: 14px; height: 14px; color: ${tab.autoBackupDrive ? 'var(--success)' : 'var(--text-muted)'};"></i>`;
+    toggleAutoBackupBtn.innerHTML = `<i data-lucide="${tab.autoBackupDrive ? 'cloud-check' : 'cloud-upload'}" style="width: 14px; height: 14px; color: ${tab.autoBackupDrive ? 'var(--color-success, #2ea043)' : 'var(--color-text-muted, #8b949e)'};"></i>`;
     toggleAutoBackupBtn.style.cssText = 'background: transparent; border: none; padding: 2px; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 4px;';
     toggleAutoBackupBtn.addEventListener('click', (e) => {
       e.stopPropagation();
