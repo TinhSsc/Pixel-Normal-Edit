@@ -105,7 +105,7 @@ export function setupDriveUI() {
       driveHeaderIcon.style.color = 'var(--text-muted)';
     }
     if (driveHeaderStatus) {
-      driveHeaderStatus.title = `Chưa kết nối Google Drive`;
+      driveHeaderStatus.title = t('drive.disconnectedTitle');
     }
     if (driveLoginBtn) driveLoginBtn.style.display = 'block';
     if (driveLogoutBtn) driveLogoutBtn.style.display = 'none';
@@ -116,8 +116,8 @@ export function setupDriveUI() {
       driveUploadList.innerHTML = `
         <div style="text-align: center; padding: 30px 20px; color: var(--text-muted); background: var(--surface-1); border-radius: 8px; border: 1px dashed var(--border);">
            <i data-lucide="hard-drive" style="width: 36px; height: 36px; margin-bottom: 12px; opacity: 0.5;"></i>
-           <div style="margin-bottom: 12px;">Bạn cần đăng nhập Google Drive để chọn ảnh</div>
-           <button id="uploadDriveLoginBtn" class="btn btn-primary" style="padding: 8px 16px;">Kết nối Drive</button>
+           <div style="margin-bottom: 12px;" data-i18n="drive.loginRequired">${t('drive.loginRequired')}</div>
+           <button id="uploadDriveLoginBtn" class="btn btn-primary" style="padding: 8px 16px;" data-i18n="drive.login">${t('drive.login')}</button>
         </div>
       `;
       const btn = document.getElementById('uploadDriveLoginBtn');
@@ -190,7 +190,7 @@ export function setupDriveUI() {
 
         openDrivePicker(async (fileId, fileName, mimeType) => {
           try {
-            openDrivePickerBtn.innerHTML = '<i data-lucide="loader-2" class="spin" style="width: 16px; height: 16px;"></i> Đang tải...';
+            openDrivePickerBtn.innerHTML = `<i data-lucide="loader-2" class="spin" style="width: 16px; height: 16px;"></i> ${t('status.loading')}`;
             if (window.lucide) window.lucide.createIcons();
             
             const imgBlob = await downloadImageFromDrive(fileId);
@@ -214,11 +214,11 @@ export function setupDriveUI() {
 
               const jsonFile = new File([imgBlob], fileName, { type: 'application/json' });
               handleJsonFile(jsonFile);
-              showNotification(`Đã mở dự án: ${fileName}`);
+              showNotification(t('drive.projectLoaded', fileName));
             } else {
               const imgFile = new File([imgBlob], fileName, { type: imgBlob.type || 'image/png' });
               handleImageFile(imgFile, true);
-              showNotification(`Đã mở ảnh: ${fileName}`);
+              showNotification(t('drive.imageLoaded', fileName));
             }
             
           } catch (err) {
@@ -248,7 +248,7 @@ export function setupDriveUI() {
     }
 
     try {
-      driveUploadList.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--text-muted);"><i data-lucide="loader-2" class="spin"></i> Đang tải danh sách...</div>`;
+      driveUploadList.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--text-muted);"><i data-lucide="loader-2" class="spin"></i> ${t('drive.loadingList')}</div>`;
       if (window.lucide) window.lucide.createIcons();
       
       const files = await listDriveFiles();
@@ -319,11 +319,11 @@ export function setupDriveUI() {
 
               const jsonFile = new File([imgBlob], file.name, { type: 'application/json' });
               handleJsonFile(jsonFile);
-              showNotification(`Đã mở dự án: ${file.name}`);
+              showNotification(t('drive.projectLoaded', file.name));
             } else {
               const imgFile = new File([imgBlob], file.name, { type: imgBlob.type || 'image/png' });
               handleImageFile(imgFile, true);
-              showNotification(`Đã mở ảnh: ${file.name}`);
+              showNotification(t('drive.imageLoaded', file.name));
             }
             
           } catch (err) {
@@ -352,12 +352,12 @@ export function setupDriveUI() {
     }
 
     try {
-      localDirUploadList.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--text-muted);"><i data-lucide="loader-2" class="spin"></i> Đang tải danh sách...</div>`;
+      localDirUploadList.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--text-muted);"><i data-lucide="loader-2" class="spin"></i> ${t('drive.loadingList')}</div>`;
       if (window.lucide) window.lucide.createIcons();
       
       const files = await listLocalFiles();
       if (files.length === 0) {
-        localDirUploadList.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--text-muted);">Không tìm thấy ảnh hoặc project nào trong Thư mục cục bộ</div>`;
+        localDirUploadList.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--text-muted);">${t('local.noFilesFound')}</div>`;
         return;
       }
 
@@ -415,10 +415,10 @@ export function setupDriveUI() {
             if (file.isJson) {
 
               handleJsonFile(fileBlob);
-              showNotification(`Đã mở dự án: ${file.name}`);
+              showNotification(t('local.projectOpened', file.name));
             } else {
               handleImageFile(fileBlob, true);
-              showNotification(`Đã mở ảnh: ${file.name}`);
+              showNotification(t('local.imageOpened', file.name));
             }
             
           } catch (err) {

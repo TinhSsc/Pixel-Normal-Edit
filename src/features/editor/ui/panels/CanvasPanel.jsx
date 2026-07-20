@@ -24,6 +24,7 @@ import { GRID_WIDTH, GRID_HEIGHT } from '../../engine/core/state.js';
 import CanvasSettingsModal from '../resize/CanvasSettingsModal.jsx';
 import { renderPixels, setForceFullRender } from '../../engine/core/render.js';
 import { getZoom, getPan, setPan, applyTransform } from '../../engine/core/viewport.js';
+import { t } from '../../../../i18n/i18n.js';
 
 function OnionSkinLayer({ frame }) {
   const ref = React.useRef(null);
@@ -66,9 +67,6 @@ function OnionSkinLayer({ frame }) {
 
 export default function CanvasPanel() {
   const [isToolbarCollapsed, setIsToolbarCollapsed] = useState(false);
-  // Batch 1.2: chỉ theo dõi trạng thái bật/tắt Animation Mode để đổi icon nút.
-  // CHƯA đổi giao diện canvas (sẽ làm ở Batch 2.1) — mục tiêu batch này là
-  // có nút toggle hoạt động đúng, verify được qua console.log.
   const [isAnimMode, setIsAnimMode] = useState(animationModeState);
   const [framesState, setFramesState] = useState(frames);
   const [previews, setPreviews] = useState(getPreviewItems);
@@ -80,7 +78,6 @@ export default function CanvasPanel() {
   }, []);
 
   useEffect(() => {
-    // This runs after React has rendered the preview canvases
     const pan = getPan();
     const zoom = getZoom();
     const showGridFlag = document.getElementById('showGrid')?.checked;
@@ -162,11 +159,9 @@ export default function CanvasPanel() {
   const handleToggleAnimationMode = () => {
     const newValue = toggleAnimationMode();
     if (newValue) {
-      // Lần đầu bật Animation Mode: biến ảnh đang vẽ dở thành frame đầu tiên.
       initAnimationFromCurrentState();
     }
     setIsAnimMode(newValue);
-    // eslint-disable-next-line no-console
     console.log('[AnimationMode]', newValue ? 'BẬT' : 'TẮT');
   };
 
@@ -186,7 +181,7 @@ export default function CanvasPanel() {
     const hasHistory = frame.historyState && frame.historyState.undoStack && frame.historyState.undoStack.length > 0;
 
     if (hasPixelData || hasHistory) {
-      if (!window.confirm('Xóa trang này? Dữ liệu của trang sẽ mất.')) return;
+      if (!window.confirm(t('confirm.deleteFrame'))) return;
     }
 
     setRemovingFrameId(frame.id);
@@ -247,7 +242,7 @@ export default function CanvasPanel() {
       <div className="canvas-wrap" style={{ position: 'relative', overflow: 'hidden' }}>
         {/* Toast Notification Container */}
         <div id="toastContainer" className="toast-container">
-          <div id="status" data-i18n="status.init" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>Sẵn sàng</div>
+          <div id="status" data-i18n="status.init" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', textShadow: '0 1px 3px rgba(0,0,0,0.8)' }}>{t('status.ready')}</div>
           <button
             id="stopTaskBtn"
             className="btn stop-btn"
@@ -263,7 +258,7 @@ export default function CanvasPanel() {
             className="btn collapse-toolbar-btn"
             onClick={() => setIsToolbarCollapsed(!isToolbarCollapsed)}
             style={{ width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, background: 'var(--color-surface-alt)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderRadius: '6px', border: '1px solid var(--color-border)', pointerEvents: 'auto', color: 'var(--color-text-bright)' }}
-            title="Thu gọn / Mở rộng"
+            title={t('tooltip.collapseToolbar')}
           >
             <span style={{ display: isToolbarCollapsed ? 'none' : 'block' }}><Icon name={ICONS.MINUS} style={{ width: '16px', height: '16px' }} /></span>
             <span style={{ display: isToolbarCollapsed ? 'block' : 'none' }}><Icon name={ICONS.PLUS} style={{ width: '16px', height: '16px' }} /></span>
@@ -286,14 +281,11 @@ export default function CanvasPanel() {
               />
             </div>
 
-            {/* Batch 1.2: nút toggle Animation Mode. Khi bật, sẽ chuyển sang
-                Animation Strip view ở Batch 2.1. Hiện tại chỉ đổi trạng thái
-                module (animation-state.js) và đổi icon/tô sáng nút. */}
             <button
               id="toggleAnimationModeBtn"
               className="btn"
               onClick={handleToggleAnimationMode}
-              title={isAnimMode ? 'Xem Source Image' : 'Xem Animation'}
+              title={isAnimMode ? t('tooltip.viewSource') : t('tooltip.viewAnimation')}
               style={isAnimMode ? { background: 'var(--accent)', color: '#fff' } : undefined}
             >
               <Icon name={ICONS.FILM} style={{ width: '16px', height: '16px' }} />

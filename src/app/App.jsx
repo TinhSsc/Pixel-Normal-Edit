@@ -319,7 +319,7 @@ function App() {
     <>
 
       {AUTH_ROUTES.includes(route) ? (
-        <Suspense fallback={<div style={{display:'flex',justifyContent:'center',alignItems:'center',height:'100vh',color:'var(--text-muted)'}}><Icon name={ICONS.LOADER} className="spin" style={{width: 24, height: 24, marginRight: 8}}/> Đang tải...</div>}>
+        <Suspense fallback={<div style={{display:'flex',justifyContent:'center',alignItems:'center',height:'100vh',color:'var(--text-muted)'}}><Icon name={ICONS.LOADER} className="spin" style={{width: 24, height: 24, marginRight: 8}}/>{t('status.loading')}</div>}>
           {route === 'login' ? (
             <LoginPage onLoggedIn={handleLoggedIn} onNavigate={navigate} />
           ) : route === 'register' ? (
@@ -341,7 +341,7 @@ function App() {
                 className="btn" 
                 style={{ padding: '4px', display: 'flex', alignItems: 'center' }} 
                 onClick={() => document.getElementById('globalSettingsModal').style.display = 'flex'}
-                title="Cài đặt"
+                title={t('tooltip.settings')}
               >
                 <Icon name={ICONS.SETTINGS} style={{ width: '20px', height: '20px', color: 'var(--color-text-muted)' }} />
               </button>
@@ -534,8 +534,8 @@ function App() {
               <div id="driveUploadList" style={{ width: '100%', height: '100%', maxHeight: '45vh', overflowY: 'auto', paddingRight: '8px' }}>
                 <div style={{ textAlign: 'center', padding: '30px 20px', color: 'var(--text-muted)', background: 'var(--surface-1)', borderRadius: '8px', border: '1px dashed var(--border)' }}>
                    <Icon name={ICONS.CLOUD} style={{ width: '36px', height: '36px', marginBottom: '12px', opacity: 0.5 }} />
-                   <div style={{ marginBottom: '12px' }}>Bạn cần đăng nhập Google Drive để chọn ảnh</div>
-                   <button id="uploadDriveLoginBtn" className="btn btn-primary" style={{ padding: '8px 16px' }}>Kết nối Drive</button>
+                   <div style={{ marginBottom: '12px' }} data-i18n="drive.loginRequired">Bạn cần đăng nhập Google Drive để chọn ảnh</div>
+                   <button id="uploadDriveLoginBtn" className="btn btn-primary" style={{ padding: '8px 16px' }} data-i18n="drive.login">Kết nối Drive</button>
                 </div>
               </div>
             </div>

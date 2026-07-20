@@ -36,6 +36,11 @@ export default {
   "tooltip.gridSize": "Đổi kích thước canvas",
   "tooltip.gradDir": "Đổi hướng chuyển màu gradient",
   "tooltip.rulerMode": "Đo khoảng cách theo pixel",
+  "tooltip.replaceTolerance": "Độ sai lệch màu",
+  "tooltip.settings": "Cài đặt",
+  "tooltip.collapseToolbar": "Thu gọn / Mở rộng",
+  "tooltip.viewSource": "Xem ảnh gốc",
+  "tooltip.viewAnimation": "Xem Animation",
   "label.rotateOptions": "Chế độ xoay",
   "option.rotateSize": "Xoay canvas",
   "option.rotatePixel": "Chỉ xoay pixel",
@@ -44,6 +49,8 @@ export default {
   "tooltip.login": "Đăng nhập để lưu trên Drive",
 
   "confirm.leave": "Bạn có chắc chuyển sang nơi khác? Mọi dữ liệu bản vẽ chưa lưu sẽ bị mất!",
+  "confirm.deleteFrame": "Xóa trang này? Dữ liệu của trang sẽ mất.",
+  "confirm.resetAllData": "Bạn có chắc chắn muốn xóa toàn bộ dữ liệu? Hành động này không thể hoàn tác!",
 
   "btn.upload": "Tải lên",
   "btn.compress": "Nén",
@@ -94,7 +101,7 @@ export default {
   "group.shape": "Hình",
   "group.nav": "Điều hướng",
   "group.navigation": "Điều hướng (Canvas)",
-  "group.settings": "Biến đổi",
+  "group.settings": "Chế độ & Trạng thái",
   "group.imageOps": "Ảnh",
   "group.operations": "Chỉnh sửa",
 
@@ -118,6 +125,9 @@ export default {
   "label.replaceBg": "Thay nền",
   "label.flattenBg": "Gộp nền",
   "label.gradDir": "Hướng",
+  "label.animationPage": "Trang {0} / {1}",
+  "label.speed": "Tốc độ: ",
+  "label.fps": "fps",
 
   "option.customSize": "Tùy chỉnh...",
   "option.vertical": "Dọc (Trên-Dưới)",
@@ -160,8 +170,8 @@ export default {
 
   "group.backupSync": "Lưu trữ & Đồng bộ",
   "settings.localDirectory": "Thư mục cục bộ",
-  "settings.localDirectoryDesc": "Cấp quyền để ứng dụng lưu file trực tiếp vào máy mà không cần hộp thoại tải xuống.",
-  "settings.noDirectorySelected": "Chưa chọn thư mục nào",
+  "settings.localDirectoryDesc": "Cấp quyền cho trình duyệt lưu file trực tiếp vào thiết bị của bạn mà không cần phải hiện hộp thoại tải xuống.",
+  "settings.noDirectorySelected": "Chưa cấu hình Thư mục cục bộ",
   "settings.clearDirectory": "Xóa cấu hình",
   "settings.changeDirectory": "Thay đổi thư mục",
   "settings.selectDirectory": "Chọn thư mục",
@@ -171,6 +181,7 @@ export default {
   "settings.autoSaveDest.local": "Chỉ lưu vào Thư mục cục bộ",
   "settings.autoSaveDest.drive": "Chỉ lưu vào Google Drive",
   "settings.autoSaveDest.both": "Lưu vào cả Thư mục cục bộ và Google Drive",
+  "settings.goToSettings": "Đi tới Cài đặt",
   "troubleshoot.title": "Khắc phục sự cố",
   "troubleshoot.desc": "Nếu ứng dụng bị lỗi hoặc kẹt, bạn có thể xóa toàn bộ dữ liệu cục bộ để khôi phục lại trạng thái ban đầu.",
   "troubleshoot.reset": "Khôi phục dữ liệu gốc (Reset)",
@@ -207,14 +218,14 @@ export default {
   "drive.openPicker": "Duyệt toàn bộ Drive...",
   "drive.selectFile": "Chọn file từ Google Drive",
   "drive.noFiles": "Không tìm thấy file nào trên Drive",
+  "drive.loginRequired": "Bạn cần đăng nhập Google Drive để chọn ảnh",
+  "drive.connectedTitle": "Đã kết nối Google Drive",
+  "drive.disconnectedTitle": "Chưa kết nối Google Drive",
+  "drive.loadingList": "Đang tải danh sách...",
+  "drive.projectLoaded": "Đã mở dự án: {0}",
+  "drive.imageLoaded": "Đã mở ảnh: {0}",
+  "drive.sectionTitle": "Google Drive",
 
-  "auth.title": "Đăng nhập",
-  "auth.email": "Email",
-  "auth.password": "Mật khẩu",
-  "auth.loginBtn": "Đăng nhập",
-  "auth.or": "hoặc",
-  "auth.forgotPassword": "Quên mật khẩu?",
-  "auth.createAccount": "Tạo tài khoản",
   "auth.registerTitle": "Đăng ký",
   "auth.name": "Họ tên",
   "auth.registerBtn": "Đăng ký",
@@ -264,8 +275,16 @@ export default {
   "status.sizeChanged": "Đã đổi kích thước thành",
   "status.needImg": "Vui lòng tải ảnh lên trước.",
   "status.compressing": "Đang nén ảnh...",
+  "status.compressed": "Đã nén",
   "status.largeImgWarning": "Ảnh có kích thước quá lớn (>1 triệu điểm ảnh) có thể gây giật lag khi chỉnh sửa. Bạn có chắc chắn muốn tải lên không?",
   "status.taskAborted": "Đã dừng thuật toán.",
+  "status.blankCanvas": "Canvas đang trống, không thể xén!",
+  "status.toolHidden": "Vui lòng chọn một công cụ để sử dụng.",
+  "status.loading": "Đang tải...",
+  "status.ready": "Sẵn sàng",
+  "status.savedToDrive": "Đã lưu vào Google Drive",
+  "status.savedToLocal": "Đã lưu vào Thư mục cục bộ",
+  "status.fileCreatedLocal": "Đã tạo file tại Thư mục cục bộ",
 
   "status.scanBg": "Đang quét nền...",
   "status.scanBgCount": "Đang quét nền: {0} khối...",
@@ -297,13 +316,8 @@ export default {
   "download.local": "Lưu vào máy",
   "download.drive": "Google Drive",
   "download.execute": "Tiến hành tải xuống",
-
-  "settings.localDirectory": "Thư mục cục bộ",
-  "settings.localDirectoryDesc": "Cấp quyền cho trình duyệt lưu file trực tiếp vào thiết bị của bạn mà không cần phải hiện hộp thoại tải xuống.",
-  "settings.noDirectorySelected": "Chưa cấu hình Thư mục cục bộ",
-  "settings.clearDirectory": "Xóa cấu hình",
-  "settings.changeDirectory": "Thay đổi thư mục",
-  "settings.selectDirectory": "Chọn thư mục",
+  "download.noCanvasSelected": "Vui lòng chọn ít nhất 1 canvas để tải!",
+  "download.success": "Đã tải thành công {0} tệp!",
 
   "modal.clickToSelect": "hoặc nhấp để chọn file từ máy tính",
 
@@ -332,5 +346,12 @@ export default {
   "resizeModal.scaleTitle": "Thu phóng ảnh",
   "resizeModal.scaleDesc": "Co giãn toàn bộ hình ảnh cho vừa khít với kích thước mới",
   "resizeModal.clearTitle": "Xoá mất ảnh",
-  "resizeModal.clearDesc": "Tạo một trang giấy trắng hoàn toàn mới"
+  "resizeModal.clearDesc": "Tạo một trang giấy trắng hoàn toàn mới",
+
+  "local.noFilesFound": "Không tìm thấy ảnh hoặc project nào trong Thư mục cục bộ",
+  "local.projectOpened": "Đã mở dự án: {0}",
+  "local.imageOpened": "Đã mở ảnh: {0}",
+
+  "tab.disableAutoSave": "Tắt tự động lưu lên Drive",
+  "tab.enableAutoSave": "Bật tự động lưu lên Drive"
 };

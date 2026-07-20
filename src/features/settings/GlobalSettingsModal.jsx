@@ -358,7 +358,7 @@ export default function GlobalSettingsModal() {
             <div style={{ background: 'var(--color-surface)', padding: '20px', borderRadius: '12px', border: '1px solid var(--color-border)' }}>
               <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }} data-i18n="group.backupSync">Lưu trữ & Đồng bộ</div>
               <div className="setting-group" style={{ marginBottom: '0' }}>
-                <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', color: 'var(--text-primary)' }}>Google Drive</h4>
+                <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', color: 'var(--text-primary)' }} data-i18n="drive.sectionTitle">{t('drive.sectionTitle')}</h4>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--color-surface-alt)', borderRadius: '8px', flexWrap: 'wrap', gap: '12px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <Icon name={ICONS.CLOUD} style={{ color: 'var(--text-muted)' }} />
@@ -430,7 +430,7 @@ export default function GlobalSettingsModal() {
                   Nếu ứng dụng bị lỗi hoặc kẹt, bạn có thể xóa toàn bộ dữ liệu cục bộ để khôi phục lại trạng thái ban đầu.
                 </p>
                 <button className="btn" style={{ padding: '8px 16px', fontSize: '13px', background: 'rgba(239, 68, 68, 0.1)', color: 'var(--color-danger)', border: '1px solid var(--color-danger)' }} onClick={() => {
-                  if (window.confirm('Bạn có chắc chắn muốn xóa toàn bộ dữ liệu? Mọi ảnh và thiết lập chưa lưu sẽ bị mất, ứng dụng sẽ tải lại.')) {
+                  if (window.confirm(t('confirm.resetAllData'))) {
                     localStorage.clear();
                     window.location.reload();
                   }

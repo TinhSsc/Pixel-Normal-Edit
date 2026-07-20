@@ -187,7 +187,7 @@ export function initEditor() {
     executeDownloadBtn.addEventListener('click', async () => {
       const selectedCheckboxes = document.querySelectorAll('#downloadCanvasList input[type="checkbox"]:checked');
       if (selectedCheckboxes.length === 0) {
-        showNotification('Vui lòng chọn ít nhất 1 canvas để tải!', true);
+        showNotification(t('download.noCanvasSelected'), true);
         return;
       }
 
@@ -263,7 +263,7 @@ export function initEditor() {
           }
         }
         
-        showNotification(`Đã tải thành công ${successCount} tệp!`);
+        showNotification(t('download.success', successCount));
         downloadModal.style.display = 'none';
       } catch (err) {
         showNotification(err.message, true);

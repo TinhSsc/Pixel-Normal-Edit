@@ -137,16 +137,16 @@ export async function performQuickSave() {
 
   let success = false;
 
-  if (currentTab.storage && currentTab.storage.type === 'drive') {
-    success = await syncToDrive(currentTab);
-    if (success) { setHeaderStatus('saved'); showNotification('Đã lưu vào Google Drive'); }
-  } else if (currentTab.storage && currentTab.storage.type === 'local') {
-    success = await syncToLocal(currentTab);
-    if (success) { setHeaderStatus('saved'); showNotification('Đã lưu vào Thư mục cục bộ'); }
-  } else if (getCurrentDirectoryHandle()) {
-    // Nếu đã cấu hình local directory mà tab chưa link đâu, lưu vào local dir
-    success = await syncToLocal(currentTab);
-    if (success) { setHeaderStatus('saved'); showNotification('Đã tạo file tại Thư mục cục bộ'); }
+    if (currentTab.storage && currentTab.storage.type === 'drive') {
+      success = await syncToDrive(currentTab);
+      if (success) { setHeaderStatus('saved'); showNotification(t('status.savedToDrive')); }
+    } else if (currentTab.storage && currentTab.storage.type === 'local') {
+      success = await syncToLocal(currentTab);
+      if (success) { setHeaderStatus('saved'); showNotification(t('status.savedToLocal')); }
+    } else if (getCurrentDirectoryHandle()) {
+      // Nếu đã cấu hình local directory mà tab chưa link đâu, lưu vào local dir
+      success = await syncToLocal(currentTab);
+      if (success) { setHeaderStatus('saved'); showNotification(t('status.fileCreatedLocal')); }
   } else {
     // Không có link nào, mở Save As
     const btn = document.getElementById('openDownloadModalBtn');

@@ -52,11 +52,11 @@ function AnimationPreview() {
         <canvas ref={canvasRef} style={{ width: '100%', height: '150px', objectFit: 'contain', imageRendering: 'pixelated' }} />
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', color: 'var(--text-muted)' }}>
-        <span>Trang {playIdx % animState.frames.length + 1} / {animState.frames.length}</span>
+        <span data-i18n="label.animationPage">{t('label.animationPage', playIdx % animState.frames.length + 1, animState.frames.length)}</span>
         <label style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-          Tốc độ: 
+          <span data-i18n="label.speed">{t('label.speed')}</span>
           <input type="number" min="1" max="60" value={fps} onChange={e => setFps(Math.max(1, parseInt(e.target.value) || 10))} style={{ width: '40px', background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text-primary)', borderRadius: '2px', padding: '2px' }} />
-          fps
+          <span data-i18n="label.fps">{t('label.fps')}</span>
         </label>
       </div>
     </div>
