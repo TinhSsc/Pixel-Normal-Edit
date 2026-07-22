@@ -6,11 +6,7 @@ import { resizeCanvas, fitToScreen } from '../core/viewport.js';
 
 import { syncGridSizeUI } from './grid-size-select.js';
 
-export function setupTrim() {
-  const trimBtn = document.getElementById('trimBtn');
-  
-  if (trimBtn) {
-    trimBtn.onclick = async () => {
+export async function autoTrimCanvas() {
     let minX = GRID_WIDTH;
     let minY = GRID_HEIGHT;
     let maxX = -1;
@@ -79,6 +75,13 @@ export function setupTrim() {
     renderPixels();
     
     setStatus(`Trimmed to ${newW}x${newH}`);
+}
+export function setupTrim() {
+  const trimBtn = document.getElementById('trimBtn');
+  
+  if (trimBtn) {
+    trimBtn.onclick = async () => {
+      await autoTrimCanvas();
     };
   }
 }

@@ -42,6 +42,7 @@ import { initMobilePopupTriggers } from '../../../shared/dom/popup-controller';
 
 import { saveToolbarState } from './core/toolbar-save.js';
 import { loadAndResetToolbarState } from './core/toolbar-reset.js';
+import { initEditorAPI } from '../api/editor-api.js';
 
 let initialized = false;
 
@@ -49,11 +50,10 @@ export function initEditor() {
   if (initialized) return;
   initialized = true;
 
+  initEditorAPI();
   initEls();
 
   reloadLucideIcons();
-
-  // Initialize Canvas
   initMainCanvasLayout();
 
   // Setup Modes

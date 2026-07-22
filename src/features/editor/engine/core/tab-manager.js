@@ -498,7 +498,7 @@ export function refreshUIAfterBatchImport() {
   }
 }
 
-export function closeTab(id) {
+export function closeTab(id, force = false) {
   if (tabs.length === 1) return;
 
   const index = tabs.findIndex(t => t.id === id);
@@ -508,7 +508,7 @@ export function closeTab(id) {
 
   const tab = tabs[index];
   const hasModifications = tab.history && tab.history.undoStack && tab.history.undoStack.length > 0;
-  if (hasModifications) {
+  if (hasModifications && !force) {
     if (!window.confirm(t('confirm.closeTab') || 'Bạn có chắc muốn đóng tab này? Dữ liệu chưa lưu sẽ bị mất.')) {
       return;
     }
