@@ -182,7 +182,7 @@ export default function CanvasSettingsModal({ isOpen, onClose }) {
         {/* RIGHT COLUMN: CHIẾN LƯỢC XỬ LÝ ẢNH */}
         <div style={{ flex: '0 0 250px', display: 'flex', flexDirection: 'column' }}>
           <h3 style={{ fontSize: '12px', fontWeight: 500, color: 'var(--color-text)', marginBottom: '12px', lineHeight: 1.5 }}>
-            Xử lý ảnh khi đổi sang <span style={{ background: 'var(--color-surface-alt)', padding: '2px 6px', borderRadius: '4px', fontWeight: 'bold', color: 'var(--color-text-bright)' }}>{width} × {height}</span>:
+            {t('resizeModal.processStrategy') || 'Xử lý ảnh khi đổi sang'} <span style={{ background: 'var(--color-surface-alt)', padding: '2px 6px', borderRadius: '4px', fontWeight: 'bold', color: 'var(--color-text-bright)' }}>{width} × {height}</span>:
           </h3>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1 }}>

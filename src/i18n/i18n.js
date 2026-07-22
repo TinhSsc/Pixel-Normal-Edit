@@ -73,7 +73,6 @@ export function updateDOM() {
       key.startsWith('transform.')
     ) {
       el.setAttribute('data-tooltip', value);
-      return;
     }
 
     // All other elements: update text nodes only (preserves child icons)

@@ -59,6 +59,5 @@ export const ICONS = {
   LAYOUT_GRID: 'layout-grid',
   FILE_ARCHIVE: 'file-archive',
   EYE: 'eye',
-  EYE_OFF: 'eye-off',
-  CHROME: 'chrome',
+  EYE_OFF: 'eye-off'
 };

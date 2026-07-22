@@ -3,6 +3,7 @@ import GoogleButton from '../../../shared/ui/GoogleButton.jsx';
 import { registerWithEmail, loginWithGoogle } from '../logic/firebase/auth-api.js';
 import { setCurrentUser } from '../logic/auth-state.js';
 import { setDriveToken } from '../../storage/cloud/drive-api.js';
+import { t } from '../../../i18n/i18n.js';
 import './AuthPages.css';
 
 export default function RegisterPage({ onLoggedIn, onNavigate }) {
@@ -47,20 +48,20 @@ export default function RegisterPage({ onLoggedIn, onNavigate }) {
   return (
     <div className="auth-page">
       <form className="auth-card" onSubmit={handleSubmit}>
-        <h2 data-i18n="auth.registerTitle">Đăng ký</h2>
+        <h2>{t('auth.registerTitle') || "Đăng ký"}</h2>
 
         <div className="auth-field">
-          <label data-i18n="auth.name">Họ tên</label>
+          <label>{t('auth.fullNameLabel') || "Họ tên"}</label>
           <input type="text" value={name} onChange={(e) => setName(e.target.value)} required />
         </div>
 
         <div className="auth-field">
-          <label data-i18n="auth.email">Email</label>
+          <label>{t('auth.emailLabel') || "Email"}</label>
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         </div>
 
         <div className="auth-field">
-          <label data-i18n="auth.password">Mật khẩu</label>
+          <label>{t('auth.passwordLabel') || "Mật khẩu"}</label>
           <input
             type="password"
             value={password}
@@ -73,15 +74,15 @@ export default function RegisterPage({ onLoggedIn, onNavigate }) {
         {error && <p className="auth-error">{error}</p>}
 
         <button type="submit" className="btn btn-primary" style={{ justifyContent: 'center' }}>
-          <span data-i18n="auth.registerBtn">Đăng ký</span>
+          <span>{t('auth.registerBtn') || "Đăng ký"}</span>
         </button>
 
-        <div className="auth-divider" data-i18n="auth.or">hoặc</div>
+        <div className="auth-divider">{t('auth.or') || "hoặc"}</div>
 
         <GoogleButton onCredential={handleGoogle} />
 
         <div className="auth-links">
-          <a onClick={() => onNavigate('login')} data-i18n="auth.alreadyHaveAccount">Đã có tài khoản? Đăng nhập</a>
+          <a onClick={() => onNavigate('login')}>{t('auth.alreadyHaveAccount') || "Đã có tài khoản? Đăng nhập"}</a>
         </div>
       </form>
     </div>

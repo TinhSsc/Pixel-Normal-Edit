@@ -164,11 +164,11 @@ export default function EditPanel() {
 
       <div className="panel-section" style={{ marginTop: 'auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', borderBottom: '1px solid #444', paddingBottom: '5px' }}>
-          <h3 style={{ margin: 0, border: 'none', padding: 0 }} data-i18n="label.sourceImage">Ảnh gốc</h3>
+          <h3 style={{ margin: 0, border: 'none', padding: 0 }} data-i18n="label.sourceImage">{t('label.sourceImage') || 'Ảnh gốc'}</h3>
           <div style={{ display: 'flex', gap: '6px' }}>
             <button id="setBgBtn" className="btn" style={{ padding: '4px 8px', fontSize: '11px' }} data-i18n="tooltip.setBg">
               <Icon name={ICONS.IMAGE_PLUS} style={{ width: '14px', height: '14px' }} />
-              <span data-i18n="label.bg">Nền</span>
+              <span data-i18n="label.bg">{t('label.bg') || 'Nền'}</span>
             </button>
             <button id="replaceBgBtn" className="btn" style={{ padding: '4px 8px', fontSize: '11px', display: 'none' }} data-i18n="tooltip.replaceBg">
               <Icon name={ICONS.IMAGE} style={{ width: '14px', height: '14px' }} />

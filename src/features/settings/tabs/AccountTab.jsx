@@ -85,7 +85,7 @@ export default function AccountTab() {
   return (
     <div className="tab-content active" id="tab-account">
       <div style={{ background: 'var(--color-surface)', padding: '20px', borderRadius: '12px', border: '1px solid var(--color-border)', marginBottom: '16px' }}>
-        <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }} data-i18n="settings.accountTitle">Tài khoản Pixel Normal Edit</div>
+        <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }}>{t('settings.accountTitle') || 'Tài khoản Pixel Normal Edit'}</div>
         <div className="setting-group" style={{ marginBottom: '0' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--color-surface-alt)', borderRadius: '8px', flexWrap: 'wrap', gap: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }} id="pixelAccountInfo">
@@ -113,7 +113,7 @@ export default function AccountTab() {
       </div>
 
       <div style={{ background: 'var(--color-surface)', padding: '20px', borderRadius: '12px', border: '1px solid var(--color-border)' }}>
-        <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }} data-i18n="group.backupSync">Lưu trữ & Đồng bộ</div>
+        <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }}>{t('group.backupSync') || 'Lưu trữ & Đồng bộ'}</div>
         <div className="setting-group" style={{ marginBottom: '0' }}>
           <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', color: 'var(--text-primary)' }} data-i18n="drive.sectionTitle">{t('drive.sectionTitle')}</h4>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--color-surface-alt)', borderRadius: '8px', flexWrap: 'wrap', gap: '12px' }}>
@@ -127,23 +127,23 @@ export default function AccountTab() {
               </span>
             </div>
             {!isDriveConnected ? (
-              <button id="driveLoginBtn" className="btn btn-primary" style={{ padding: '6px 12px', fontSize: '13px' }} onClick={loginToDrive} data-i18n="drive.login">Đăng nhập Drive</button>
+              <button id="driveLoginBtn" className="btn btn-primary" style={{ padding: '6px 12px', fontSize: '13px' }} onClick={loginToDrive}>{t('drive.login') || 'Đăng nhập Drive'}</button>
             ) : (
-              <button id="driveLogoutBtn" className="btn" style={{ padding: '6px 12px', fontSize: '13px' }} onClick={logoutDrive} data-i18n="drive.logout">Đăng xuất</button>
+              <button id="driveLogoutBtn" className="btn" style={{ padding: '6px 12px', fontSize: '13px' }} onClick={logoutDrive}>{t('drive.logout') || 'Đăng xuất'}</button>
             )}
           </div>
         </div>
 
         <div className="setting-group" style={{ marginBottom: '0', marginTop: '16px' }}>
-          <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', color: 'var(--text-primary)' }} data-i18n="settings.localDirectory">Thư mục cục bộ</h4>
-          <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '12px' }} data-i18n="settings.localDirectoryDesc">
-            Cấp quyền để ứng dụng lưu file trực tiếp vào máy mà không cần hộp thoại tải xuống.
+          <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', color: 'var(--text-primary)' }}>{t('settings.localDirectory') || 'Thư mục cục bộ'}</h4>
+          <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '12px' }}>
+            {t('settings.localDirectoryDesc') || 'Cấp quyền để ứng dụng lưu file trực tiếp vào máy mà không cần hộp thoại tải xuống.'}
           </p>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--color-surface-alt)', borderRadius: '8px', flexWrap: 'wrap', gap: '8px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden' }}>
               <Icon name={ICONS.FOLDER} style={{ color: 'var(--text-muted)' }} />
               <span style={{ fontSize: '13px', color: localDirName ? 'var(--success)' : 'var(--text-muted)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', maxWidth: '200px' }}>
-                {localDirName ? localDirName : <span data-i18n="settings.noDirectorySelected">Chưa chọn thư mục nào</span>}
+                {localDirName ? localDirName : <span>{t('settings.noDirectorySelected') || 'Chưa chọn thư mục nào'}</span>}
               </span>
             </div>
             <div style={{ display: 'flex', gap: '8px' }}>
@@ -168,9 +168,9 @@ export default function AccountTab() {
         </div>
 
         <div className="setting-group" style={{ marginBottom: '0', marginTop: '16px' }}>
-          <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', color: 'var(--text-primary)' }} data-i18n="settings.autoSaveDest">Nơi lưu tự động (Auto Save)</h4>
-          <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '12px' }} data-i18n="settings.autoSaveDestDesc">
-            Hệ thống sẽ tự động đồng bộ file của bạn theo chu kỳ 5 giây mỗi khi có thay đổi.
+          <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', color: 'var(--text-primary)' }}>{t('settings.autoSaveDest') || 'Nơi lưu tự động (Auto Save)'}</h4>
+          <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '12px' }}>
+            {t('settings.autoSaveDestDesc') || 'Hệ thống sẽ tự động đồng bộ file của bạn theo chu kỳ 5 giây mỗi khi có thay đổi.'}
           </p>
           <select
             value={autoSaveDest}
@@ -199,19 +199,17 @@ export default function AccountTab() {
       </div>
 
       <div style={{ background: 'var(--color-surface)', padding: '20px', borderRadius: '12px', border: '1px solid var(--color-border)', marginTop: '16px' }}>
-        <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--color-danger)' }} data-i18n="troubleshoot.title">Khắc phục sự cố</div>
+        <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--color-danger)' }}>{t('troubleshoot.title') || 'Khắc phục sự cố'}</div>
         <div className="setting-group" style={{ marginBottom: '0' }}>
-          <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '12px', lineHeight: '1.5' }} data-i18n="troubleshoot.desc">
-            Nếu ứng dụng bị lỗi hoặc kẹt, bạn có thể xóa toàn bộ dữ liệu cục bộ để khôi phục lại trạng thái ban đầu.
+          <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '12px', lineHeight: '1.5' }}>
+            {t('troubleshoot.desc') || 'Nếu ứng dụng bị lỗi hoặc kẹt, bạn có thể xóa toàn bộ dữ liệu cục bộ để khôi phục lại trạng thái ban đầu.'}
           </p>
           <button className="btn" style={{ padding: '8px 16px', fontSize: '13px', background: 'rgba(239, 68, 68, 0.1)', color: 'var(--color-danger)', border: '1px solid var(--color-danger)' }} onClick={() => {
             if (window.confirm(t('confirm.resetAllData'))) {
               localStorage.clear();
               window.location.reload();
             }
-          }} data-i18n="troubleshoot.reset">
-            Khôi phục dữ liệu gốc (Reset)
-          </button>
+          }}>{t('troubleshoot.reset') || 'Khôi phục dữ liệu gốc (Reset)'}</button>
         </div>
       </div>
     </div>

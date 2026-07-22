@@ -52,7 +52,11 @@ function App() {
 
   const isInit = useRef(false);
 
-  const [isDesktop, setIsDesktop] = useState(window.innerWidth > 768);
+  const checkIsDesktop = () => {
+    return window.innerWidth > 768 || window.matchMedia('(max-height: 500px) and (orientation: landscape)').matches;
+  };
+
+  const [isDesktop, setIsDesktop] = useState(checkIsDesktop());
 
   const AUTH_ROUTES = ['login', 'register', 'forgot-password'];
   const getRoute = () => window.location.hash.replace('#', '');
@@ -120,7 +124,7 @@ function App() {
 
   useEffect(() => {
 
-    const handleResize = () => setIsDesktop(window.innerWidth > 768);
+    const handleResize = () => setIsDesktop(checkIsDesktop());
 
     window.addEventListener('resize', handleResize);
 
@@ -338,7 +342,7 @@ function App() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h1 style={{ margin: 0, fontSize: '24px', color: 'var(--text-primary)' }} data-i18n="app.title">Pixel Normal Edit</h1>
+              <h1 style={{ margin: 0, fontSize: '24px', color: 'var(--text-primary)' }}>{t('app.title') || "Pixel Normal Edit"}</h1>
               <button 
                 className="btn" 
                 style={{ padding: '4px', display: 'flex', alignItems: 'center' }} 
@@ -349,40 +353,40 @@ function App() {
               </button>
             </div>
 
-            <span style={{ fontSize: '13px', color: 'var(--text-muted)', display: 'none' }} data-i18n="app.desc">Pixel Normal Edit</span>
+            <span style={{ fontSize: '13px', color: 'var(--text-muted)', display: 'none' }}>{t('app.desc') || "Pixel Normal Edit"}</span>
 
           </div>
 
           <div className="header-actions">
 
 
-            <button id="toggleToolsBtn" className="btn btn-primary mobile-only" data-i18n="tooltip.toggleTools">
+            <button id="toggleToolsBtn" className="btn btn-primary mobile-only" title={t('tooltip.toggleTools') || "Toggle Tools"}>
 
               <Icon name={ICONS.MENU} style={{ width: '18px', height: '18px' }} />
 
-              <span data-i18n="text.showTools">Mở công cụ</span>
+              <span>{t('text.showTools') || "Mở công cụ"}</span>
 
             </button>
 
-            <button id="openUploadModalBtn" className="btn" data-i18n="tooltip.uploadFull">
+            <button id="openUploadModalBtn" className="btn" title={t('tooltip.uploadFull') || "Upload"}>
 
               <Icon name={ICONS.UPLOAD} style={{ width: '18px', height: '18px' }} />
 
-              <span data-i18n="btn.upload">Tải lên</span>
+              <span>{t('btn.upload') || "Tải lên"}</span>
 
             </button>
 
 
-            <button id="openDownloadModalBtn" className="btn btn-primary" style={{ background: 'var(--success)' }} data-i18n="btn.saveAs" onClick={() => { document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none'); document.getElementById('downloadModal').style.display = 'flex'; }}>
+            <button id="openDownloadModalBtn" className="btn btn-primary" style={{ background: 'var(--success)' }} title={t('btn.saveAs') || "Lưu dưới dạng..."} onClick={() => { document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none'); document.getElementById('downloadModal').style.display = 'flex'; }}>
               <Icon name={ICONS.DOWNLOAD} style={{ width: '18px', height: '18px' }} />
-              <span data-i18n="btn.saveAs">Lưu dưới dạng...</span>
+              <span>{t('btn.saveAs') || "Lưu dưới dạng..."}</span>
             </button>
             
             <div id="saveStatusIndicator" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: 'var(--text-muted)', marginLeft: '8px', opacity: 0.7 }}>
               {/* Status will be updated via JS */}
             </div>
 
-            <button className="btn desktop-only undo-btn-action" data-i18n="tooltip.undo"><Icon name={ICONS.UNDO} style={{ width: '18px', height: '18px' }} /></button>
+            <button className="btn desktop-only undo-btn-action" title={t('tooltip.undo') || "Undo"}><Icon name={ICONS.UNDO} style={{ width: '18px', height: '18px' }} /></button>
 
             <button className="btn desktop-only redo-btn-action" data-i18n="tooltip.redo"><Icon name={ICONS.REDO} style={{ width: '18px', height: '18px' }} /></button>
 

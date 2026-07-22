@@ -229,7 +229,7 @@ export default function GlobalSettingsModal() {
     <div id="globalSettingsModal" className="modal-overlay" style={{ display: 'none', zIndex: 99999 }}>
       <div className="modal-content" style={{ maxWidth: '800px', width: '90%', height: '80vh', display: 'flex', flexDirection: 'column' }}>
         <div className="modal-header">
-          <h3 style={{ margin: 0, fontSize: '18px' }} data-i18n="modal.settingsTitle">Cài đặt chung</h3>
+          <h3 style={{ margin: 0, fontSize: '18px' }}>{t('modal.settingsTitle') || 'Cài đặt chung'}</h3>
           <button className="btn" style={{ padding: '4px' }} onClick={() => document.getElementById('globalSettingsModal').style.display = 'none'}>
             <Icon name={ICONS.X} />
           </button>
@@ -239,32 +239,32 @@ export default function GlobalSettingsModal() {
           <button className={`tab-btn ${activeTab === 'tab-account' ? 'active' : ''}`} data-tab="tab-account" onClick={() => setActiveTab('tab-account')}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
               <Icon name={ICONS.USER} style={{ width: '18px', height: '18px' }} />
-              <span data-i18n="modal.tabAccount">Tài khoản</span>
+              <span>{t('modal.tabAccount') || 'Tài khoản'}</span>
             </div>
           </button>
           <button className={`tab-btn ${activeTab === 'tab-appearance' ? 'active' : ''}`} data-tab="tab-appearance" onClick={() => setActiveTab('tab-appearance')}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
               <Icon name={ICONS.PALETTE} style={{ width: '18px', height: '18px' }} />
-              <span data-i18n="modal.tabAppearance">Giao diện</span>
+              <span>{t('modal.tabAppearance') || 'Giao diện'}</span>
             </div>
           </button>
           <button className={`tab-btn ${activeTab === 'tab-draw-tools' ? 'active' : ''}`} data-tab="tab-draw-tools" onClick={() => setActiveTab('tab-draw-tools')}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
               <Icon name={ICONS.PEN_TOOL} style={{ width: '18px', height: '18px' }} />
-              <span data-i18n="modal.tabDrawTools">Công cụ vẽ</span>
+              <span>{t('modal.tabDrawTools') || 'Công cụ vẽ'}</span>
             </div>
           </button>
           <button className={`tab-btn ${activeTab === 'tab-edit-tools' ? 'active' : ''}`} data-tab="tab-edit-tools" onClick={() => setActiveTab('tab-edit-tools')}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
               <Icon name={ICONS.SETTINGS_2} style={{ width: '18px', height: '18px' }} />
-              <span data-i18n="modal.tabEditTools">Thao tác</span>
+              <span>{t('modal.tabEditTools') || 'Thao tác'}</span>
             </div>
           </button>
         </div>
         <div className="custom-scrollbar" style={{ flex: 1, overflowY: 'auto', padding: '4px', paddingRight: '8px' }}>
           <div className={`tab-content ${activeTab === 'tab-appearance' ? 'active' : ''}`} id="tab-appearance" style={{ display: activeTab === 'tab-appearance' ? 'block' : 'none' }}>
             <div style={{ background: 'var(--color-surface)', padding: '20px', borderRadius: '12px', border: '1px solid var(--color-border)', marginBottom: '12px' }}>
-              <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }} data-i18n="settings.language">Ngôn ngữ (Language)</div>
+              <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }}>{t('settings.language') || 'Ngôn ngữ (Language)'}</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <CustomDropdown
                   id="languageSelect"
@@ -282,7 +282,7 @@ export default function GlobalSettingsModal() {
             </div>
 
             <div style={{ background: 'var(--color-surface)', padding: '20px', borderRadius: '12px', border: '1px solid var(--color-border)' }}>
-              <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }} data-i18n="theme.title">Giao diện (Theme)</div>
+              <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }}>{t('theme.title') || 'Giao diện (Theme)'}</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <CustomDropdown
                   id="themeSelect"
@@ -296,15 +296,15 @@ export default function GlobalSettingsModal() {
 
                 <div id="customThemeSettings" style={{ display: 'none', padding: '16px', background: 'var(--color-surface-alt)', borderRadius: '8px', border: '1px dashed var(--color-border)', marginTop: '8px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                    <label style={{ fontSize: '13px', color: 'var(--text-muted)', cursor: 'pointer' }} htmlFor="customBgColor" data-i18n="theme.bg">Nền (Bg)</label>
+                    <label style={{ fontSize: '13px', color: 'var(--text-muted)', cursor: 'pointer' }} htmlFor="customBgColor">{t('theme.bg') || 'Nền (Bg)'}</label>
                     <input type="color" id="customBgColor" defaultValue="#191920" style={{ width: '32px', height: '32px', padding: 0, border: 'none', borderRadius: '6px', cursor: 'pointer', background: 'transparent' }} />
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                    <label style={{ fontSize: '13px', color: 'var(--text-muted)', cursor: 'pointer' }} htmlFor="customPrimaryColor" data-i18n="theme.primary">Nhấn (Primary)</label>
+                    <label style={{ fontSize: '13px', color: 'var(--text-muted)', cursor: 'pointer' }} htmlFor="customPrimaryColor">{t('theme.primary') || 'Nhấn (Primary)'}</label>
                     <input type="color" id="customPrimaryColor" defaultValue="#5b5bf0" style={{ width: '32px', height: '32px', padding: 0, border: 'none', borderRadius: '6px', cursor: 'pointer', background: 'transparent' }} />
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <label style={{ fontSize: '13px', color: 'var(--text-muted)', cursor: 'pointer' }} htmlFor="customGridLineColor" data-i18n="theme.gridLine">Lưới (Grid)</label>
+                    <label style={{ fontSize: '13px', color: 'var(--text-muted)', cursor: 'pointer' }} htmlFor="customGridLineColor">{t('theme.gridLine') || 'Lưới (Grid)'}</label>
                     <input type="color" id="customGridLineColor" defaultValue="#ffffff" style={{ width: '32px', height: '32px', padding: 0, border: 'none', borderRadius: '6px', cursor: 'pointer', background: 'transparent' }} />
                   </div>
                 </div>
@@ -312,7 +312,7 @@ export default function GlobalSettingsModal() {
             </div>
 
             <div style={{ background: 'var(--color-surface)', padding: '20px', borderRadius: '12px', border: '1px solid var(--color-border)', marginTop: '12px' }}>
-              <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }} data-i18n="settings.penShapeTitle">Hình dạng bút vẽ</div>
+              <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }}>{t('settings.penShapeTitle') || 'Hình dạng bút vẽ'}</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <CustomDropdown
                   id="globalPenShape"
@@ -326,15 +326,15 @@ export default function GlobalSettingsModal() {
             </div>
 
             <div style={{ background: 'var(--color-surface)', padding: '20px', borderRadius: '12px', border: '1px solid var(--color-border)', marginTop: '12px' }}>
-              <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }} data-i18n="settings.display">Hiển thị</div>
+              <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }}>{t('settings.display') || 'Hiển thị'}</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: 'var(--text-primary)', cursor: 'pointer' }}>
                   <input type="checkbox" id="showBtnNamesToggle" className="check" />
-                  <span data-i18n="settings.showBtnNames">Hiển thị tên công cụ dưới biểu tượng</span>
+                  <span>{t('settings.showBtnNames') || 'Hiển thị tên công cụ dưới biểu tượng'}</span>
                 </label>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: 'var(--text-primary)', cursor: 'pointer' }}>
                   <input type="checkbox" id="animationsToggle" defaultChecked className="check" />
-                  <span data-i18n="settings.animations">Bật hiệu ứng chuyển động (Animations)</span>
+                  <span>{t('settings.animations') || 'Bật hiệu ứng chuyển động (Animations)'}</span>
                 </label>
               </div>
             </div>
@@ -342,7 +342,7 @@ export default function GlobalSettingsModal() {
 
           <div className={`tab-content ${activeTab === 'tab-account' ? 'active' : ''}`} id="tab-account" style={{ display: activeTab === 'tab-account' ? 'block' : 'none' }}>
             <div style={{ background: 'var(--color-surface)', padding: '20px', borderRadius: '12px', border: '1px solid var(--color-border)', marginBottom: '16px' }}>
-              <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }} data-i18n="settings.accountTitle">Tài khoản Pixel Normal Edit</div>
+              <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }}>{t('settings.accountTitle') || 'Tài khoản Pixel Normal Edit'}</div>
               <div className="setting-group" style={{ marginBottom: '0' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--color-surface-alt)', borderRadius: '8px', flexWrap: 'wrap', gap: '12px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }} id="pixelAccountInfo">
@@ -370,32 +370,35 @@ export default function GlobalSettingsModal() {
             </div>
 
             <div style={{ background: 'var(--color-surface)', padding: '20px', borderRadius: '12px', border: '1px solid var(--color-border)' }}>
-              <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }} data-i18n="group.backupSync">Lưu trữ & Đồng bộ</div>
+              <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }}>{t('group.backupSync') || 'Lưu trữ & Đồng bộ'}</div>
               <div className="setting-group" style={{ marginBottom: '0' }}>
                 <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', color: 'var(--text-primary)' }} data-i18n="drive.sectionTitle">{t('drive.sectionTitle')}</h4>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--color-surface-alt)', borderRadius: '8px', flexWrap: 'wrap', gap: '12px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <Icon name={ICONS.CLOUD} style={{ color: 'var(--text-muted)' }} />
-                    <span id="driveStatusText" style={{ fontSize: '13px', color: 'var(--text-muted)' }} data-i18n="status.driveDisconnected">Chưa kết nối</span>
+                    <span id="driveStatusText" style={{ fontSize: '13px', color: 'var(--text-muted)' }} data-i18n="status.driveDisconnected">{t('status.driveDisconnected') || 'Chưa kết nối'}</span>
                   </div>
-                  <button id="driveLoginBtn" className="btn btn-primary" style={{ padding: '6px 12px', fontSize: '13px' }} data-i18n="drive.login" onClick={async () => {
+                  <button id="driveLoginBtn" className="btn btn-primary" style={{ padding: '6px 12px', fontSize: '13px' }} onClick={async () => {
                     const { loginToDrive } = await import('../storage/cloud/drive-api.js');
                     await loginToDrive();
-                  }}>Đăng nhập Drive</button>
-                  <button id="driveLogoutBtn" className="btn" style={{ padding: '6px 12px', fontSize: '13px', display: 'none' }} data-i18n="drive.logout">Đăng xuất</button>
+                  }}>{t('drive.login') || 'Đăng nhập Drive'}</button>
+                  <button id="driveLogoutBtn" className="btn" style={{ padding: '6px 12px', fontSize: '13px' }} onClick={async () => {
+                    const { logoutDrive } = await import('../storage/cloud/drive-api.js');
+                    await logoutDrive();
+                  }}>{t('drive.logout') || 'Đăng xuất'}</button>
                 </div>
               </div>
 
               <div className="setting-group" style={{ marginBottom: '0', marginTop: '16px' }}>
-                <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', color: 'var(--text-primary)' }} data-i18n="settings.localDirectory">Thư mục cục bộ</h4>
-                <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '12px' }} data-i18n="settings.localDirectoryDesc">
-                  Cấp quyền để ứng dụng lưu file trực tiếp vào máy mà không cần hộp thoại tải xuống.
+                <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', color: 'var(--text-primary)' }}>{t('settings.localDirectory') || 'Thư mục cục bộ'}</h4>
+                <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '12px' }}>
+                  {t('settings.localDirectoryDesc') || 'Cấp quyền để ứng dụng lưu file trực tiếp vào máy mà không cần hộp thoại tải xuống.'}
                 </p>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--color-surface-alt)', borderRadius: '8px', flexWrap: 'wrap', gap: '8px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden' }}>
                     <Icon name={ICONS.FOLDER} style={{ color: 'var(--text-muted)' }} />
                     <span style={{ fontSize: '13px', color: localDirName ? 'var(--success)' : 'var(--text-muted)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', maxWidth: '200px' }}>
-                      {localDirName ? localDirName : <span data-i18n="settings.noDirectorySelected">Chưa chọn thư mục nào</span>}
+                      {localDirName ? localDirName : <span>{t('settings.noDirectorySelected') || 'Chưa chọn thư mục nào'}</span>}
                     </span>
                   </div>
                   <div style={{ display: 'flex', gap: '8px' }}>
@@ -420,9 +423,9 @@ export default function GlobalSettingsModal() {
               </div>
 
               <div className="setting-group" style={{ marginBottom: '0', marginTop: '16px' }}>
-                <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', color: 'var(--text-primary)' }} data-i18n="settings.autoSaveDest">Nơi lưu tự động (Auto Save)</h4>
-                <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '12px' }} data-i18n="settings.autoSaveDestDesc">
-                  Hệ thống sẽ tự động đồng bộ file của bạn theo chu kỳ 5 giây mỗi khi có thay đổi.
+                <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', color: 'var(--text-primary)' }}>{t('settings.autoSaveDest') || 'Nơi lưu tự động (Auto Save)'}</h4>
+                <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '12px' }}>
+                  {t('settings.autoSaveDestDesc') || 'Hệ thống sẽ tự động đồng bộ file của bạn theo chu kỳ 5 giây mỗi khi có thay đổi.'}
                 </p>
                 <CustomDropdown
                   value={autoSaveDest}
@@ -441,19 +444,17 @@ export default function GlobalSettingsModal() {
               </div>
             </div>
             <div style={{ background: 'var(--color-surface)', padding: '20px', borderRadius: '12px', border: '1px solid var(--color-border)', marginTop: '16px' }}>
-              <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--color-danger)' }} data-i18n="troubleshoot.title">Khắc phục sự cố</div>
+              <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--color-danger)' }}>{t('troubleshoot.title') || 'Khắc phục sự cố'}</div>
               <div className="setting-group" style={{ marginBottom: '0' }}>
-                <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '12px', lineHeight: '1.5' }} data-i18n="troubleshoot.desc">
-                  Nếu ứng dụng bị lỗi hoặc kẹt, bạn có thể xóa toàn bộ dữ liệu cục bộ để khôi phục lại trạng thái ban đầu.
+                <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '12px', lineHeight: '1.5' }}>
+                  {t('troubleshoot.desc') || 'Nếu ứng dụng bị lỗi hoặc kẹt, bạn có thể xóa toàn bộ dữ liệu cục bộ để khôi phục lại trạng thái ban đầu.'}
                 </p>
                 <button className="btn" style={{ padding: '8px 16px', fontSize: '13px', background: 'rgba(239, 68, 68, 0.1)', color: 'var(--color-danger)', border: '1px solid var(--color-danger)' }} onClick={() => {
                   if (window.confirm(t('confirm.resetAllData'))) {
                     localStorage.clear();
                     window.location.reload();
                   }
-                }} data-i18n="troubleshoot.reset">
-                  Khôi phục dữ liệu gốc (Reset)
-                </button>
+                }}>{t('troubleshoot.reset') || 'Khôi phục dữ liệu gốc (Reset)'}</button>
               </div>
             </div>
           </div>

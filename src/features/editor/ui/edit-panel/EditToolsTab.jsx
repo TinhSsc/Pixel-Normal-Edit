@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { editConfig } from './edit-manager.js';
 import { navigationConfig } from './navigation-manager.js';
-import { updateDOM } from "../../../../i18n/i18n.js";
+import { updateDOM, t } from "../../../../i18n/i18n.js";
 import { Icon, ICONS } from '../../../../shared/ui/icons';
 
 export default function EditToolsTab() {
@@ -42,9 +42,8 @@ export default function EditToolsTab() {
             className={`nested-tab-btn ${idx === 0 ? 'active' : ''}`} 
             data-subtab={`subtab-edit-${group.id}`}
             data-tools={group.tools.join(' ')}
-            data-i18n={group.titleKey}
           >
-            {group.defaultTitle}
+            {t(group.titleKey) || group.defaultTitle}
           </button>
         ))}
       </div>
@@ -66,7 +65,7 @@ export default function EditToolsTab() {
                       <Icon name={tool.icon} style={{ width: '20px', height: '20px', color: 'var(--color-text)' }} />
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
-                      <span style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-text)' }} data-i18n={tool.tooltipKey}>{toolId}</span>
+                      <span style={{ fontSize: '15px', fontWeight: 600, color: 'var(--color-text)' }}>{t(tool.tooltipKey) || toolId}</span>
                     </div>
                   </div>
                   <label className="ui-bookmark" title={isHidden ? "Hiện công cụ này" : "Ẩn công cụ này"}>

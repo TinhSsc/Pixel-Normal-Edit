@@ -1,3 +1,5 @@
+import { t } from '../../../i18n/i18n.js';
+
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const API_KEY = import.meta.env.VITE_GOOGLE_API_KEY;
 const SCOPES = 'https://www.googleapis.com/auth/drive.file';
@@ -14,7 +16,7 @@ export function initGoogleDrive() {
   }
   
   if (!CLIENT_ID) {
-    console.error('Missing VITE_GOOGLE_CLIENT_ID in .env');
+    console.error(t('drive.errMissingClientId') || 'Missing VITE_GOOGLE_CLIENT_ID in .env');
     return;
   }
 
@@ -38,7 +40,7 @@ export function loginToDrive() {
   if (tokenClient) {
     tokenClient.requestAccessToken({ prompt: '' }); // Or 'consent' if we want to force re-auth
   } else {
-    alert("Google Identity Services failed to initialize.");
+    alert(t('drive.errInit') || "Google Identity Services failed to initialize.");
   }
 }
 
@@ -95,7 +97,7 @@ async function getOrCreateAppFolder() {
   
   if (searchRes.status === 401) {
     setDriveToken(null);
-    throw new Error('Phiên đăng nhập Google Drive đã hết hạn. Vui lòng kết nối lại.');
+    throw new Error(t('drive.errSessionExpired') || 'Phiên đăng nhập Google Drive đã hết hạn. Vui lòng kết nối lại.');
   }
   
   const searchData = await searchRes.json();
@@ -125,7 +127,7 @@ async function getOrCreateAppFolder() {
 }
 
 export async function uploadToDrive(fileName, fileBlob, fileId = null) {
-  if (!accessToken) throw new Error("Not logged in to Google Drive");
+  if (!accessToken) throw new Error(t('drive.errNotLoggedIn') || "Not logged in to Google Drive");
 
   let mimeType = 'image/png';
   if (fileName.toLowerCase().endsWith('.jpg') || fileName.toLowerCase().endsWith('.jpeg')) mimeType = 'image/jpeg';
@@ -162,12 +164,12 @@ export async function uploadToDrive(fileName, fileBlob, fileId = null) {
 
   if (res.status === 401) {
     setDriveToken(null);
-    throw new Error('Phiên đăng nhập Google Drive đã hết hạn. Vui lòng kết nối lại.');
+    throw new Error(t('drive.errSessionExpired') || 'Phiên đăng nhập Google Drive đã hết hạn. Vui lòng kết nối lại.');
   }
 
   if (!res.ok) {
     const err = await res.json();
-    throw new Error(err.error?.message || "Lỗi khi upload file lên Drive");
+    throw new Error(err.error?.message || t('drive.errUpload') || "Lỗi khi upload file lên Drive");
   }
 
   const data = await res.json();
@@ -175,7 +177,7 @@ export async function uploadToDrive(fileName, fileBlob, fileId = null) {
 }
 
 export async function listDriveFiles() {
-  if (!accessToken) throw new Error("Not logged in to Google Drive");
+  if (!accessToken) throw new Error(t('drive.errNotLoggedIn') || "Not logged in to Google Drive");
 
   const query = encodeURIComponent("(mimeType='image/png' or mimeType='image/jpeg' or mimeType='image/webp' or mimeType='application/json') and trashed=false");
   const res = await fetch(`https://www.googleapis.com/drive/v3/files?q=${query}&fields=files(id,name,modifiedTime,thumbnailLink)`, {
@@ -187,12 +189,12 @@ export async function listDriveFiles() {
 
   if (res.status === 401) {
     setDriveToken(null);
-    throw new Error('Phiên đăng nhập Google Drive đã hết hạn. Vui lòng kết nối lại.');
+    throw new Error(t('drive.errSessionExpired') || 'Phiên đăng nhập Google Drive đã hết hạn. Vui lòng kết nối lại.');
   }
 
   if (!res.ok) {
     const err = await res.json();
-    throw new Error(err.error?.message || "Lỗi khi lấy danh sách file từ Drive");
+    throw new Error(err.error?.message || t('drive.errListFiles') || "Lỗi khi lấy danh sách file từ Drive");
   }
 
   const data = await res.json();
@@ -200,7 +202,7 @@ export async function listDriveFiles() {
 }
 
 export async function downloadFromDrive(fileId) {
-  if (!accessToken) throw new Error("Not logged in to Google Drive");
+  if (!accessToken) throw new Error(t('drive.errNotLoggedIn') || "Not logged in to Google Drive");
 
   const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
     method: 'GET',
@@ -211,12 +213,12 @@ export async function downloadFromDrive(fileId) {
 
   if (res.status === 401) {
     setDriveToken(null);
-    throw new Error('Phiên đăng nhập Google Drive đã hết hạn. Vui lòng kết nối lại.');
+    throw new Error(t('drive.errSessionExpired') || 'Phiên đăng nhập Google Drive đã hết hạn. Vui lòng kết nối lại.');
   }
 
   if (!res.ok) {
     const err = await res.json();
-    throw new Error(err.error?.message || "Lỗi khi tải file từ Drive");
+    throw new Error(err.error?.message || t('drive.errDownload') || "Lỗi khi tải file từ Drive");
   }
 
   const json = await res.text();
@@ -224,7 +226,7 @@ export async function downloadFromDrive(fileId) {
 }
 
 export async function downloadImageFromDrive(fileId) {
-  if (!accessToken) throw new Error("Not logged in to Google Drive");
+  if (!accessToken) throw new Error(t('drive.errNotLoggedIn') || "Not logged in to Google Drive");
 
   const res = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
     method: 'GET',
@@ -235,12 +237,12 @@ export async function downloadImageFromDrive(fileId) {
 
   if (res.status === 401) {
     setDriveToken(null);
-    throw new Error('Phiên đăng nhập Google Drive đã hết hạn. Vui lòng kết nối lại.');
+    throw new Error(t('drive.errSessionExpired') || 'Phiên đăng nhập Google Drive đã hết hạn. Vui lòng kết nối lại.');
   }
 
   if (!res.ok) {
     const err = await res.json();
-    throw new Error(err.error?.message || "Lỗi khi tải ảnh từ Drive");
+    throw new Error(err.error?.message || t('drive.errDownloadImage') || "Lỗi khi tải ảnh từ Drive");
   }
 
   const blob = await res.blob();
@@ -249,13 +251,13 @@ export async function downloadImageFromDrive(fileId) {
 
 export function openDrivePicker(onFilePicked, onCancel) {
   if (!accessToken) {
-    throw new Error("Chưa đăng nhập Google Drive");
+    throw new Error(t('drive.errNotLoggedIn') || "Chưa đăng nhập Google Drive");
   }
   if (!API_KEY) {
-    throw new Error("Thiếu cấu hình VITE_GOOGLE_API_KEY trong .env");
+    throw new Error(t('drive.errMissingApiKey') || "Thiếu cấu hình VITE_GOOGLE_API_KEY trong .env");
   }
   if (typeof gapi === 'undefined') {
-    throw new Error("Đang tải thư viện API, vui lòng thử lại sau.");
+    throw new Error(t('drive.errLoadingApi') || "Đang tải thư viện API, vui lòng thử lại sau.");
   }
 
   gapi.load('picker', { callback: createPicker });

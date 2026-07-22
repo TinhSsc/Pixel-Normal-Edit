@@ -1,5 +1,6 @@
 import { Icon, ICONS } from '../../../../shared/ui/icons';
 import React, { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { getPreviewItems, subscribeLayoutChange, updatePreviewTransform } from '../../engine/core/preview-group-manager.js';
 import {
   isAnimationMode as animationModeState,
@@ -66,11 +67,25 @@ function OnionSkinLayer({ frame }) {
   );
 }
 
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== 'undefined' ? window.matchMedia('(max-width: 768px) and (orientation: portrait)').matches : false
+  );
+  useEffect(() => {
+    const mql = window.matchMedia('(max-width: 768px) and (orientation: portrait)');
+    const handler = (e) => setIsMobile(e.matches);
+    mql.addEventListener('change', handler);
+    return () => mql.removeEventListener('change', handler);
+  }, []);
+  return isMobile;
+}
+
 export default function CanvasPanel() {
   const [isToolbarCollapsed, setIsToolbarCollapsed] = useState(false);
   const [isAnimMode, setIsAnimMode] = useState(animationModeState);
   const [framesState, setFramesState] = useState(frames);
   const [previews, setPreviews] = useState(getPreviewItems);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     return subscribeLayoutChange((newItems) => {
@@ -93,7 +108,21 @@ export default function CanvasPanel() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [removingFrameId, setRemovingFrameId] = useState(null);
   const [isNavCollapsed, setIsNavCollapsed] = useState(false);
+  const [portalTarget, setPortalTarget] = useState(null);
   const canvasFadeRef = useRef(null);
+
+  useEffect(() => {
+    // Attempt to find the portal target after initial mount
+    const target = document.getElementById('mobile-animation-strip-portal');
+    if (target) setPortalTarget(target);
+    
+    // In case ToolbarPanel mounts slightly later, listen to the custom event
+    const handleToolbarMounted = () => {
+      setPortalTarget(document.getElementById('mobile-animation-strip-portal'));
+    };
+    window.addEventListener('toolbar-mounted', handleToolbarMounted);
+    return () => window.removeEventListener('toolbar-mounted', handleToolbarMounted);
+  }, []);
 
   useEffect(() => {
     return subscribeAnimationState((newState) => {
@@ -228,9 +257,9 @@ export default function CanvasPanel() {
     <>
       <button className="btn action-btn mobile-only undo-btn-action" data-i18n="tooltip.undo"><Icon name={ICONS.UNDO} /></button>
       <button className="btn action-btn mobile-only redo-btn-action" data-i18n="tooltip.redo"><Icon name={ICONS.REDO} /></button>
-      <button className="tool-btn mobile-only" data-tool="cut" data-i18n="tooltip.cut" title="Cut (Ctrl+X)"><Icon name={ICONS.SCISSORS} /></button>
-      <button className="tool-btn mobile-only" data-tool="copy" data-i18n="tooltip.copy" title="Copy (Ctrl+C)"><Icon name={ICONS.COPY} /></button>
-      <button className="tool-btn mobile-only" data-tool="paste" data-i18n="tooltip.paste" title="Paste (Ctrl+V)"><Icon name={ICONS.CLIPBOARD_PASTE} /></button>
+      <button className="tool-btn mobile-only" data-tool="cut" data-i18n="tooltip.cut" title={t('tooltip.cutDesc') || "Cut (Ctrl+X)"}><Icon name={ICONS.SCISSORS} /></button>
+      <button className="tool-btn mobile-only" data-tool="copy" data-i18n="tooltip.copy" title={t('tooltip.copyDesc') || "Copy (Ctrl+C)"}><Icon name={ICONS.COPY} /></button>
+      <button className="tool-btn mobile-only" data-tool="paste" data-i18n="tooltip.paste" title={t('tooltip.pasteDesc') || "Paste (Ctrl+V)"}><Icon name={ICONS.CLIPBOARD_PASTE} /></button>
       <button className="tool-btn" data-tool="pan" data-i18n="tool.pan"><Icon name={ICONS.HAND} /></button>
       <button className="btn action-btn" id="zoomInBtn" data-i18n="tooltip.zoomIn"><Icon name={ICONS.ZOOM_IN} /></button>
       <button className="btn action-btn" id="zoomOutBtn" data-i18n="tooltip.zoomOut"><Icon name={ICONS.ZOOM_OUT} /></button>
@@ -251,7 +280,7 @@ export default function CanvasPanel() {
             style={{ display: 'none', padding: '4px 12px', fontSize: '11px', fontWeight: 'bold', background: '#e06c75', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.4)', marginLeft: '12px', pointerEvents: 'auto' }}
             data-i18n="btn.stopTask"
           >
-            Dừng
+            {t('btn.stopTask') || 'Dừng'}
           </button>
         </div>
         {/* Attached Tool Bar (Header) */}
@@ -305,7 +334,22 @@ export default function CanvasPanel() {
             <div id={`grid-${p.id}`} style={{ position: 'absolute', top: '-1px', left: '-1px', transformOrigin: '0 0' }}></div>
           </div>
         ))}
-        {isAnimMode && (
+        <div id="gridOverlay" style={{ pointerEvents: 'none', position: 'absolute', top: '-1px', left: '-1px', transformOrigin: '0 0', zIndex: 10 }}>
+          <div id="mirrorLine" style={{ display: 'none', position: 'absolute', left: '50%', top: 0, bottom: 0, background: 'rgba(255, 60, 60, 0.8)', zIndex: 10 }}></div>
+          <div id="selectionOverlay" style={{ display: 'none', position: 'absolute', pointerEvents: 'none', border: '1px dashed white', boxShadow: '0 0 0 1px black', zIndex: 20 }}></div>
+        </div>
+        <div id="brush-cursor"></div>
+        <svg id="ruler-overlay" style={{ display: 'none', position: 'absolute', top: 0, left: 0, overflow: 'visible', pointerEvents: 'none', zIndex: 998 }}>
+          <line id="rulerLine" x1="0" y1="0" x2="0" y2="0" stroke="#ffffff" strokeWidth="1.5" />
+          <line id="rulerTickStart" x1="0" y1="0" x2="0" y2="0" stroke="#ffffff" strokeWidth="1.5" />
+          <line id="rulerTickEnd" x1="0" y1="0" x2="0" y2="0" stroke="#ffffff" strokeWidth="1.5" />
+          <text id="rulerLabel" x="0" y="0" fill="#ffffff" stroke="#000000" strokeWidth="3" paintOrder="stroke" fontSize="12" textAnchor="middle">0</text>
+        </svg>
+      </div>
+
+      {/* Animation Strip or Floating Navigation */}
+      {isAnimMode && (() => {
+        const stripContent = (
           <AnimationStripPanel
             frames={framesState}
             activeFrameIndex={activeIndex}
@@ -320,36 +364,34 @@ export default function CanvasPanel() {
             newFrameId={newFrameId}
             removingFrameId={removingFrameId}
           >
-            {navTools}
+            {/* On desktop, show navTools in the strip. On mobile, it's separated into floating-nav. */}
+            {!isMobile && (
+              <div style={{ display: 'flex', gap: '6px' }}>
+                {navTools}
+              </div>
+            )}
           </AnimationStripPanel>
-        )}
-        <div id="gridOverlay" style={{ pointerEvents: 'none', position: 'absolute', top: '-1px', left: '-1px', transformOrigin: '0 0', zIndex: 10 }}>
-          <div id="mirrorLine" style={{ display: 'none', position: 'absolute', left: '50%', top: 0, bottom: 0, background: 'rgba(255, 60, 60, 0.8)', zIndex: 10 }}></div>
-          <div id="selectionOverlay" style={{ display: 'none', position: 'absolute', pointerEvents: 'none', border: '1px dashed white', boxShadow: '0 0 0 1px black', zIndex: 20 }}></div>
-        </div>
-        <div id="brush-cursor"></div>
-        <svg id="ruler-overlay" style={{ display: 'none', position: 'absolute', top: 0, left: 0, overflow: 'visible', pointerEvents: 'none', zIndex: 998 }}>
-          <line id="rulerLine" x1="0" y1="0" x2="0" y2="0" stroke="#ffffff" strokeWidth="1.5" />
-          <line id="rulerTickStart" x1="0" y1="0" x2="0" y2="0" stroke="#ffffff" strokeWidth="1.5" />
-          <line id="rulerTickEnd" x1="0" y1="0" x2="0" y2="0" stroke="#ffffff" strokeWidth="1.5" />
-          <text id="rulerLabel" x="0" y="0" fill="#ffffff" stroke="#000000" strokeWidth="3" paintOrder="stroke" fontSize="12" textAnchor="middle">0</text>
-        </svg>
-      </div>
+        );
 
-      {/* Floating Navigation */}
-      {!isAnimMode && (
-        <div className={`floating-nav ${isNavCollapsed ? 'collapsed' : ''}`} id="floatingNav">
-          <div className="floating-nav-header">
-            <span data-i18n="group.nav">Điều hướng</span>
-            <button id="toggleNavBtn" onClick={() => setIsNavCollapsed(!isNavCollapsed)} data-i18n="tooltip.toggleNav">
-              <Icon name={ICONS.CHEVRON_DOWN} style={isNavCollapsed ? { transform: 'rotate(90deg)' } : {}} />
-            </button>
-          </div>
-          <div className="floating-nav-content" id="floatingNavContent">
-            {navTools}
-          </div>
+        if (isMobile && portalTarget) {
+          return createPortal(stripContent, portalTarget);
+        }
+
+        return stripContent;
+      })()}
+
+      {/* Floating Navigation ALWAYS renders on mobile, but on desktop only when NOT in anim mode */}
+      <div className={`floating-nav ${isNavCollapsed ? 'collapsed' : ''} ${isAnimMode && !isMobile ? 'desktop-hide' : ''}`} style={{ display: isAnimMode && !isMobile ? 'none' : '' }} id="floatingNav">
+        <div className="floating-nav-header">
+          <span data-i18n="group.nav">{t('group.nav') || 'Điều hướng'}</span>
+          <button id="toggleNavBtn" onClick={() => setIsNavCollapsed(!isNavCollapsed)} data-i18n="tooltip.toggleNav">
+            <Icon name={ICONS.CHEVRON_DOWN} style={isNavCollapsed ? { transform: 'rotate(90deg)' } : {}} />
+          </button>
         </div>
-      )}
+        <div className="floating-nav-content" id="floatingNavContent">
+          {navTools}
+        </div>
+      </div>
     </div>
   );
 }

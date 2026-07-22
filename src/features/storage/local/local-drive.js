@@ -1,4 +1,5 @@
 import { saveLocalDirectoryHandle, getLocalDirectoryHandle } from '../../editor/engine/core/storage.js';
+import { t } from "../../../i18n/i18n.js";
 
 let currentDirectoryHandle = null;
 
@@ -17,7 +18,7 @@ export function getCurrentDirectoryHandle() {
 export async function pickLocalDirectory() {
   try {
     if (!('showDirectoryPicker' in window)) {
-      throw new Error("Trình duyệt không hỗ trợ chọn thư mục (File System Access API).");
+      throw new Error(t('local.errNotSupported') || "Trình duyệt không hỗ trợ chọn thư mục (File System Access API).");
     }
     
     currentDirectoryHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
@@ -29,7 +30,7 @@ export async function pickLocalDirectory() {
     return currentDirectoryHandle;
   } catch (err) {
     if (err.name !== 'AbortError') {
-      console.error('Failed to pick directory:', err);
+      console.error(t('local.errPickDir') || 'Failed to pick directory:', err);
     }
     return null;
   }
@@ -55,12 +56,12 @@ export async function verifyPermission(handle) {
 
 export async function saveFileToLocalDrive(filename, blob) {
   if (!currentDirectoryHandle) {
-    throw new Error("Chưa chọn thư mục làm việc.");
+    throw new Error(t('local.errNoDir') || "Chưa chọn thư mục làm việc.");
   }
   
   const hasPermission = await verifyPermission(currentDirectoryHandle);
   if (!hasPermission) {
-    throw new Error("Không có quyền ghi vào thư mục. Vui lòng cấp quyền lại.");
+    throw new Error(t('local.errNoWritePerm') || "Không có quyền ghi vào thư mục. Vui lòng cấp quyền lại.");
   }
   
   const fileHandle = await currentDirectoryHandle.getFileHandle(filename, { create: true });
@@ -100,7 +101,7 @@ export async function listLocalFiles() {
       }
     }
   } catch (err) {
-    console.error('Failed to list local files:', err);
+    console.error(t('local.errListFiles') || 'Failed to list local files:', err);
   }
   
   // Sort by lastModified descending
@@ -111,7 +112,7 @@ export async function listLocalFiles() {
 export async function readLocalFile(fileHandle) {
   const hasPermission = await verifyPermission(fileHandle);
   if (!hasPermission) {
-    throw new Error("Không có quyền đọc file. Vui lòng cấp quyền lại.");
+    throw new Error(t('local.errNoReadPerm') || "Không có quyền đọc file. Vui lòng cấp quyền lại.");
   }
   
   const file = await fileHandle.getFile();

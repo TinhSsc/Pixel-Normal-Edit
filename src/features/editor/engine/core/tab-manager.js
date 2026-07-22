@@ -439,7 +439,7 @@ export function createNewTab() {
     debouncedSaveWorkspace();
     debounceExtractCanvasColors();
   } catch (err) {
-    alert("Error creating tab: " + err.message + "\n" + err.stack);
+      alert(`${t('status.error') || 'Error'}: ${err.message}` + "\n" + err.stack);
   }
 }
 

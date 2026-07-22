@@ -1,5 +1,7 @@
 import React, { useId, useRef, useEffect, useState } from 'react';
 import { Icon, ICONS } from './icons';
+import { t } from '../../i18n/i18n.js';
+
 
 /**
  * Custom Dropdown Component using CSS tricks for animations
@@ -93,7 +95,7 @@ export const CustomDropdown = ({ options = [], value, onChange, id, style, defau
       />
       <label htmlFor={`toggle-${dropdownId}`} className="dropdown-trigger">
         <span className="trigger-text">
-          {selectedOption ? selectedOption.label : 'Select...'}
+          {selectedOption ? selectedOption.label : (t('dropdown.select') || 'Select...')}
         </span>
         <span className="trigger-icon">
           <Icon name={ICONS.CHEVRON_DOWN} />

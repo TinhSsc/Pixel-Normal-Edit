@@ -58,7 +58,7 @@ export function setupUploadModal() {
     
     if (filesArray.length === 0) return;
     if (filesArray.length > 50) {
-      alert("Vui lòng chọn tối đa 50 file để tránh quá tải bộ nhớ.");
+      alert(t('upload.maxFilesError') || "Vui lòng chọn tối đa 50 file để tránh quá tải bộ nhớ.");
       return;
     }
     
@@ -66,18 +66,18 @@ export function setupUploadModal() {
     const hasImg = filesArray.some(f => !f.name.endsWith('.zip'));
     
     if (hasZip && hasImg) {
-      alert("Vui lòng không chọn lẫn file ZIP và file ảnh rời.");
+      alert(t('upload.mixFileError') || "Vui lòng không chọn lẫn file ZIP và file ảnh rời.");
       return;
     }
     
     if (mode === 'current-tab' && filesArray.length > 1) {
-      alert("Chế độ 'Ghi đè Tab hiện tại' chỉ hỗ trợ tải 1 file.");
+      alert(t('upload.singleFileOverrideError') || "Chế độ 'Ghi đè Tab hiện tại' chỉ hỗ trợ tải 1 file.");
       return;
     }
     
     const currentTab = getTabs().find(t => t.id === getActiveTabId());
     if (mode === 'current-tab' && currentTab?.animation?.isAnimationMode) {
-      if (!window.confirm("Tab hiện tại đang là Ảnh động. Nếu ghi đè, toàn bộ frame sẽ bị xóa. Tiếp tục?")) return;
+      if (!window.confirm(t('upload.overrideAnimConfirm') || "Tab hiện tại đang là Ảnh động. Nếu ghi đè, toàn bộ frame sẽ bị xóa. Tiếp tục?")) return;
     }
     
     document.getElementById('uploadModal').style.display = 'none';
@@ -138,13 +138,30 @@ async function processImageBatch(files, mode, autoSize) {
   }
 
   if (errorCount > 0) {
-    alert(`Bỏ qua ${errorCount} file (không đúng định dạng hoặc lỗi đọc).`);
+    alert((t('upload.skipFilesError') || 'Bỏ qua {count} file (không đúng định dạng hoặc lỗi đọc).').replace('{count}', errorCount));
   }
 
   if (imageObjects.length === 0) return;
 
   if (mode === 'animation') {
-    handleMultipleImageFrames(imageObjects);
+    if (imageObjects.length === 1) {
+      const { img } = imageObjects[0];
+      const w = img.naturalWidth;
+      const h = img.naturalHeight;
+      if (w > h && w % h === 0 && (w / h) > 1) {
+        handleSpriteSheet(img, w / h);
+      } else {
+        const numStr = window.prompt(t('upload.promptSpriteFrames') || "Nhập số khung hình ngang (frames) cho Sprite Sheet này:", "2");
+        const numFrames = parseInt(numStr, 10);
+        if (!isNaN(numFrames) && numFrames > 1) {
+           handleSpriteSheet(img, numFrames);
+        } else {
+           handleMultipleImageFrames(imageObjects);
+        }
+      }
+    } else {
+      handleMultipleImageFrames(imageObjects);
+    }
   } else if (mode === 'multi-tab') {
     imageObjects.forEach(({name, img}) => {
       const canvas = document.createElement('canvas');
@@ -164,7 +181,7 @@ async function processImageBatch(files, mode, autoSize) {
     // Keep sprite sheet logic for current-tab mode
     if (w > h && w % h === 0 && w / h > 1) {
       const numFrames = w / h;
-      if (window.confirm(`Phát hiện Sprite Sheet gồm ${numFrames} khung hình ngang. Bạn có muốn tải lên thành dạng Ảnh động (Animation) không?`)) {
+      if (window.confirm((t('upload.confirmSpriteAnim') || `Phát hiện Sprite Sheet gồm {count} khung hình ngang. Bạn có muốn tải lên thành dạng Ảnh động (Animation) không?`).replace('{count}', numFrames))) {
         handleSpriteSheet(img, numFrames);
         return;
       }

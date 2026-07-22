@@ -116,3 +116,11 @@ html.animations-enabled .panel-section {
   animation: fadeInTab 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Tắt triệt để mọi animation và transition trên toàn bộ phần tử khi người dùng bỏ check "Enable UI animations" */
+html:not(.animations-enabled) *,
+html:not(.animations-enabled) *::before,
+html:not(.animations-enabled) *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}

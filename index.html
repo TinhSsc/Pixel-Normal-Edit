@@ -36,6 +36,12 @@
           if (primary) document.documentElement.style.setProperty('--custom-primary', primary);
         }
       }
+      var animEnabled = localStorage.getItem('pixel-edit-animations-enabled');
+      if (animEnabled === 'false') {
+        document.documentElement.classList.remove('animations-enabled');
+      } else {
+        document.documentElement.classList.add('animations-enabled');
+      }
     })();
   </script>
 </head>

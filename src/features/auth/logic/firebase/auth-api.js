@@ -1,4 +1,5 @@
 import { auth } from './config.js';
+import { t } from '../../../../i18n/i18n.js';
 import { 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
@@ -60,19 +61,19 @@ export async function logoutUser() {
 function handleAuthError(error) {
   const code = error.code;
   if (code === 'auth/user-not-found' || code === 'auth/invalid-credential') {
-    return new Error('Email hoặc mật khẩu không chính xác.');
+    return new Error(t('auth.errEmailOrPassword') || 'Email hoặc mật khẩu không chính xác.');
   }
   if (code === 'auth/email-already-in-use') {
-    return new Error('Email này đã được sử dụng.');
+    return new Error(t('auth.errEmailInUse') || 'Email này đã được sử dụng.');
   }
   if (code === 'auth/weak-password') {
-    return new Error('Mật khẩu quá yếu, vui lòng chọn mật khẩu mạnh hơn.');
+    return new Error(t('auth.errWeakPassword') || 'Mật khẩu quá yếu, vui lòng chọn mật khẩu mạnh hơn.');
   }
   if (code === 'auth/invalid-email') {
-    return new Error('Định dạng email không hợp lệ.');
+    return new Error(t('auth.errInvalidEmail') || 'Định dạng email không hợp lệ.');
   }
   if (code === 'auth/popup-closed-by-user') {
-    return new Error('Đăng nhập bằng Google đã bị hủy.');
+    return new Error(t('auth.errGoogleCancelled') || 'Đăng nhập bằng Google đã bị hủy.');
   }
-  return new Error(error.message || 'Có lỗi xảy ra khi xác thực.');
+  return new Error(error.message || t('auth.errDefault') || 'Có lỗi xảy ra khi xác thực.');
 }

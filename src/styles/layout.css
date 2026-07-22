@@ -188,7 +188,7 @@
 
 @media (min-width: 769px) {}
 
-@media (max-width: 768px) {
+@media (max-width: 768px) and (orientation: portrait) {
   .mobile-popup-trigger {
     display: flex;
   }
@@ -317,7 +317,7 @@
 
 
 /* Mobile Responsive Layout */
-@media (max-width: 768px) {
+@media (max-width: 768px) and (orientation: portrait) {
 
   html,
   body {
@@ -335,15 +335,45 @@
   }
 
   .header {
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    gap: 15px;
-    text-align: center;
+    gap: 5px;
+    padding: 8px 5px;
+    margin-bottom: 5px;
+    border-radius: 6px;
+  }
+
+  .header h1 {
+    font-size: 14px !important;
+    white-space: nowrap;
   }
 
   .header-actions {
-    flex-wrap: wrap;
-    justify-content: center;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    gap: 4px;
+    width: 100%;
+  }
+
+  .header-actions .btn {
+    padding: 4px 6px;
+    font-size: 11px;
+    min-width: unset;
+  }
+
+  .header-actions .btn span {
+    display: none; /* Hide text to keep on one line */
+  }
+
+  .header-actions .btn.avatar-btn {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+  }
+
+  .header-actions .btn.avatar-btn .avatar-placeholder svg {
+    width: 14px !important;
+    height: 14px !important;
   }
 
   .editor-layout {
@@ -428,7 +458,7 @@
   display: none !important;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 768px) and (orientation: portrait) {
   .mobile-only {
     display: flex !important;
   }
@@ -446,6 +476,32 @@
   .canvas-wrap {
     min-height: 400px;
     /* Ensure canvas has enough space */
+  }
+}
+
+/* Mobile Landscape (Desktop UI mode but small screen) */
+@media (max-height: 500px) and (orientation: landscape) {
+  .header {
+    padding: 5px 10px;
+    margin-bottom: 2px;
+  }
+  .header h1 {
+    font-size: 16px !important;
+  }
+  .header-actions .btn {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+  .header-actions .btn span {
+    display: none; /* Hide text to save space */
+  }
+  .header-actions .btn.avatar-btn {
+    width: 28px;
+    height: 28px;
+  }
+  .header-actions .btn.avatar-btn .avatar-placeholder svg {
+    width: 16px !important;
+    height: 16px !important;
   }
 }
 

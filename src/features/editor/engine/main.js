@@ -168,7 +168,7 @@ export function initEditor() {
           
           const selectAllSpan = document.createElement('span');
           selectAllSpan.setAttribute('data-i18n', 'download.selectAll');
-          selectAllSpan.textContent = 'Chọn tất cả (All Tabs)';
+          selectAllSpan.textContent = t('download.selectAll') || 'Chọn tất cả (All Tabs)';
           
           selectAllLabel.appendChild(selectAllCheckbox);
           selectAllLabel.appendChild(selectAllSpan);

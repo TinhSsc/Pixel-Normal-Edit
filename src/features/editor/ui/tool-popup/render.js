@@ -1,6 +1,7 @@
 // render.js — dựng DOM: nút expand, danh sách variant, quick-pin bar, đổi icon tool-btn.
 // Không tự ý kích hoạt tool ở đây — chỉ vẽ UI. events.js gọi các hàm này sau khi xử lý state.
 import { TOOL_VARIANTS } from './toolVariants.js';
+import { t } from '../../../../i18n/i18n.js';
 import { getActiveVariant, getPins } from './popupState.js';
 
 export function getVariant(baseTool, variantId) {
@@ -37,7 +38,7 @@ export function renderVariantList(baseTool) {
   list.innerHTML = variants.map(v => `
     <div class="tool-variant-item${v.id === activeId ? ' active' : ''}" data-variant-id="${v.id}">
       <i data-lucide="${v.icon}"></i>
-      <span>${v.label}</span>
+      <span>${t(v.labelKey) || v.label}</span>
       <button type="button" class="tool-variant-pin-btn${pins.includes(v.id) ? ' pinned' : ''}" data-variant-id="${v.id}">
         <i data-lucide="pin"></i>
       </button>
@@ -83,8 +84,8 @@ export function renderQuickPinBar(baseTools) {
       btn.dataset.baseTool = baseTool;
       btn.dataset.variantId = variant.id;
       btn.dataset.pinned = 'true';
-      btn.dataset.tooltip = variant.label;
-      btn.title = variant.label;
+      btn.dataset.tooltip = t(variant.labelKey) || variant.label;
+      btn.title = t(variant.labelKey) || variant.label;
       btn.innerHTML = `<i data-lucide="${variant.icon}"></i>`;
       
       grid.insertBefore(btn, nextSibling);

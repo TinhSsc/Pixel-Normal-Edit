@@ -321,3 +321,54 @@
     transform: scale(1.2);
   }
 }
+
+/* ------ Mobile Responsive ------ */
+@media (max-width: 768px) and (orientation: portrait) {
+  .animation-strip {
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    width: 100%;
+    margin-top: 10px;
+    padding: 8px;
+    gap: 8px;
+    flex-wrap: wrap; /* Cho phép các thành phần tràn xuống dòng */
+  }
+  
+  .animation-strip-frames {
+    height: 52px;
+    padding-top: 4px;
+    flex: 1; /* Cho phép khung hình chiếm không gian còn lại */
+  }
+  
+  .animation-strip-frame {
+    width: 36px;
+    height: 36px;
+  }
+
+  .animation-strip-expand-btn {
+    bottom: 80px;
+    width: 40px;
+    height: 48px;
+    border-radius: 12px 0 0 12px;
+  }
+
+  .animation-strip.collapsed {
+    transform: translate(-50%, 20px) scale(0.9);
+  }
+
+  /* Cho phép cuộn ngang đối với các công cụ nếu quá nhiều */
+  .animation-strip-tools {
+    border-left: none !important;
+    padding-left: 0 !important;
+    flex: 1;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .animation-strip-tools::-webkit-scrollbar {
+    display: none;
+  }
+}

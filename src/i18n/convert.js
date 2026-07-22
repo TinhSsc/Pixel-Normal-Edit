@@ -34,10 +34,74 @@ function printSection(title) {
 
 const languages = {
   en: {
-
+    "group.settings": "Settings",
+    "group.imageOps": "Image Operations",
+    "tooltip.rulerMode": "Ruler",
+    "label.rulerOptions": "Ruler Options",
+    "option.rulerDraw": "Draw",
+    "option.rulerMeasure": "Measure",
+    "tooltip.gradientMode": "Gradient",
+    "label.gradDir": "Direction",
+    "option.vertical": "Vertical",
+    "option.horizontal": "Horizontal",
+    "option.diagonal": "Diagonal",
+    "option.radial": "Radial",
+    "tooltip.showGrid": "Show Grid",
+    "tooltip.mirrorMode": "Mirror",
+    "transform.rotate": "Rotate",
+    "label.rotateOptions": "Rotate Options",
+    "option.rotateSize": "By Size",
+    "option.rotatePixel": "By Pixel",
+    "transform.flipH": "Flip Horizontal",
+    "transform.flipV": "Flip Vertical",
+    "group.navigation": "Navigation",
+    "tool.crop": "Crop",
+    "tool.cut": "Cut",
+    "tool.copy": "Copy",
+    "tool.paste": "Paste",
+    "toolVariant.eraser": "Eraser",
+    "toolVariant.picker": "Color Picker",
+    "toolVariant.fill": "Fill",
+    "toolVariant.magic": "Magic Eraser",
+    "toolVariant.outline": "Outline",
+    "toolVariant.line": "Line",
+    "toolVariant.rect": "Rectangle",
+    "toolVariant.circle": "Circle"
   },
   vi: {
-
+    "group.settings": "Cài đặt",
+    "group.imageOps": "Thao tác ảnh",
+    "tooltip.rulerMode": "Thước đo",
+    "label.rulerOptions": "Tùy chọn thước",
+    "option.rulerDraw": "Vẽ",
+    "option.rulerMeasure": "Đo đạc",
+    "tooltip.gradientMode": "Gradient",
+    "label.gradDir": "Hướng",
+    "option.vertical": "Dọc",
+    "option.horizontal": "Ngang",
+    "option.diagonal": "Chéo",
+    "option.radial": "Xung quanh",
+    "tooltip.showGrid": "Lưới",
+    "tooltip.mirrorMode": "Đối xứng",
+    "transform.rotate": "Xoay",
+    "label.rotateOptions": "Tùy chọn xoay",
+    "option.rotateSize": "Theo kích thước",
+    "option.rotatePixel": "Theo Pixel",
+    "transform.flipH": "Lật ngang",
+    "transform.flipV": "Lật dọc",
+    "group.navigation": "Điều hướng",
+    "tool.crop": "Cắt",
+    "tool.cut": "Cắt (Cut)",
+    "tool.copy": "Sao chép",
+    "tool.paste": "Dán",
+    "toolVariant.eraser": "Tẩy",
+    "toolVariant.picker": "Lấy màu",
+    "toolVariant.fill": "Đổ màu",
+    "toolVariant.magic": "Xóa nền",
+    "toolVariant.outline": "Tạo viền",
+    "toolVariant.line": "Đường thẳng",
+    "toolVariant.rect": "Hình chữ nhật",
+    "toolVariant.circle": "Hình tròn"
   }
 };
 
@@ -77,11 +141,28 @@ Object.entries(languages).forEach(([langCode, langData]) => {
       console.log(`[SYNC] [${langCode}] ➕ Thêm key mới: ${key}`);
     } else {
       const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const emptyRegex = new RegExp(`(^\\s*(["']?)${escapedKey}\\2\\s*:)\\s*(["']["'])\\s*(,|$)`, "m");
-      if (emptyRegex.test(content) && value !== "") {
-        content = content.replace(emptyRegex, `$1 ${JSON.stringify(value)}$3`);
-        isModified = true;
-        console.log(`[SYNC] [${langCode}] ✏️ Điền nội dung cho key đang rỗng: ${key}`);
+      const lineRegex = new RegExp(`(^\\s*(["']?)${escapedKey}\\2\\s*:)\\s*(.*?)(\\s*(?:,|$))`, "m");
+      const match = content.match(lineRegex);
+      if (match && value !== "") {
+        const newValueStr = JSON.stringify(value);
+        const currentRaw = match[3];
+        let shouldReplace = false;
+        
+        try {
+           // eval to handle both single and double quotes gracefully
+           const evalValue = eval(`(${currentRaw})`);
+           if (evalValue !== value) {
+              shouldReplace = true;
+           }
+        } catch(e) {
+           if (currentRaw !== newValueStr) shouldReplace = true;
+        }
+
+        if (shouldReplace) {
+          content = content.replace(lineRegex, `$1 ${newValueStr}$4`);
+          isModified = true;
+          console.log(`[SYNC] [${langCode}] 🔄 Cập nhật key: ${key}`);
+        }
       }
     }
   });
@@ -216,9 +297,21 @@ allFiles.forEach(file => {
   }
 
   // --- data-i18n="key" ---
-  const dataI18nRegex = /data-i18n(?:-[a-z]+)?\s*=\s*(?:['"]([^'"]+)['"]|\{\s*['"]([^'"]+)['"]\s*\})/g;
+  const dataI18nRegex = /data-i18n(?:-[a-z]+)?\s*=\s*(?:['"]([^'"]+)['"]|\{\s*['"]([^'"]+)['"]\s*\}|\{`([^`]+)`\})/g;
   while ((match = dataI18nRegex.exec(content)) !== null) {
-    usedKeys.add(match[1] || match[2]);
+    const key = match[1] || match[2] || match[3];
+    if (key.includes('${')) {
+      const staticPrefix = key.split('${')[0];
+      if (staticPrefix) dynamicKeyPrefixes.add(staticPrefix);
+    } else {
+      usedKeys.add(key);
+    }
+  }
+
+  // --- Dynamic object keys (titleKey, tooltipKey, labelKey) ---
+  const objKeyRegex = /\b(?:titleKey|tooltipKey|labelKey|descKey)\s*:\s*['"]([^'"]+)['"]/g;
+  while ((match = objKeyRegex.exec(content)) !== null) {
+    usedKeys.add(match[1]);
   }
 
   // --- JSX/TSX text nodes (multi-line aware): >...text...< with no nested tags ---

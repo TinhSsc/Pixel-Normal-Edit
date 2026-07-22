@@ -166,7 +166,7 @@ export default function AppearanceTab() {
   return (
     <div className="tab-content active" id="tab-appearance">
       <div style={{ background: 'var(--color-surface)', padding: '20px', borderRadius: '12px', border: '1px solid var(--color-border)', marginBottom: '12px' }}>
-        <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }} data-i18n="settings.language">Ngôn ngữ (Language)</div>
+        <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }}>{t('settings.language') || 'Ngôn ngữ (Language)'}</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <CustomDropdown
             id="languageSelect"
@@ -184,7 +184,7 @@ export default function AppearanceTab() {
       </div>
 
       <div style={{ background: 'var(--color-surface)', padding: '20px', borderRadius: '12px', border: '1px solid var(--color-border)' }}>
-        <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }} data-i18n="theme.title">Giao diện (Theme)</div>
+        <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }}>{t('theme.title') || 'Giao diện (Theme)'}</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <CustomDropdown
             id="themeSelect"
@@ -198,15 +198,15 @@ export default function AppearanceTab() {
 
           <div id="customThemeSettings" style={{ display: 'none', padding: '16px', background: 'var(--color-surface-alt)', borderRadius: '8px', border: '1px dashed var(--color-border)', marginTop: '8px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-              <label style={{ fontSize: '13px', color: 'var(--text-muted)', cursor: 'pointer' }} htmlFor="customBgColor" data-i18n="theme.bg">Nền (Bg)</label>
+              <label style={{ fontSize: '13px', color: 'var(--text-muted)', cursor: 'pointer' }} htmlFor="customBgColor">{t('theme.bg') || 'Nền (Bg)'}</label>
               <input type="color" id="customBgColor" defaultValue="#191920" style={{ width: '32px', height: '32px', padding: 0, border: 'none', borderRadius: '6px', cursor: 'pointer', background: 'transparent' }} />
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-              <label style={{ fontSize: '13px', color: 'var(--text-muted)', cursor: 'pointer' }} htmlFor="customPrimaryColor" data-i18n="theme.primary">Nhấn (Primary)</label>
+              <label style={{ fontSize: '13px', color: 'var(--text-muted)', cursor: 'pointer' }} htmlFor="customPrimaryColor">{t('theme.primary') || 'Nhấn (Primary)'}</label>
               <input type="color" id="customPrimaryColor" defaultValue="#5b5bf0" style={{ width: '32px', height: '32px', padding: 0, border: 'none', borderRadius: '6px', cursor: 'pointer', background: 'transparent' }} />
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <label style={{ fontSize: '13px', color: 'var(--text-muted)', cursor: 'pointer' }} htmlFor="customGridLineColor" data-i18n="theme.gridLine">Lưới (Grid)</label>
+              <label style={{ fontSize: '13px', color: 'var(--text-muted)', cursor: 'pointer' }} htmlFor="customGridLineColor">{t('theme.gridLine') || 'Lưới (Grid)'}</label>
               <input type="color" id="customGridLineColor" defaultValue="#ffffff" style={{ width: '32px', height: '32px', padding: 0, border: 'none', borderRadius: '6px', cursor: 'pointer', background: 'transparent' }} />
             </div>
           </div>
@@ -214,7 +214,7 @@ export default function AppearanceTab() {
       </div>
 
       <div style={{ background: 'var(--color-surface)', padding: '20px', borderRadius: '12px', border: '1px solid var(--color-border)', marginTop: '12px' }}>
-        <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }} data-i18n="settings.penShapeTitle">Hình dạng bút vẽ</div>
+        <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }}>{t('settings.penShapeTitle') || 'Hình dạng bút vẽ'}</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <CustomDropdown
             id="globalPenShape"
@@ -228,15 +228,15 @@ export default function AppearanceTab() {
       </div>
 
       <div style={{ background: 'var(--color-surface)', padding: '20px', borderRadius: '12px', border: '1px solid var(--color-border)', marginTop: '12px' }}>
-        <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }} data-i18n="settings.display">Hiển thị</div>
+        <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }}>{t('settings.display') || 'Hiển thị'}</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: 'var(--text-primary)', cursor: 'pointer' }}>
             <input type="checkbox" id="showBtnNamesToggle" className="check" />
-            <span data-i18n="settings.showBtnNames">Hiển thị tên công cụ dưới biểu tượng</span>
+            <span>{t('settings.showBtnNames') || 'Hiển thị tên công cụ dưới biểu tượng'}</span>
           </label>
           <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: 'var(--text-primary)', cursor: 'pointer' }}>
             <input type="checkbox" id="animationsToggle" defaultChecked className="check" />
-            <span data-i18n="settings.animations">Bật hiệu ứng chuyển động (Animations)</span>
+            <span>{t('settings.animations') || 'Bật hiệu ứng chuyển động (Animations)'}</span>
           </label>
         </div>
       </div>
