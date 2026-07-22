@@ -326,12 +326,12 @@
   }
 
   body {
-    padding: 10px;
+    padding: 0;
     min-height: 100vh;
   }
 
   .container {
-    padding: 10px;
+    padding: 5px;
   }
 
   .header {
@@ -362,7 +362,8 @@
   }
 
   .header-actions .btn span {
-    display: none; /* Hide text to keep on one line */
+    display: none;
+    /* Hide text to keep on one line */
   }
 
   .header-actions .btn.avatar-btn {
@@ -382,14 +383,14 @@
 
   .main-area {
     order: 1;
-    padding: 10px;
+    padding: 0;
     flex: none;
-    min-height: 60vh;
+    min-height: 75vh;
   }
 
   .canvas-wrap {
     width: 100%;
-    overflow: auto;
+    overflow: hidden;
   }
 
   .floating-nav {
@@ -474,7 +475,7 @@
   }
 
   .canvas-wrap {
-    min-height: 400px;
+    min-height: 75vh;
     /* Ensure canvas has enough space */
   }
 }
@@ -485,20 +486,26 @@
     padding: 5px 10px;
     margin-bottom: 2px;
   }
+
   .header h1 {
     font-size: 16px !important;
   }
+
   .header-actions .btn {
     padding: 4px 8px;
     font-size: 12px;
   }
+
   .header-actions .btn span {
-    display: none; /* Hide text to save space */
+    display: none;
+    /* Hide text to save space */
   }
+
   .header-actions .btn.avatar-btn {
     width: 28px;
     height: 28px;
   }
+
   .header-actions .btn.avatar-btn .avatar-placeholder svg {
     width: 16px !important;
     height: 16px !important;

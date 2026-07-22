@@ -347,15 +347,15 @@
     height: 36px;
   }
 
-  .animation-strip-expand-btn {
-    bottom: 80px;
-    width: 40px;
-    height: 48px;
-    border-radius: 12px 0 0 12px;
+  .animation-strip-expand-btn,
+  .animation-strip-collapse-btn {
+    display: none !important;
   }
 
   .animation-strip.collapsed {
-    transform: translate(-50%, 20px) scale(0.9);
+    transform: none;
+    opacity: 1;
+    pointer-events: auto;
   }
 
   /* Cho phép cuộn ngang đối với các công cụ nếu quá nhiều */

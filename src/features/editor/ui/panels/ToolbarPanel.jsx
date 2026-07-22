@@ -16,7 +16,7 @@ export default function ToolbarPanel() {
 
   return (
     <div className="toolbar" style={{ width: '100%', height: '100%', overflowY: 'auto', overflowX: 'hidden' }}>
-      <div id="mobile-animation-strip-portal" className="mobile-only" style={{ width: '100%' }}></div>
+      <div id="mobile-animation-strip-portal" className="mobile-only" style={{ width: '100%', order: -1, marginBottom: '15px' }}></div>
       <div className="tool-group" style={{ paddingBottom: '15px', borderBottom: '1px solid #3e3e4a', marginBottom: '15px', width: '100%' }}>
         <div className="color-picker-wrapper">
           <input type="color" id="colorPicker" className="color-input primary-color" defaultValue="#000000" data-i18n="tooltip.primaryColor" />

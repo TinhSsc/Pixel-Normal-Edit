@@ -196,6 +196,7 @@ export default function AnimationStripPanel({
           <div style={{ width: '1px', height: '32px', background: 'var(--color-border)', marginLeft: '4px', marginRight: '4px' }} />
           <button
             type="button"
+            className="animation-strip-collapse-btn"
             onClick={() => setIsCollapsed(true)}
             data-i18n="tooltip.collapseAnimStrip"
             style={{
