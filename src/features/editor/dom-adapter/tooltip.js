@@ -1,3 +1,5 @@
+import { t } from '../../../i18n/i18n.js';
+
 export function initCustomTooltip() {
   const tooltip = document.getElementById('custom-tooltip');
   if (!tooltip) return;
@@ -5,10 +7,27 @@ export function initCustomTooltip() {
   let hideTimer = null;
 
   document.addEventListener('mouseover', e => {
-    const el = e.target.closest('[data-tooltip]');
+    const el = e.target.closest('[data-tooltip], [title], [data-i18n^="tooltip."], [data-i18n^="tool."], [data-i18n^="transform."]');
     if (!el) return;
 
-    const text = el.getAttribute('data-tooltip');
+    let text = el.getAttribute('data-tooltip');
+
+    // Migrate native title to custom tooltip
+    if (!text && el.hasAttribute('title') && el.getAttribute('title').trim()) {
+      text = el.getAttribute('title');
+      el.removeAttribute('title');
+      el.setAttribute('data-tooltip', text);
+    }
+
+    // Handle React elements that re-rendered and lost data-tooltip
+    if (!text && el.hasAttribute('data-i18n')) {
+      const key = el.getAttribute('data-i18n');
+      if (key.startsWith('tooltip.') || key.startsWith('tool.') || key.startsWith('transform.')) {
+        text = t(key);
+        el.setAttribute('data-tooltip', text);
+      }
+    }
+
     if (!text) return;
 
     clearTimeout(hideTimer);
@@ -32,3 +51,4 @@ export function initCustomTooltip() {
     hideTimer = setTimeout(() => tooltip.classList.remove('show'), 100);
   });
 }
+

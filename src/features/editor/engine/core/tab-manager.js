@@ -10,7 +10,7 @@ import { generateWorkspacePngBlob } from '../../io/export/export-png.js';
 import { generateWorkspaceJpegBlob } from '../../io/export/export-jpeg.js';
 import { generateWorkspaceWebpBlob } from '../../io/export/export-webp.js';
 import { generateWorkspaceJsonBlob } from '../../io/export/export-json.js';
-import { uploadToDrive, getDriveToken } from '../../../storage/cloud/drive-api.js';
+import { uploadToDrive, getDriveToken, ensureDriveLogin } from '../../../storage/cloud/drive-api.js';
 import { saveFileToLocalDrive, getCurrentDirectoryHandle } from '../../../storage/local/local-drive.js';
 import { showNotification } from '../../../storage/cloud/drive-ui.js';
 import { debounceExtractCanvasColors } from './color-palette.js';
@@ -53,8 +53,13 @@ function setHeaderStatus(statusText) {
     if (statusText === 'saving') {
       indicator.innerHTML = `<i data-lucide="loader-2" class="spin" style="width:12px;height:12px"></i> <span data-i18n="status.saving">${t('status.saving') || 'Đang lưu...'}</span>`;
       indicator.style.color = 'var(--pixel-blue)';
-    } else if (statusText === 'saved') {
-      indicator.innerHTML = `<i data-lucide="check" style="width:12px;height:12px"></i> <span data-i18n="status.saved">${t('status.saved') || 'Đã lưu'}</span>`;
+    } else if (statusText.startsWith('saved')) {
+      let text = t('status.saved') || 'Đã lưu';
+      if (statusText === 'saved-drive') text += ' (Drive)';
+      else if (statusText === 'saved-local') text += ' (Máy)';
+      else if (statusText === 'saved-both') text += ' (Cả hai)';
+      
+      indicator.innerHTML = `<i data-lucide="check" style="width:12px;height:12px"></i> <span>${text}</span>`;
       indicator.style.color = 'var(--success)';
       setTimeout(() => { if (indicator.innerHTML.includes('check')) indicator.innerHTML = ''; }, 3000);
     } else if (statusText === 'error') {
@@ -137,16 +142,16 @@ export async function performQuickSave() {
 
   let success = false;
 
-    if (currentTab.storage && currentTab.storage.type === 'drive') {
-      success = await syncToDrive(currentTab);
-      if (success) { setHeaderStatus('saved'); showNotification(t('status.savedToDrive')); }
-    } else if (currentTab.storage && currentTab.storage.type === 'local') {
-      success = await syncToLocal(currentTab);
-      if (success) { setHeaderStatus('saved'); showNotification(t('status.savedToLocal')); }
-    } else if (getCurrentDirectoryHandle()) {
-      // Nếu đã cấu hình local directory mà tab chưa link đâu, lưu vào local dir
-      success = await syncToLocal(currentTab);
-      if (success) { setHeaderStatus('saved'); showNotification(t('status.fileCreatedLocal')); }
+  if (currentTab.storage && currentTab.storage.type === 'drive') {
+    success = await syncToDrive(currentTab);
+    if (success) { setHeaderStatus('saved-drive'); showNotification(t('status.savedToDrive')); }
+  } else if (currentTab.storage && currentTab.storage.type === 'local') {
+    success = await syncToLocal(currentTab);
+    if (success) { setHeaderStatus('saved-local'); showNotification(t('status.savedToLocal')); }
+  } else if (getCurrentDirectoryHandle()) {
+    // Nếu đã cấu hình local directory mà tab chưa link đâu, lưu vào local dir
+    success = await syncToLocal(currentTab);
+    if (success) { setHeaderStatus('saved-local'); showNotification(t('status.fileCreatedLocal')); }
   } else {
     // Không có link nào, mở Save As
     const btn = document.getElementById('openDownloadModalBtn');
@@ -163,20 +168,28 @@ async function performAutoSave() {
   const dest = localStorage.getItem('auto_save_destination') || 'drive';
   if (dest === 'none' || !currentTab) return;
 
-  let success = false;
+  let successDrive = false;
+  let successLocal = false;
+
   if (dest === 'drive' || dest === 'both') {
     if (getDriveToken()) {
-      success = await syncToDrive(currentTab) || success;
+      successDrive = await syncToDrive(currentTab);
     }
   }
 
   if (dest === 'local' || dest === 'both') {
     if (getCurrentDirectoryHandle()) {
-      success = await syncToLocal(currentTab) || success;
+      successLocal = await syncToLocal(currentTab);
     }
   }
 
-  if (success) setHeaderStatus('saved');
+  if (successDrive && successLocal) {
+    setHeaderStatus('saved-both');
+  } else if (successDrive) {
+    setHeaderStatus('saved-drive');
+  } else if (successLocal) {
+    setHeaderStatus('saved-local');
+  }
 }
 
 export function debouncedSaveWorkspace() {
@@ -427,6 +440,61 @@ export function createNewTab() {
     debounceExtractCanvasColors();
   } catch (err) {
     alert("Error creating tab: " + err.message + "\n" + err.stack);
+  }
+}
+
+export function createTabFromData(name, w, h, data32) {
+  try {
+    saveCurrentTabState();
+    tabCounter++;
+    const newId = generateId();
+    
+    const newPixelMap = new Uint32Array(w * h);
+    newPixelMap.set(data32);
+
+    const newTab = {
+      id: newId,
+      name: name || ((t('tab.newCanvas') || 'New Canvas') + ' ' + tabCounter),
+      pixelMap: newPixelMap,
+      groupMap: new Map(),
+      history: { undoStack: [], redoStack: [], currentStroke: null },
+      grid: { w: w, h: h, imgData: null, data32: null },
+      bg: { src: '', css: '', hasBg: false },
+      autoBackupDrive: false,
+      storage: { type: null, id: null, handle: null, name: null },
+      format: 'png',
+      animation: null
+    };
+
+    const tmpCanvas = document.createElement('canvas');
+    tmpCanvas.width = w;
+    tmpCanvas.height = h;
+    const tmpCtx = tmpCanvas.getContext('2d');
+    const imgData = tmpCtx.createImageData(w, h);
+    new Uint32Array(imgData.data.buffer).set(data32);
+    tmpCtx.putImageData(imgData, 0, 0);
+    
+    newTab.grid.imgData = tmpCtx.getImageData(0, 0, w, h);
+    newTab.grid.data32 = new Uint32Array(newTab.grid.imgData.data.buffer);
+
+    tabs.push(newTab);
+    activeTabId = newId;
+    return newId;
+  } catch (err) {
+    console.error("Error createTabFromData", err);
+  }
+}
+
+export function refreshUIAfterBatchImport() {
+  const currentTab = tabs.find(t => t.id === activeTabId);
+  if (currentTab) {
+    loadTabState(currentTab);
+    resizeCanvas();
+    fitToScreen();
+    renderPixels();
+    renderTabsUI();
+    debouncedSaveWorkspace();
+    debounceExtractCanvasColors();
   }
 }
 

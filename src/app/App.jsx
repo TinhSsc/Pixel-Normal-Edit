@@ -20,9 +20,11 @@ import DrawToolsTab from '../features/editor/ui/toolbar/DrawToolsTab.jsx';
 import CanvasPanel from '../features/editor/ui/panels/CanvasPanel.jsx';
 
 import EditPanel from '../features/editor/ui/edit-panel/EditPanel.jsx';
-const GlobalSettingsModal = lazy(() => import('../features/settings/GlobalSettingsModal.jsx'));
+import GlobalSettingsModal from '../features/settings/GlobalSettingsModal.jsx';
 const CropModal = lazy(() => import('../features/editor/ui/crop/CropModal.jsx'));
 const ResizeModal = lazy(() => import('../features/editor/ui/resize/ResizeModal.jsx'));
+import UploadModal from '../features/editor/ui/modals/UploadModal.jsx';
+import DownloadModal from '../features/editor/ui/modals/DownloadModal.jsx';
 
 const LoginPage = lazy(() => import('../features/auth/ui/LoginPage.jsx'));
 const RegisterPage = lazy(() => import('../features/auth/ui/RegisterPage.jsx'));
@@ -67,10 +69,10 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (!currentUser && !AUTH_ROUTES.includes(route)) {
-      navigate('login');
+    if (AUTH_ROUTES.includes(route)) {
+      navigate('');
     }
-  }, [route, currentUser]);
+  }, [route]);
 
   useEffect(() => {
     // Re-initialize icons when switching routes or rendering
@@ -388,24 +390,14 @@ function App() {
 
             <button id="loginBtn" className="btn avatar-btn" data-i18n="tooltip.login" title={currentUser ? currentUser.name || currentUser.email : ''} onClick={(e) => {
               e.preventDefault();
-              if (currentUser) {
-                const modal = document.getElementById('globalSettingsModal');
-                if (modal) {
-                   document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
-                   modal.style.display = 'flex';
-                   // Automatically switch to account tab
-                   const accTab = modal.querySelector('.modal-tabs [data-tab="tab-account"]');
-                   if (accTab) accTab.click();
-                }
-                return;
+              const modal = document.getElementById('globalSettingsModal');
+              if (modal) {
+                 document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
+                 modal.style.display = 'flex';
+                 // Automatically switch to account tab
+                 const accTab = modal.querySelector('.modal-tabs [data-tab="tab-account"]');
+                 if (accTab) accTab.click();
               }
-
-              if (pixelMap && pixelMap.size > 0) {
-                if (!window.confirm(t('confirm.leave') || "Bạn có chắc chuyển sang nơi khác? Mọi dữ liệu bản vẽ chưa lưu sẽ bị mất!")) {
-                  return;
-                }
-              }
-              navigate('login');
             }}>
 
               <img src={currentUser?.picture || undefined} alt="" className="avatar-img" style={{ display: (currentUser && currentUser.picture) ? 'block' : 'none' }} />
@@ -461,181 +453,10 @@ function App() {
 
 
 
-        {/* Upload Modal */}
-      <div id="uploadModal" className="modal-overlay" style={{ display: 'none' }}>
-        <div className="modal-content">
-          <div className="modal-header">
-            <h3 style={{ margin: 0, fontSize: '18px' }} data-i18n="modal.uploadTitle">Tải dữ liệu lên</h3>
-            <button id="closeUploadModalBtn" className="btn" style={{ padding: '4px' }}><Icon name={ICONS.X} /></button>
-          </div>
-
-          <div className="modal-tabs">
-            <button className="tab-btn active" data-tab="tab-image">
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                <Icon name={ICONS.IMAGE} style={{ width: '18px', height: '18px' }} />
-                <span data-i18n="modal.tabImage">Ảnh (PNG/JPG)</span>
-              </div>
-            </button>
-            <button className="tab-btn" data-tab="tab-json">
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                <Icon name={ICONS.FILE_JSON} style={{ width: '18px', height: '18px' }} />
-                <span data-i18n="modal.tabJson">Dữ liệu (JSON)</span>
-              </div>
-            </button>
-          </div>
-
-          <div className="tab-content active" id="tab-image">
-            <div className="source-tabs">
-               <button className="source-btn active" data-source="local-dir">
-                 <Icon name={ICONS.MONITOR} style={{ width: '16px', height: '16px' }} /> <span data-i18n="modal.tabComputer">Máy tính</span>
-               </button>
-               <button className="source-btn" data-source="drive">
-                 <Icon name={ICONS.HARD_DRIVE} style={{ width: '16px', height: '16px' }} /> <span data-i18n="modal.tabDrive">Google Drive</span>
-               </button>
-            </div>
-            
-            <label id="autoSizeLabel" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: 'var(--text-primary)', cursor: 'pointer', margin: '10px 0 20px', fontWeight: 500 }}>
-              <input type="checkbox" id="autoSizeOnUpload" defaultChecked style={{ width: '16px', height: '16px', accentColor: 'var(--accent)' }} />
-              <span data-i18n="modal.autoSize">Tự động chỉnh lưới theo kích thước ảnh</span>
-            </label>
-            
-            <div id="source-local-dir-content" style={{ minHeight: '180px' }}>
-              <div id="imageDropZone" className="drag-drop-zone" style={{ marginBottom: '16px', padding: '16px', minHeight: 'auto', borderStyle: 'solid', borderWidth: '1px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                  <Icon name={ICONS.UPLOAD_CLOUD} style={{ width: '20px', height: '20px', color: 'var(--accent)' }} />
-                  <span style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)' }} data-i18n="modal.clickToSelect">Nhấp hoặc kéo thả file để tải lên</span>
-                </div>
-                <input type="file" id="imageUploadModal" accept="image/*" style={{ display: 'none' }} />
-              </div>
-
-              <div id="localDirUploadList" style={{ width: '100%', height: '100%', maxHeight: '45vh', overflowY: 'auto', paddingRight: '8px' }}>
-                <div style={{ textAlign: 'center', padding: '30px 20px', color: 'var(--text-muted)', background: 'var(--surface-1)', borderRadius: '8px', border: '1px dashed var(--border)' }}>
-                   <Icon name={ICONS.FOLDER} style={{ width: '36px', height: '36px', marginBottom: '12px', opacity: 0.5 }} />
-                   <div style={{ marginBottom: '12px' }} data-i18n="settings.noDirectorySelected">Bạn chưa cấu hình Thư mục cục bộ</div>
-                   <button className="btn btn-primary" style={{ padding: '8px 16px' }} onClick={() => {
-                     document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
-                     document.getElementById('globalSettingsModal').style.display = 'flex';
-                     setTimeout(() => {
-                        const accountBtn = document.querySelector('.tab-btn[data-tab="tab-account"]');
-                        if (accountBtn) accountBtn.click();
-                     }, 50);
-                   }} data-i18n="settings.changeDirectory">Đi tới Cài đặt</button>
-                </div>
-              </div>
-            </div>
-            
-            <div id="source-drive-content" style={{ display: 'none', minHeight: '180px' }}>
-              <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'flex-end' }}>
-                <button id="openDrivePickerBtn" className="btn btn-secondary" style={{ padding: '8px 16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Icon name={ICONS.SEARCH} style={{ width: '16px', height: '16px' }} />
-                  <span data-i18n="drive.openPicker">Duyệt toàn bộ Drive...</span>
-                </button>
-              </div>
-              <div id="driveUploadList" style={{ width: '100%', height: '100%', maxHeight: '45vh', overflowY: 'auto', paddingRight: '8px' }}>
-                <div style={{ textAlign: 'center', padding: '30px 20px', color: 'var(--text-muted)', background: 'var(--surface-1)', borderRadius: '8px', border: '1px dashed var(--border)' }}>
-                   <Icon name={ICONS.CLOUD} style={{ width: '36px', height: '36px', marginBottom: '12px', opacity: 0.5 }} />
-                   <div style={{ marginBottom: '12px' }} data-i18n="drive.loginRequired">Bạn cần đăng nhập Google Drive để chọn ảnh</div>
-                   <button id="uploadDriveLoginBtn" className="btn btn-primary" style={{ padding: '8px 16px' }} data-i18n="drive.login">Kết nối Drive</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="tab-content" id="tab-json">
-            <textarea id="jsonInputText" data-i18n="modal.jsonPlaceholder" placeholder="Dán mã JSON (hoặc nội dung file .txt) vào đây..."
-              style={{ width: '100%', height: '140px', background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text-primary)', borderRadius: '8px', padding: '16px', fontFamily: 'monospace', resize: 'vertical', marginBottom: '16px', fontSize: '13px', outline: 'none', transition: 'border-color 0.2s' }}
-              onFocus={(e) => e.target.style.borderColor = 'var(--accent)'}
-              onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
-            ></textarea>
-            
-            <button id="parseJsonTextBtn" className="btn btn-primary" style={{ width: '100%', marginBottom: '24px', padding: '12px', fontSize: '15px', fontWeight: 500 }}>
-              <Icon name={ICONS.CODE} style={{ width: '18px', height: '18px' }} />
-              <span data-i18n="modal.parseJson">Nhập từ Text</span>
-            </button>
-
-            <div id="jsonDropZone" className="drag-drop-zone" style={{ padding: '30px 20px' }}>
-              <Icon name={ICONS.FILE_JSON} style={{ width: '36px', height: '36px', color: 'var(--success)', marginBottom: '12px' }} />
-              <div style={{ fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }} data-i18n="modal.dropJson">Hoặc kéo thả file .json vào đây</div>
-              <input type="file" id="jsonUploadModal" accept=".json, .txt, application/json, text/plain" style={{ display: 'none' }} />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Download Modal */}
-      <div id="downloadModal" className="modal-overlay" style={{ display: 'none' }}>
-        <div className="modal-content" style={{ maxWidth: '500px' }}>
-          <div className="modal-header">
-            <h3 style={{ margin: 0, fontSize: '18px' }} data-i18n="modal.downloadTitle">Tải xuống</h3>
-            <button id="closeDownloadModalBtn" className="btn" style={{ padding: '4px' }}><Icon name={ICONS.X} /></button>
-          </div>
-          <div style={{ padding: '20px' }}>
-            
-            {/* Bước 1: Chọn Canvas */}
-            <div className="download-section" style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '10px' }} data-i18n="download.step1">1. Chọn tệp (Canvas)</label>
-              <div id="downloadCanvasList" className="download-canvas-list" style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '150px', overflowY: 'auto', background: 'var(--surface-1)', padding: '10px', borderRadius: '8px', border: '1px solid var(--border)' }}>
-                {/* Checkboxes will be injected here via JS */}
-              </div>
-            </div>
-            
-            {/* Bước 2: Chọn Định dạng */}
-            <div className="download-section" style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '10px' }} data-i18n="download.step2">2. Định dạng xuất</label>
-              <div className="download-options-grid format-selector" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
-                <button className="dl-format-btn select-btn active" data-format="png" style={{ flexDirection: 'column', padding: '12px 8px', alignItems: 'center' }}>
-                  <Icon name={ICONS.IMAGE} style={{ width: '24px', height: '24px', marginBottom: '4px' }} />
-                  <span style={{ fontSize: '13px', fontWeight: 600 }}>PNG</span>
-                </button>
-                <button className="dl-format-btn select-btn" data-format="jpeg" style={{ flexDirection: 'column', padding: '12px 8px', alignItems: 'center' }}>
-                  <Icon name={ICONS.IMAGE} style={{ width: '24px', height: '24px', marginBottom: '4px' }} />
-                  <span style={{ fontSize: '13px', fontWeight: 600 }}>JPG</span>
-                </button>
-                <button className="dl-format-btn select-btn" data-format="webp" style={{ flexDirection: 'column', padding: '12px 8px', alignItems: 'center' }}>
-                  <Icon name={ICONS.IMAGE} style={{ width: '24px', height: '24px', marginBottom: '4px' }} />
-                  <span style={{ fontSize: '13px', fontWeight: 600 }}>WEBP</span>
-                </button>
-                <button className="dl-format-btn select-btn" data-format="json" style={{ flexDirection: 'column', padding: '12px 8px', alignItems: 'center' }}>
-                  <Icon name={ICONS.FILE_JSON} style={{ width: '24px', height: '24px', marginBottom: '4px' }} />
-                  <span style={{ fontSize: '13px', fontWeight: 600 }}>JSON</span>
-                </button>
-                <button className="dl-format-btn select-btn anim-format" data-format="spritesheet" style={{ flexDirection: 'column', padding: '12px 8px', alignItems: 'center', gridColumn: 'span 2' }}>
-                  <Icon name={ICONS.LAYOUT_GRID} style={{ width: '24px', height: '24px', marginBottom: '4px' }} />
-                  <span style={{ fontSize: '13px', fontWeight: 600 }}>Sprite Sheet</span>
-                </button>
-                <button className="dl-format-btn select-btn anim-format" data-format="zip" style={{ flexDirection: 'column', padding: '12px 8px', alignItems: 'center', gridColumn: 'span 2' }}>
-                  <Icon name={ICONS.FILE_ARCHIVE} style={{ width: '24px', height: '24px', marginBottom: '4px' }} />
-                  <span style={{ fontSize: '13px', fontWeight: 600 }}>ZIP Frames</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Bước 3: Nơi lưu */}
-            <div className="download-section" style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', fontSize: '14px', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '10px' }} data-i18n="download.step3">3. Nơi lưu trữ</label>
-              <div className="download-options-grid dest-selector" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                <button className="dl-dest-btn select-btn active" data-dest="local" style={{ padding: '12px', justifyContent: 'center' }}>
-                  <Icon name={ICONS.MONITOR_DOWN} style={{ width: '20px', height: '20px' }} />
-                  <span style={{ fontWeight: 600, fontSize: '14px' }} data-i18n="download.local">Lưu vào máy</span>
-                </button>
-                <button className="dl-dest-btn select-btn" data-dest="drive" style={{ padding: '12px', justifyContent: 'center' }}>
-                  <Icon name={ICONS.HARD_DRIVE_UPLOAD} style={{ width: '20px', height: '20px' }} />
-                  <span style={{ fontWeight: 600, fontSize: '14px' }} data-i18n="download.drive">Google Drive</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Bước 4: Action */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '16px', borderTop: '1px solid var(--border)' }}>
-               <button id="executeDownloadBtn" className="btn btn-primary" style={{ padding: '10px 24px', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                 <Icon name={ICONS.DOWNLOAD} style={{ width: '18px', height: '18px' }} />
-                 <span style={{ fontWeight: 600 }} data-i18n="download.execute">Tiến hành tải xuống</span>
-               </button>
-            </div>
-
-          </div>
-        </div>
-      </div>
+      <Suspense fallback={null}>
+        <UploadModal />
+        <DownloadModal />
+      </Suspense>
 
 
 

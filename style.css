@@ -1,6 +1,7 @@
 @import url('./src/styles/theme.css');
 @import url('./src/styles/base.css');
 @import url('./src/styles/animations.css');
+@import url('./src/shared/styles/animation-manager.css');
 @import url('./src/styles/global/components.css');
 @import url('./src/styles/layout.css');
 @import url('./src/styles/global/toolbar.css');

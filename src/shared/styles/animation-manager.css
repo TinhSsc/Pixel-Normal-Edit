@@ -1,0 +1,200 @@
+/* 
+ * Animation Manager CSS
+ * 
+ * Module CSS dùng chung cho tất cả animation/transition trong app.
+ * 
+ * Cách sử dụng:
+ * 1. Import trong style.css: @import './shared/styles/animation-manager.css';
+ * 2. Thêm class tương ứng vào element HTML
+ * 3. Animation có thể bật/tắt qua class .animations-enabled / .animations-disabled trên <html>
+ */
+
+/* ===== KEYFRAMES ===== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeInTab {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes particleFade {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.5); }
+}
+
+@keyframes toastSlideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes toastSlideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes autobackup-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes placeholderPulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 0.3; }
+}
+
+/* ===== ANIMATION CLASSES ===== */
+
+/* Fade */
+.anim-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.anim-fade-out {
+  animation: fadeOut 0.3s ease-in;
+}
+
+/* Slide */
+.anim-slide-up {
+  animation: slideUp 0.3s ease-out;
+}
+
+.anim-slide-down {
+  animation: slideDown 0.3s ease-in;
+}
+
+/* Modal */
+.anim-modal-enter {
+  animation: modalSlideUp 0.25s ease-out;
+}
+
+/* Tab */
+.anim-tab-enter {
+  animation: fadeInTab 0.2s ease-out;
+}
+
+/* Utility */
+.anim-spin {
+  animation: spin 2s linear infinite;
+}
+
+.anim-pulse {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.anim-toast-enter {
+  animation: toastSlideIn 0.3s ease-out;
+}
+
+.anim-toast-exit {
+  animation: toastSlideOut 0.3s ease-in forwards;
+}
+
+/* ===== TRANSITION CLASSES ===== */
+
+/* Button hover/active */
+.interact-btn {
+  transition: background-color 0.15s ease, 
+              color 0.15s ease, 
+              transform 0.1s ease, 
+              box-shadow 0.15s ease;
+}
+
+.interact-btn:active {
+  transform: scale(0.97);
+}
+
+/* Tool button */
+.interact-tool-btn {
+  transition: color 0.15s ease, 
+              background-color 0.15s ease, 
+              transform 0.1s ease;
+}
+
+.interact-tool-btn:active {
+  transform: scale(0.95);
+}
+
+/* ===== ANIMATION TOGGLE ===== */
+
+/* Khi animation được bật (mặc định) */
+html:not(.animations-disabled) .anim-enabled {
+  animation-duration: inherit;
+  animation-fill-mode: inherit;
+}
+
+/* Khi animation bị tắt */
+html.animations-disabled,
+html.animations-disabled * {
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+  transition-duration: 0s !important;
+  transition-delay: 0s !important;
+}
+
+html.animations-disabled .anim-enabled {
+  animation: none !important;
+  transition: none !important;
+}

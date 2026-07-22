@@ -1,7 +1,7 @@
 import { GRID_WIDTH, GRID_HEIGHT, pixelMap, setStatus } from '../../engine/core/state.js';
 import { t } from '../../../../i18n/i18n.js';
 
-function getPixelCanvas(tab = null) {
+function getPixelCanvas(tab = null, options = { transparent: false }) {
   const canvas = document.createElement('canvas');
   const w = tab ? tab.grid.w : GRID_WIDTH;
   const h = tab ? tab.grid.h : GRID_HEIGHT;
@@ -28,8 +28,8 @@ function getPixelCanvas(tab = null) {
   return canvas;
 }
 
-export function exportJpeg(tab = null) {
-  const canvas = getPixelCanvas(tab);
+export function exportJpeg(tab = null, options = { transparent: false }) {
+  const canvas = getPixelCanvas(tab, options);
   const namePrefix = tab ? tab.name.replace(/\s+/g, '-') : 'pixel-art';
   const a = document.createElement('a');
   a.download = `${namePrefix}.jpg`;
@@ -38,9 +38,9 @@ export function exportJpeg(tab = null) {
   setStatus(t('status.dlJpeg'));
 }
 
-export function generateWorkspaceJpegBlob(tab = null) {
+export function generateWorkspaceJpegBlob(tab = null, options = { transparent: false }) {
   return new Promise((resolve) => {
-    const canvas = getPixelCanvas(tab);
+    const canvas = getPixelCanvas(tab, options);
     canvas.toBlob((blob) => {
       resolve(blob);
     }, 'image/jpeg', 0.9);

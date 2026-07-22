@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Icon, ICONS } from '../../../../shared/ui/icons';
 import { GRID_WIDTH, GRID_HEIGHT, setStatus } from '../../engine/core/state.js';
 import { setGridSize } from '../../engine/actions/grid-size-select.js';
+import { t } from '../../../../i18n/i18n.js';
 
 export default function CanvasSettingsModal({ isOpen, onClose }) {
   const [width, setWidth] = useState(32);
@@ -122,12 +123,12 @@ export default function CanvasSettingsModal({ isOpen, onClose }) {
         <div style={{ flex: '0 0 200px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
             <Icon name={ICONS.MAXIMIZE} style={{ width: '16px', height: '16px', color: 'var(--color-primary)' }} />
-            <h2 style={{ fontSize: '14px', fontWeight: 'bold', color: 'var(--color-text-bright)', margin: 0 }}>Cài đặt Kích thước</h2>
+            <h2 style={{ fontSize: '14px', fontWeight: 'bold', color: 'var(--color-text-bright)', margin: 0 }} data-i18n="settings.canvasSize">{t('settings.canvasSize') || 'Cài đặt Kích thước'}</h2>
           </div>
           
           <div style={{ display: 'flex', gap: '12px' }}>
             <div style={{ flex: 1 }}>
-              <label style={{ display: 'block', fontSize: '10px', fontWeight: 'bold', color: 'var(--color-text-muted)', marginBottom: '6px', textTransform: 'uppercase' }}>Width</label>
+              <label style={{ display: 'block', fontSize: '10px', fontWeight: 'bold', color: 'var(--color-text-muted)', marginBottom: '6px', textTransform: 'uppercase' }} data-i18n="label.width">{t('label.width') || 'Width'}</label>
               <input 
                 type="number" 
                 value={width} 
@@ -136,7 +137,7 @@ export default function CanvasSettingsModal({ isOpen, onClose }) {
               />
             </div>
             <div style={{ flex: 1 }}>
-              <label style={{ display: 'block', fontSize: '10px', fontWeight: 'bold', color: 'var(--color-text-muted)', marginBottom: '6px', textTransform: 'uppercase' }}>Height</label>
+              <label style={{ display: 'block', fontSize: '10px', fontWeight: 'bold', color: 'var(--color-text-muted)', marginBottom: '6px', textTransform: 'uppercase' }} data-i18n="label.height">{t('label.height') || 'Height'}</label>
               <input 
                 type="number" 
                 value={height} 
@@ -148,11 +149,11 @@ export default function CanvasSettingsModal({ isOpen, onClose }) {
 
           <label style={{ display: 'flex', alignItems: 'center', gap: '10px', background: 'var(--color-surface-alt)', padding: '10px', borderRadius: '8px', cursor: 'pointer' }}>
             <input type="checkbox" className="check" checked={isLocked} onChange={(e) => setIsLocked(e.target.checked)} />
-            <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-text)', userSelect: 'none' }}>Khóa tỷ lệ (Ratio)</span>
+            <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-text)', userSelect: 'none' }} data-i18n="label.lockRatio">{t('label.lockRatio') || 'Khóa tỷ lệ (Ratio)'}</span>
           </label>
 
           <div style={{ paddingTop: '12px', borderTop: '1px solid var(--color-border)' }}>
-            <label style={{ display: 'block', fontSize: '10px', fontWeight: 'bold', color: 'var(--color-text-muted)', marginBottom: '10px', textTransform: 'uppercase' }}>Tỷ lệ (Presets)</label>
+            <label style={{ display: 'block', fontSize: '10px', fontWeight: 'bold', color: 'var(--color-text-muted)', marginBottom: '10px', textTransform: 'uppercase' }} data-i18n="label.presets">{t('label.presets') || 'Tỷ lệ (Presets)'}</label>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px' }}>
               {[
                 { label: '1:1', ratioW: 1, ratioH: 1 },
@@ -191,8 +192,8 @@ export default function CanvasSettingsModal({ isOpen, onClose }) {
                 <Icon name={ICONS.CROP} style={{ width: '16px', height: '16px' }} />
               </div>
               <div>
-                <div style={{ fontWeight: 600, fontSize: '13px', marginBottom: '2px', color: strategy === 'keep' ? 'var(--color-primary)' : 'var(--color-text-bright)' }}>Giữ nguyên ảnh</div>
-                <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', lineHeight: 1.4 }}>Giữ tỷ lệ gốc, tự động cắt hoặc bù thêm nền. (Sẽ căn chỉnh ở bước sau)</div>
+                <div style={{ fontWeight: 600, fontSize: '13px', marginBottom: '2px', color: strategy === 'keep' ? 'var(--color-primary)' : 'var(--color-text-bright)' }} data-i18n="resizeModal.keepImage">{t('resizeModal.keepImage') || 'Giữ nguyên ảnh'}</div>
+                <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', lineHeight: 1.4 }} data-i18n="resizeModal.keepImageDesc">{t('resizeModal.keepImageDesc') || 'Giữ tỷ lệ gốc, tự động cắt hoặc bù thêm nền. (Sẽ căn chỉnh ở bước sau)'}</div>
               </div>
             </label>
 
@@ -202,8 +203,8 @@ export default function CanvasSettingsModal({ isOpen, onClose }) {
                 <Icon name={ICONS.MAXIMIZE} style={{ width: '16px', height: '16px' }} />
               </div>
               <div>
-                <div style={{ fontWeight: 600, fontSize: '13px', marginBottom: '2px', color: strategy === 'scale' ? 'var(--color-primary)' : 'var(--color-text-bright)' }}>Thu phóng ảnh</div>
-                <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', lineHeight: 1.4 }}>Co giãn toàn bộ hình ảnh vừa khít kích thước mới.</div>
+                <div style={{ fontWeight: 600, fontSize: '13px', marginBottom: '2px', color: strategy === 'scale' ? 'var(--color-primary)' : 'var(--color-text-bright)' }} data-i18n="resizeModal.scaleImage">{t('resizeModal.scaleImage') || 'Thu phóng ảnh'}</div>
+                <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', lineHeight: 1.4 }} data-i18n="resizeModal.scaleImageDesc">{t('resizeModal.scaleImageDesc') || 'Co giãn toàn bộ hình ảnh vừa khít kích thước mới.'}</div>
               </div>
             </label>
 
@@ -213,8 +214,8 @@ export default function CanvasSettingsModal({ isOpen, onClose }) {
                 <Icon name={ICONS.TRASH_2} style={{ width: '16px', height: '16px' }} />
               </div>
               <div>
-                <div style={{ fontWeight: 600, fontSize: '13px', marginBottom: '2px', color: strategy === 'clear' ? 'var(--color-danger)' : 'var(--color-text-bright)' }}>Xóa ảnh hiện tại</div>
-                <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', lineHeight: 1.4 }}>Xóa toàn bộ ảnh cũ, tạo canvas trắng hoàn toàn.</div>
+                <div style={{ fontWeight: 600, fontSize: '13px', marginBottom: '2px', color: strategy === 'clear' ? 'var(--color-danger)' : 'var(--color-text-bright)' }} data-i18n="resizeModal.clearImage">{t('resizeModal.clearImage') || 'Xóa ảnh hiện tại'}</div>
+                <div style={{ fontSize: '11px', color: 'var(--color-text-muted)', lineHeight: 1.4 }} data-i18n="resizeModal.clearImageDesc">{t('resizeModal.clearImageDesc') || 'Xóa toàn bộ ảnh cũ, tạo canvas trắng hoàn toàn.'}</div>
               </div>
             </label>
           </div>
@@ -227,15 +228,17 @@ export default function CanvasSettingsModal({ isOpen, onClose }) {
           onClick={onClose}
           className="btn"
           style={{ padding: '8px 16px', fontSize: '13px', background: 'transparent', border: '1px solid var(--color-border)' }}
+          data-i18n="btn.cancel"
         >
-          Hủy
+          {t('btn.cancel') || 'Hủy'}
         </button>
         <button 
           onClick={handleApply}
           className="btn btn-primary"
           style={{ padding: '8px 24px', fontSize: '13px', fontWeight: 'bold', borderRadius: '8px' }}
+          data-i18n="btn.apply"
         >
-          Áp dụng
+          {t('btn.apply') || 'Áp dụng'}
         </button>
       </div>
     </div>

@@ -21,6 +21,7 @@ import {
 } from '../../engine/core/animation-state.js';
 import AnimationStripPanel from './AnimationStripPanel.jsx';
 import { GRID_WIDTH, GRID_HEIGHT } from '../../engine/core/state.js';
+import { performQuickSave } from '../../engine/core/tab-manager.js';
 import CanvasSettingsModal from '../resize/CanvasSettingsModal.jsx';
 import { renderPixels, setForceFullRender } from '../../engine/core/render.js';
 import { getZoom, getPan, setPan, applyTransform } from '../../engine/core/viewport.js';
@@ -163,6 +164,7 @@ export default function CanvasPanel() {
     }
     setIsAnimMode(newValue);
     console.log('[AnimationMode]', newValue ? 'BẬT' : 'TẮT');
+    performQuickSave(); // Save state immediately so F5 doesn't restore stale data
   };
 
   const handleInsertFrame = (atIndex) => {

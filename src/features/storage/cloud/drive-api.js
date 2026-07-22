@@ -264,12 +264,16 @@ export function openDrivePicker(onFilePicked, onCancel) {
     // Only show images and JSON
     const view = new google.picker.DocsView(google.picker.ViewId.DOCS);
     view.setMimeTypes('image/png,image/jpeg,image/webp,application/json');
+    view.setMode(google.picker.DocsViewMode.GRID); // Grid view by default for beautiful thumbnails
 
     const picker = new google.picker.PickerBuilder()
       .addView(view)
       .setOAuthToken(accessToken)
       .setDeveloperKey(API_KEY)
+      .enableFeature(google.picker.Feature.SUPPORT_TEAM_DRIVES) // Support Team/Shared Drives
+      .enableFeature(google.picker.Feature.SIMPLE_UPLOAD_ENABLED) // Enable upload in Picker
       .setCallback(pickerCallback)
+      .setSize(1050, 650) // Make it larger and more modern/spacious
       .build();
     
     picker.setVisible(true);

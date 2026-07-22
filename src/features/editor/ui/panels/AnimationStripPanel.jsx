@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Icon, ICONS } from '../../../../shared/ui/icons';
+import { t } from '../../../../i18n/i18n';
 
 function drawFrameThumbnail(canvasEl, frame) {
   if (!canvasEl || !frame) return;
@@ -101,7 +102,13 @@ export default function AnimationStripPanel({
   removingFrameId,
   children
 }) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    return localStorage.getItem('animationStripCollapsed') === 'true';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('animationStripCollapsed', isCollapsed);
+  }, [isCollapsed]);
   const [frameToDelete, setFrameToDelete] = useState(null);
   const [dontAskAgain, setDontAskAgain] = useState(false);
 
@@ -207,15 +214,15 @@ export default function AnimationStripPanel({
       {frameToDelete !== null && createPortal(
         <div className="modal-overlay" style={{ display: 'flex', zIndex: 999999 }}>
           <div className="modal-content" style={{ maxWidth: '320px', textAlign: 'center' }}>
-            <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', color: 'var(--color-text-bright)' }}>Xác nhận xóa</h3>
-            <p style={{ color: 'var(--color-text-muted)', marginBottom: '24px' }}>Bạn có chắc chắn muốn xóa trang {frameToDelete + 1} không?</p>
+            <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', color: 'var(--color-text-bright)' }} data-i18n="confirm.deleteTitle">Xác nhận xóa</h3>
+            <p style={{ color: 'var(--color-text-muted)', marginBottom: '24px' }}>{t('confirm.deleteFrameMsg', frameToDelete + 1)}</p>
             <div style={{ marginBottom: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
               <input type="checkbox" id="dontAskDeleteFrame" checked={dontAskAgain} onChange={(e) => setDontAskAgain(e.target.checked)} style={{ cursor: 'pointer' }} />
-              <label htmlFor="dontAskDeleteFrame" style={{ cursor: 'pointer', color: 'var(--color-text)', fontSize: '14px' }}>Không nhắc lại (trong 2 giờ)</label>
+              <label htmlFor="dontAskDeleteFrame" style={{ cursor: 'pointer', color: 'var(--color-text)', fontSize: '14px' }} data-i18n="confirm.dontAskAgain">Không nhắc lại (trong 2 giờ)</label>
             </div>
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
-              <button className="btn" onClick={() => { setFrameToDelete(null); setDontAskAgain(false); }}>Hủy</button>
-              <button className="btn btn-primary" style={{ background: 'var(--color-danger)', borderColor: 'var(--color-danger)' }} onClick={confirmDelete}>Xóa</button>
+              <button className="btn" onClick={() => { setFrameToDelete(null); setDontAskAgain(false); }} data-i18n="btn.cancel">Hủy</button>
+              <button className="btn btn-primary" style={{ background: 'var(--color-danger)', borderColor: 'var(--color-danger)' }} onClick={confirmDelete} data-i18n="btn.delete">Xóa</button>
             </div>
           </div>
         </div>,

@@ -3,14 +3,27 @@ import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import { t } from '../../../../i18n/i18n.js';
 
-function drawFrameToCanvas(frame, canvasCtx, offsetX, offsetY) {
+function drawFrameToCanvas(frame, canvasCtx, offsetX, offsetY, options = { transparent: true }) {
+  if (!options.transparent) {
+    canvasCtx.fillStyle = '#ffffff';
+    canvasCtx.fillRect(offsetX, offsetY, frame.width, frame.height);
+  }
   const imgData = new ImageData(frame.width, frame.height);
   const data32 = new Uint32Array(imgData.data.buffer);
   data32.set(frame.pixelMap);
-  canvasCtx.putImageData(imgData, offsetX, offsetY);
+  
+  if (!options.transparent) {
+    const tmpCanvas = document.createElement('canvas');
+    tmpCanvas.width = frame.width;
+    tmpCanvas.height = frame.height;
+    tmpCanvas.getContext('2d').putImageData(imgData, 0, 0);
+    canvasCtx.drawImage(tmpCanvas, offsetX, offsetY);
+  } else {
+    canvasCtx.putImageData(imgData, offsetX, offsetY);
+  }
 }
 
-export function generateSpriteSheetBlob(tab) {
+export function generateSpriteSheetBlob(tab, options = { transparent: true }) {
   return new Promise((resolve, reject) => {
     if (!tab || !tab.animation || !tab.animation.frames || tab.animation.frames.length === 0) {
       reject(new Error("Không có dữ liệu ảnh động để xuất."));
@@ -27,15 +40,15 @@ export function generateSpriteSheetBlob(tab) {
     const ctx = canvas.getContext('2d');
 
     frames.forEach((frame, idx) => {
-      drawFrameToCanvas(frame, ctx, idx * w, 0);
+      drawFrameToCanvas(frame, ctx, idx * w, 0, options);
     });
 
     canvas.toBlob((blob) => resolve(blob), 'image/png');
   });
 }
 
-export function exportSpriteSheet(tab) {
-  generateSpriteSheetBlob(tab).then(blob => {
+export function exportSpriteSheet(tab, options = { transparent: true }) {
+  generateSpriteSheetBlob(tab, options).then(blob => {
     const namePrefix = tab.name.replace(/\s+/g, '-') + '-spritesheet';
     saveAs(blob, `${namePrefix}.png`);
   }).catch(err => {
@@ -44,7 +57,7 @@ export function exportSpriteSheet(tab) {
   });
 }
 
-export async function generateZipBlob(tab) {
+export async function generateZipBlob(tab, options = { transparent: true }) {
   if (!tab || !tab.animation || !tab.animation.frames || tab.animation.frames.length === 0) {
     throw new Error("Không có dữ liệu ảnh động để xuất.");
   }
@@ -62,7 +75,7 @@ export async function generateZipBlob(tab) {
     canvas.height = frame.height;
     const ctx = canvas.getContext('2d');
     
-    drawFrameToCanvas(frame, ctx, 0, 0);
+    drawFrameToCanvas(frame, ctx, 0, 0, options);
     
     const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
     
@@ -73,12 +86,70 @@ export async function generateZipBlob(tab) {
   return await zip.generateAsync({ type: 'blob' });
 }
 
-export function exportZip(tab) {
-  generateZipBlob(tab).then(blob => {
+export function exportZip(tab, options = { transparent: true }) {
+  generateZipBlob(tab, options).then(blob => {
     const namePrefix = tab.name.replace(/\s+/g, '-');
     saveAs(blob, `${namePrefix}.zip`);
   }).catch(err => {
     console.error("Export ZIP Error:", err);
     alert(err.message);
+  });
+}
+
+export function exportAnimation(tab, format, options = { transparent: true }) {
+  return new Promise((resolve, reject) => {
+    if (!tab || !tab.animation || !tab.animation.frames || tab.animation.frames.length === 0) {
+      return reject(new Error("Không có dữ liệu ảnh động để xuất."));
+    }
+
+    if (format === 'gif') {
+      return reject(new Error("Định dạng GIF cần được tích hợp thêm thư viện (như gif.js)."));
+    }
+
+    if (format === 'webm') {
+      const frames = tab.animation.frames;
+      const fps = tab.animation.fps || 12;
+      const frameDuration = 1000 / fps;
+      const w = frames[0].width;
+      const h = frames[0].height;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext('2d');
+
+      const stream = canvas.captureStream(fps);
+      const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+      const chunks = [];
+
+      recorder.ondataavailable = e => {
+        if (e.data.size > 0) chunks.push(e.data);
+      };
+
+      recorder.onstop = () => {
+        const blob = new Blob(chunks, { type: 'video/webm' });
+        resolve(blob);
+      };
+
+      recorder.start();
+
+      let frameIdx = 0;
+      const drawNext = () => {
+        if (frameIdx >= frames.length) {
+          setTimeout(() => recorder.stop(), 50); // Small delay to capture last frame
+          return;
+        }
+
+        ctx.clearRect(0, 0, w, h);
+        drawFrameToCanvas(frames[frameIdx], ctx, 0, 0, options);
+        frameIdx++;
+
+        setTimeout(drawNext, frameDuration);
+      };
+
+      drawNext();
+    } else {
+      reject(new Error("Định dạng không được hỗ trợ."));
+    }
   });
 }

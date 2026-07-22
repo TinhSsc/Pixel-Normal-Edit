@@ -7,12 +7,22 @@ import { t, getCurrentLang, setLang } from '../../i18n/i18n.js';
 import { auth } from '../auth/logic/firebase/config.js';
 import { logout } from '../auth/logic/auth-state.js';
 import { getCurrentDirectoryHandle, clearLocalDirectory, pickLocalDirectory } from '../storage/local/local-drive.js';
+import GoogleButton from '../../shared/ui/GoogleButton.jsx';
+import { loginWithGoogle } from '../auth/logic/firebase/auth-api.js';
 export default function GlobalSettingsModal() {
   const [currentUser, setCurrentUser] = useState(null);
   const [tabCounterVal, setTabCounterVal] = useState(1);
   const [activeTab, setActiveTab] = useState('tab-appearance');
   const [autoSaveDest, setAutoSaveDest] = useState(localStorage.getItem('auto_save_destination') || 'drive');
   const [localDirName, setLocalDirName] = useState(null);
+
+  const handleGoogle = async () => {
+    try {
+      await loginWithGoogle();
+    } catch (err) {
+      alert(err.message || 'Lỗi đăng nhập bằng Google');
+    }
+  };
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -226,6 +236,12 @@ export default function GlobalSettingsModal() {
         </div>
 
         <div className="modal-tabs" style={{ flexWrap: 'wrap' }}>
+          <button className={`tab-btn ${activeTab === 'tab-account' ? 'active' : ''}`} data-tab="tab-account" onClick={() => setActiveTab('tab-account')}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              <Icon name={ICONS.USER} style={{ width: '18px', height: '18px' }} />
+              <span data-i18n="modal.tabAccount">Tài khoản</span>
+            </div>
+          </button>
           <button className={`tab-btn ${activeTab === 'tab-appearance' ? 'active' : ''}`} data-tab="tab-appearance" onClick={() => setActiveTab('tab-appearance')}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
               <Icon name={ICONS.PALETTE} style={{ width: '18px', height: '18px' }} />
@@ -242,12 +258,6 @@ export default function GlobalSettingsModal() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
               <Icon name={ICONS.SETTINGS_2} style={{ width: '18px', height: '18px' }} />
               <span data-i18n="modal.tabEditTools">Thao tác</span>
-            </div>
-          </button>
-          <button className={`tab-btn ${activeTab === 'tab-account' ? 'active' : ''}`} data-tab="tab-account" onClick={() => setActiveTab('tab-account')}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-              <Icon name={ICONS.USER} style={{ width: '18px', height: '18px' }} />
-              <span data-i18n="modal.tabAccount">Tài khoản</span>
             </div>
           </button>
         </div>
@@ -345,11 +355,15 @@ export default function GlobalSettingsModal() {
                       <span id="pixelAccountEmail" style={{ fontSize: '12px', color: 'var(--text-muted)', wordBreak: 'break-all' }} data-i18n={currentUser ? null : "auth.loginToSync"}>{currentUser ? currentUser.email : (t('auth.loginToSync') || 'Vui lòng đăng nhập để đồng bộ')}</span>
                     </div>
                   </div>
-                  {currentUser && (
+                  {currentUser ? (
                     <button id="pixelLogoutBtn" className="btn btn-primary" style={{ padding: '6px 12px', fontSize: '13px', background: 'var(--color-danger)' }} onClick={async () => {
                       await logout();
                       document.getElementById('globalSettingsModal').style.display = 'none';
                     }} data-i18n="auth.logout">{t('auth.logout') || 'Đăng xuất'}</button>
+                  ) : (
+                    <div style={{ minWidth: '200px' }}>
+                      <GoogleButton onCredential={handleGoogle} />
+                    </div>
                   )}
                 </div>
               </div>
@@ -364,7 +378,10 @@ export default function GlobalSettingsModal() {
                     <Icon name={ICONS.CLOUD} style={{ color: 'var(--text-muted)' }} />
                     <span id="driveStatusText" style={{ fontSize: '13px', color: 'var(--text-muted)' }} data-i18n="status.driveDisconnected">Chưa kết nối</span>
                   </div>
-                  <button id="driveLoginBtn" className="btn btn-primary" style={{ padding: '6px 12px', fontSize: '13px' }} data-i18n="drive.login">Đăng nhập Drive</button>
+                  <button id="driveLoginBtn" className="btn btn-primary" style={{ padding: '6px 12px', fontSize: '13px' }} data-i18n="drive.login" onClick={async () => {
+                    const { loginToDrive } = await import('../storage/cloud/drive-api.js');
+                    await loginToDrive();
+                  }}>Đăng nhập Drive</button>
                   <button id="driveLogoutBtn" className="btn" style={{ padding: '6px 12px', fontSize: '13px', display: 'none' }} data-i18n="drive.logout">Đăng xuất</button>
                 </div>
               </div>

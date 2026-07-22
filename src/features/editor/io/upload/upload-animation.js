@@ -100,6 +100,38 @@ export function handleSpriteSheet(img, numFrames) {
   document.getElementById('uploadModal').style.display = 'none';
 }
 
+export function handleMultipleImageFrames(imageObjects) {
+  if (!imageObjects || imageObjects.length === 0) return;
+  
+  // Sort theo natural order tên file (ví dụ frame-2 đứng trước frame-10)
+  imageObjects.sort((a, b) => a.name.localeCompare(b.name, undefined, {numeric: true}));
+
+  const frames = [];
+  const w = imageObjects[0].img.naturalWidth;
+  const h = imageObjects[0].img.naturalHeight;
+
+  for (let i = 0; i < imageObjects.length; i++) {
+    const { img } = imageObjects[i];
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, w, h);
+    
+    const imgData = ctx.getImageData(0, 0, w, h);
+    frames.push({
+      id: `frame_${i + 1}`,
+      pixelMap: new Uint32Array(imgData.data.buffer),
+      groupMap: [],
+      width: w,
+      height: h,
+      historyState: { undoStack: [], redoStack: [], currentStroke: null }
+    });
+  }
+
+  applyAnimationFrames(frames, w, h);
+}
+
 function applyAnimationFrames(frames, w, h) {
   // 1. Setup the main canvas to match frame size
   const offCanvas = document.createElement('canvas');

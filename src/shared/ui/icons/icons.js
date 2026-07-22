@@ -60,4 +60,5 @@ export const ICONS = {
   FILE_ARCHIVE: 'file-archive',
   EYE: 'eye',
   EYE_OFF: 'eye-off',
+  CHROME: 'chrome',
 };

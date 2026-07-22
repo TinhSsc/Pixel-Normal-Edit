@@ -65,6 +65,8 @@ export function setupDriveUI() {
           const data = await res.json();
           if (data.user && data.user.emailAddress) {
             driveUserEmail = data.user.emailAddress;
+            sessionStorage.setItem('drive_user_email', driveUserEmail);
+            window.dispatchEvent(new CustomEvent('drive-user-email-changed', { detail: { email: driveUserEmail } }));
           }
         }
       } catch (err) {
@@ -97,6 +99,8 @@ export function setupDriveUI() {
 
   window.addEventListener('drive-disconnected', () => {
     driveUserEmail = "";
+    sessionStorage.removeItem('drive_user_email');
+    window.dispatchEvent(new CustomEvent('drive-user-email-changed', { detail: { email: "" } }));
     if (driveStatusText) {
       driveStatusText.textContent = t('status.driveDisconnected') || "Chưa kết nối";
       driveStatusText.style.color = 'var(--text-muted)';
@@ -237,8 +241,9 @@ export function setupDriveUI() {
       }
     });
   }
+}
 
-  async function loadDriveFileList() {
+export async function loadDriveFileList() {
     const driveUploadList = document.getElementById('driveUploadList');
     if (!driveUploadList) return;
 
@@ -339,9 +344,9 @@ export function setupDriveUI() {
     } catch (err) {
       driveUploadList.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--color-danger);">${err.message}</div>`;
     }
-  }
+}
 
-  async function loadLocalDirFileList() {
+export async function loadLocalDirFileList() {
     const localDirUploadList = document.getElementById('localDirUploadList');
     if (!localDirUploadList) return;
 
@@ -446,7 +451,6 @@ export function setupDriveUI() {
       localDirUploadList.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--color-danger);">${err.message}</div>`;
     }
   }
-}
 
 export async function exportToDrive(tab, format) {
   let blob;

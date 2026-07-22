@@ -90,26 +90,25 @@
 .main-area::before {
   content: "";
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   border-radius: inherit;
-  
+
   /* The dot pattern - brighter since it's only a spotlight */
   background-image: radial-gradient(rgba(150, 150, 150, 0.4) 1.5px, transparent 0);
   background-size: 30px 30px;
   background-position: 0px 0px;
-  
+
   /* Spotlight mask following the mouse */
-  -webkit-mask-image: radial-gradient(
-    circle 250px at var(--mouse-x, 50%) var(--mouse-y, 50%),
-    black 0%,
-    transparent 100%
-  );
-  mask-image: radial-gradient(
-    circle 250px at var(--mouse-x, 50%) var(--mouse-y, 50%),
-    black 0%,
-    transparent 100%
-  );
-  
+  -webkit-mask-image: radial-gradient(circle 250px at var(--mouse-x, 50%) var(--mouse-y, 50%),
+      black 0%,
+      transparent 100%);
+  mask-image: radial-gradient(circle 250px at var(--mouse-x, 50%) var(--mouse-y, 50%),
+      black 0%,
+      transparent 100%);
+
   pointer-events: none;
   z-index: 0;
   opacity: 0;
@@ -301,7 +300,8 @@
   display: flex;
   gap: 6px;
   transition: all 0.3s ease;
-  overflow: visible; /* Prevent animation clipping */
+  overflow: visible;
+  /* Prevent animation clipping */
 }
 
 
@@ -318,10 +318,13 @@
 
 /* Mobile Responsive Layout */
 @media (max-width: 768px) {
-  html, body {
+
+  html,
+  body {
     overflow: auto;
     height: auto;
   }
+
   body {
     padding: 10px;
     min-height: 100vh;
@@ -383,9 +386,11 @@
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
   }
+
   .floating-nav-content::-webkit-scrollbar {
     height: 4px;
   }
+
   .floating-nav-content::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.2);
     border-radius: 2px;
@@ -613,9 +618,10 @@
 
 /* Custom Tooltip */
 #custom-tooltip {
-  position: fixed;
-  background: var(--color-surface-alt);
-  color: var(--color-text);
+  position: absolute;
+  /* hoặc fixed tùy thuộc vào layout chính của bạn */
+  background: var(--color-surface);
+  color: var(--color-text-bright);
   border: 1px solid var(--color-border);
   padding: 6px 12px;
   border-radius: 6px;
@@ -623,17 +629,28 @@
   font-weight: 500;
   pointer-events: none;
   z-index: 9999;
-  opacity: 0;
-  transform: translateY(5px);
-  transition: opacity 0.2s ease, transform 0.2s ease;
-  box-shadow: 0 4px 12px var(--color-shadow-lg);
   white-space: nowrap;
+
+  /* Trạng thái ẩn (Khởi tạo hiệu ứng) */
+  opacity: 0;
+  transform: scale(0.9) translateY(8px);
+
+  /* Nâng cấp Transition: Thêm cubic-bezier để tạo độ nẩy nhẹ */
+  transition:
+    opacity 0.15s ease-out,
+    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Tăng cường chiều sâu bằng bóng đổ rộng hơn và làm mờ nền (nếu cần) */
+  box-shadow: 0 8px 24px var(--color-shadow-lg);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 #custom-tooltip.show,
 #custom-tooltip.visible {
+  /* Trạng thái hiện (Kết thúc hiệu ứng) */
   opacity: 1;
-  transform: translateY(0);
+  transform: scale(1) translateY(0);
 }
 
 /* Brush Cursor Preview */
@@ -1079,4 +1096,130 @@
   margin: 0;
   width: 32px;
   height: 32px;
+}
+
+/* --- Premium Download Modal Styles --- */
+.premium-modal-overlay {
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+}
+
+.premium-modal {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.premium-close-btn:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  transform: rotate(90deg);
+}
+
+.premium-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.premium-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.premium-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+
+.premium-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.premium-select-btn {
+  background: var(--surface-1);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  transition: all 0.2s ease;
+}
+
+.premium-select-btn:hover {
+  background: var(--surface-2);
+  border-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.premium-select-btn.active {
+  background: rgba(9, 105, 218, 0.1);
+  border: 1px solid var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.premium-select-btn.active .btn-icon-wrapper {
+  background: var(--accent) !important;
+}
+
+.premium-select-btn.active .btn-icon-wrapper svg {
+  color: #fff !important;
+}
+
+.premium-setting-card:hover {
+  background: var(--surface-2) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Custom Checkbox */
+.premium-checkbox {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.premium-checkbox input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.premium-checkbox .checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 20px;
+  width: 20px;
+  background-color: var(--surface-3);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.2s;
+}
+
+.premium-checkbox:hover input~.checkmark {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.premium-checkbox input:checked~.checkmark {
+  background-color: var(--accent);
+  border-color: var(--accent);
+}
+
+.premium-checkbox .checkmark:after {
+  content: '';
+  position: absolute;
+  display: none;
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.premium-checkbox input:checked~.checkmark:after {
+  display: block;
+}
+
+.premium-action-submit:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(9, 105, 218, 0.4) !important;
+}
+
+.premium-action-cancel:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
 }
