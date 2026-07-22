@@ -323,7 +323,7 @@ export default function CanvasPanel() {
             </button>
           </div>
         </div>
-        <div id="canvasBackground" className={isAnimMode ? 'is-animating' : ''}></div>
+        <div id="canvasBackground" className={isAnimMode ? 'is-animating' : ''} style={{ position: 'absolute', top: 0, left: 0, transformOrigin: '0 0' }}></div>
         {isAnimMode && showOnion && (
           <OnionSkinLayer frame={getPreviousFrame()} />
         )}

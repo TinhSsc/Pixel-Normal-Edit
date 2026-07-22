@@ -240,6 +240,7 @@ export default {
   "status.eraserError": "Error erasing area.",
 
   "text.showTools": "Show Tools",
+  "text.hideTools": "Hide Tools",
 
   "status.copied": "Copied",
   "status.pasted": "Pasted",

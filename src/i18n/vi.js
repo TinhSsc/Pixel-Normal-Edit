@@ -243,6 +243,7 @@ export default {
   "status.eraserError": "Lỗi khi tẩy màu.",
 
   "text.showTools": "Mở công cụ",
+  "text.hideTools": "Đóng công cụ",
 
   "download.local": "Lưu vào máy",
   "download.drive": "Google Drive",

@@ -27,16 +27,25 @@ export function setPan(x, y) {
   let newX = x;
   let newY = y;
   
-  if (cw <= ww) {
-    newX = Math.max(0, Math.min(newX, ww - cw));
+  const isMobile = window.innerWidth <= 768;
+
+  if (isMobile) {
+    // Relaxed boundaries for mobile to avoid "hitting a wall" when dragging
+    newX = Math.max(-cw + 40, Math.min(newX, ww - 40));
+    newY = Math.max(-ch + 40, Math.min(newY, wh - 40));
   } else {
-    newX = Math.max(ww - cw, Math.min(newX, 0));
-  }
-  
-  if (ch <= wh) {
-    newY = Math.max(0, Math.min(newY, wh - ch));
-  } else {
-    newY = Math.max(wh - ch, Math.min(newY, 0));
+    // Original restricted logic for desktop
+    if (cw <= ww) {
+      newX = Math.max(0, Math.min(newX, ww - cw));
+    } else {
+      newX = Math.max(ww - cw, Math.min(newX, 0));
+    }
+    
+    if (ch <= wh) {
+      newY = Math.max(0, Math.min(newY, wh - ch));
+    } else {
+      newY = Math.max(wh - ch, Math.min(newY, 0));
+    }
   }
   
   panX = Math.round(newX); 
