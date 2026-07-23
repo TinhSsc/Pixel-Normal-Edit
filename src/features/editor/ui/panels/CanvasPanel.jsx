@@ -22,8 +22,9 @@ import {
 } from '../../engine/core/animation-state.js';
 import AnimationStripPanel from './AnimationStripPanel.jsx';
 import { GRID_WIDTH, GRID_HEIGHT } from '../../engine/core/state.js';
-import { performQuickSave } from '../../engine/core/tab-manager.js';
+import { debouncedSaveWorkspace } from '../../engine/core/tab-manager.js';
 import CanvasSettingsModal from '../resize/CanvasSettingsModal.jsx';
+import TextToolOverlay from '../text/TextToolOverlay.jsx';
 import { renderPixels, setForceFullRender } from '../../engine/core/render.js';
 import { getZoom, getPan, setPan, applyTransform } from '../../engine/core/viewport.js';
 import { t } from '../../../../i18n/i18n.js';
@@ -193,7 +194,7 @@ export default function CanvasPanel() {
     }
     setIsAnimMode(newValue);
     console.log('[AnimationMode]', newValue ? 'BẬT' : 'TẮT');
-    performQuickSave(); // Save state immediately so F5 doesn't restore stale data
+    debouncedSaveWorkspace(); // Save state using debounced (no prompt)
   };
 
   const handleInsertFrame = (atIndex) => {
@@ -338,6 +339,9 @@ export default function CanvasPanel() {
           <div id="mirrorLine" style={{ display: 'none', position: 'absolute', left: '50%', top: 0, bottom: 0, background: 'rgba(255, 60, 60, 0.8)', zIndex: 10 }}></div>
           <div id="selectionOverlay" style={{ display: 'none', position: 'absolute', pointerEvents: 'none', border: '1px dashed white', boxShadow: '0 0 0 1px black', zIndex: 20 }}></div>
         </div>
+        
+        <TextToolOverlay />
+        
         <div id="brush-cursor"></div>
         <svg id="ruler-overlay" style={{ display: 'none', position: 'absolute', top: 0, left: 0, overflow: 'visible', pointerEvents: 'none', zIndex: 998 }}>
           <line id="rulerLine" x1="0" y1="0" x2="0" y2="0" stroke="#ffffff" strokeWidth="1.5" />

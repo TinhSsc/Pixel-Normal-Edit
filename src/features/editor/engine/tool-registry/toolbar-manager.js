@@ -10,7 +10,7 @@ export const toolbarConfig = {
       id: 'draw',
       titleKey: 'group.draw',
       defaultTitle: 'Công cụ vẽ',
-      tools: ['pixel-pen', 'highlight-pen', 'blend-brush', 'spray-pen', 'eraser', 'picker']
+      tools: ['pixel-pen', 'highlight-pen', 'blend-brush', 'dither-brush', 'soft-brush', 'spray-pen', 'eraser', 'picker']
     },
     {
       id: 'fillBg',
@@ -22,7 +22,7 @@ export const toolbarConfig = {
       id: 'shape',
       titleKey: 'group.shape',
       defaultTitle: 'Hình khối',
-      tools: ['line', 'rect', 'circle']
+      tools: ['line', 'rect', 'circle', 'text']
     }
   ],
   tools: {
@@ -77,6 +77,26 @@ export const toolbarConfig = {
       popupPosition: 'bottom',
       settings: [
         { type: 'number', id: 'blendBrushSize', labelKey: 'label.pencilSize', tooltipKey: 'tooltip.pencilSize', defaultTitle: 'Cỡ bút', min: 1, max: 20, defaultValue: 1 }
+      ]
+    },
+    'dither-brush': {
+      id: 'dither-brush',
+      icon: ICONS.GRID,
+      tooltipKey: 'tool.dither-brush',
+      hasPopup: true,
+      popupPosition: 'bottom',
+      settings: [
+        { type: 'number', id: 'ditherBrushSize', labelKey: 'label.pencilSize', tooltipKey: 'tooltip.pencilSize', defaultTitle: 'Cỡ bút', min: 1, max: 20, defaultValue: 1 }
+      ]
+    },
+    'soft-brush': {
+      id: 'soft-brush',
+      icon: ICONS.CLOUD,
+      tooltipKey: 'tool.soft-brush',
+      hasPopup: true,
+      popupPosition: 'bottom',
+      settings: [
+        { type: 'number', id: 'softBrushSize', labelKey: 'label.pencilSize', tooltipKey: 'tooltip.pencilSize', defaultTitle: 'Cỡ bút', min: 1, max: 50, defaultValue: 3 }
       ]
     },
     'eraser': {
@@ -153,6 +173,20 @@ export const toolbarConfig = {
       popupPosition: 'bottom',
       settings: [
         { type: 'number', className: 'shape-thickness', labelKey: 'label.outlineThick', defaultTitle: 'Độ dày viền', min: 1, max: 20, defaultValue: 1 }
+      ]
+    },
+    'text': {
+      id: 'text',
+      variants: 'text',
+      icon: ICONS.TYPE,
+      tooltipKey: 'tool.text',
+      hasPopup: true,
+      popupPosition: 'bottom',
+      settings: [
+        { type: 'select', id: 'textToolFont', labelKey: 'text.fontFamily', defaultTitle: 'Font', options: ['Arial', 'Courier New', 'Times New Roman', 'Comic Sans MS', 'Impact', 'Verdana', 'Tahoma', 'Trebuchet MS'], defaultValue: 'Arial' },
+        { type: 'number', id: 'textToolSize', labelKey: 'text.fontSize', defaultTitle: 'Cỡ chữ', min: 8, max: 100, defaultValue: 16 },
+        { type: 'checkbox', id: 'textToolBold', labelKey: 'text.bold', defaultTitle: 'In đậm', defaultValue: false },
+        { type: 'checkbox', id: 'textToolItalic', labelKey: 'text.italic', defaultTitle: 'In nghiêng', defaultValue: false }
       ]
     }
   }

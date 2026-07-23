@@ -148,3 +148,78 @@
 .nested-tab-content.active {
   display: block;
 }
+
+/* Tool Popup Slide Animation and Arrow Pointer */
+.tool-with-popup-bottom,
+.tool-with-popup-left,
+.tool-with-popup-right {
+  position: relative;
+}
+
+.popup-bridge-bottom .tool-popup {
+  position: relative;
+  animation: popupSlideIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.tool-popup.arrow-left::before,
+.popup-bridge-bottom .tool-popup::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -6px;
+  transform: translateY(-50%);
+  border-width: 6px 6px 6px 0;
+  border-style: solid;
+  border-color: transparent var(--color-border) transparent transparent;
+  z-index: -1;
+}
+
+.tool-popup.arrow-left::after,
+.popup-bridge-bottom .tool-popup::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -5px;
+  transform: translateY(-50%);
+  border-width: 5px 5px 5px 0;
+  border-style: solid;
+  border-color: transparent var(--color-surface) transparent transparent;
+  z-index: 10;
+}
+
+.tool-popup.arrow-right::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -6px;
+  left: auto;
+  transform: translateY(-50%);
+  border-width: 6px 0 6px 6px;
+  border-style: solid;
+  border-color: transparent transparent transparent var(--color-border);
+  z-index: -1;
+}
+
+.tool-popup.arrow-right::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -5px;
+  left: auto;
+  transform: translateY(-50%);
+  border-width: 5px 0 5px 5px;
+  border-style: solid;
+  border-color: transparent transparent transparent var(--color-surface);
+  z-index: 10;
+}
+
+@keyframes popupSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

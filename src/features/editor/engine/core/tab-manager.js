@@ -21,6 +21,32 @@ let tabs = [];
 let activeTabId = null;
 let tabCounter = 1;
 
+function createTabObject(id, name, w, h, pixelMapData = null) {
+  return {
+    id,
+    name,
+    pixelMap: pixelMapData || new Uint32Array(w * h),
+    groupMap: new Map(),
+    history: { undoStack: [], redoStack: [], currentStroke: null },
+    grid: { w, h, imgData: null, data32: null },
+    bg: { src: '', css: '', hasBg: false },
+    autoBackupDrive: false,
+    storage: { type: null, id: null, handle: null, name: null },
+    format: 'png',
+    animation: null
+  };
+}
+
+function refreshUI(targetTab) {
+  if (targetTab) loadTabState(targetTab);
+  resizeCanvas();
+  fitToScreen();
+  renderPixels();
+  renderTabsUI();
+  debouncedSaveWorkspace();
+  debounceExtractCanvasColors();
+}
+
 export function getTabs() { return tabs; }
 export function getActiveTabId() { return activeTabId; }
 
@@ -102,6 +128,10 @@ export async function syncToDrive(tab) {
   } catch (err) {
     console.error("Drive sync failed:", err);
     setHeaderStatus('error');
+    if (err.message && (err.message.includes('expired') || err.message.includes('hết hạn'))) {
+      showNotification(t('drive.errSessionExpired') || 'Phiên đăng nhập Drive đã hết hạn. Vui lòng bật lại tự động lưu để đăng nhập.');
+      tab.autoBackupDrive = false; // Tắt cờ autoBackup của tab vì không còn token
+    }
     return false;
   } finally {
     isUploadingDrive = false;
@@ -172,7 +202,8 @@ async function performAutoSave() {
   let successLocal = false;
 
   if (dest === 'drive' || dest === 'both') {
-    if (getDriveToken()) {
+    // Chỉ tự động lưu lên Drive nếu tab có bật cờ autoBackupDrive
+    if (getDriveToken() && currentTab.autoBackupDrive) {
       successDrive = await syncToDrive(currentTab);
     }
   }
@@ -287,11 +318,7 @@ export function initTabs(savedData = null) {
     activeTabId = initialTab.id;
   }
 
-  renderTabsUI();
-  resizeCanvas();
-  fitToScreen();
-  renderPixels();
-  debounceExtractCanvasColors();
+  refreshUI();
 }
 
 export function saveCurrentTabState() {
@@ -376,25 +403,12 @@ export function switchTab(id) {
 
     // Wait for fade out
     setTimeout(() => {
-      loadTabState(targetTab);
-      resizeCanvas();
-      fitToScreen();
-      renderPixels();
-      renderTabsUI();
-
+      refreshUI(targetTab);
       // Remove fade out to trigger fade in
       canvasWrap.classList.remove('fade-out');
-      debouncedSaveWorkspace();
-      debounceExtractCanvasColors();
     }, 150); // Match CSS transition duration
   } else {
-    loadTabState(targetTab);
-    resizeCanvas();
-    fitToScreen();
-    renderPixels();
-    renderTabsUI();
-    debouncedSaveWorkspace();
-    debounceExtractCanvasColors();
+    refreshUI(targetTab);
   }
 }
 
@@ -406,19 +420,7 @@ export function createNewTab() {
     tabCounter++;
     const DEFAULT_SIZE = 32;
     const newId = generateId();
-    const newTab = {
-      id: newId,
-      name: (t('tab.newCanvas') || 'New Canvas') + ' ' + tabCounter,
-      pixelMap: new Uint32Array(DEFAULT_SIZE * DEFAULT_SIZE),
-      groupMap: new Map(),
-      history: { undoStack: [], redoStack: [], currentStroke: null },
-      grid: { w: DEFAULT_SIZE, h: DEFAULT_SIZE, imgData: null, data32: null },
-      bg: { src: '', css: '', hasBg: false },
-      autoBackupDrive: false,
-      storage: { type: null, id: null, handle: null, name: null },
-      format: 'png',
-      animation: null
-    };
+    const newTab = createTabObject(newId, (t('tab.newCanvas') || 'New Canvas') + ' ' + tabCounter, DEFAULT_SIZE, DEFAULT_SIZE);
 
     const tmpCanvas = document.createElement('canvas');
     tmpCanvas.width = DEFAULT_SIZE;
@@ -430,14 +432,7 @@ export function createNewTab() {
     tabs.push(newTab);
     activeTabId = newId;
 
-    loadTabState(newTab);
-
-    resizeCanvas();
-    fitToScreen();
-    renderPixels();
-    renderTabsUI();
-    debouncedSaveWorkspace();
-    debounceExtractCanvasColors();
+    refreshUI(newTab);
   } catch (err) {
       alert(`${t('status.error') || 'Error'}: ${err.message}` + "\n" + err.stack);
   }
@@ -452,19 +447,7 @@ export function createTabFromData(name, w, h, data32) {
     const newPixelMap = new Uint32Array(w * h);
     newPixelMap.set(data32);
 
-    const newTab = {
-      id: newId,
-      name: name || ((t('tab.newCanvas') || 'New Canvas') + ' ' + tabCounter),
-      pixelMap: newPixelMap,
-      groupMap: new Map(),
-      history: { undoStack: [], redoStack: [], currentStroke: null },
-      grid: { w: w, h: h, imgData: null, data32: null },
-      bg: { src: '', css: '', hasBg: false },
-      autoBackupDrive: false,
-      storage: { type: null, id: null, handle: null, name: null },
-      format: 'png',
-      animation: null
-    };
+    const newTab = createTabObject(newId, name || ((t('tab.newCanvas') || 'New Canvas') + ' ' + tabCounter), w, h, newPixelMap);
 
     const tmpCanvas = document.createElement('canvas');
     tmpCanvas.width = w;
@@ -474,8 +457,8 @@ export function createTabFromData(name, w, h, data32) {
     new Uint32Array(imgData.data.buffer).set(data32);
     tmpCtx.putImageData(imgData, 0, 0);
     
-    newTab.grid.imgData = tmpCtx.getImageData(0, 0, w, h);
-    newTab.grid.data32 = new Uint32Array(newTab.grid.imgData.data.buffer);
+    newTab.grid.imgData = imgData;
+    newTab.grid.data32 = new Uint32Array(imgData.data.buffer);
 
     tabs.push(newTab);
     activeTabId = newId;
@@ -488,13 +471,7 @@ export function createTabFromData(name, w, h, data32) {
 export function refreshUIAfterBatchImport() {
   const currentTab = tabs.find(t => t.id === activeTabId);
   if (currentTab) {
-    loadTabState(currentTab);
-    resizeCanvas();
-    fitToScreen();
-    renderPixels();
-    renderTabsUI();
-    debouncedSaveWorkspace();
-    debounceExtractCanvasColors();
+    refreshUI(currentTab);
   }
 }
 
@@ -519,15 +496,11 @@ export function closeTab(id, force = false) {
   if (activeTabId === id) {
     const nextTab = tabs[Math.max(0, index - 1)];
     activeTabId = nextTab.id;
-    loadTabState(nextTab);
-    resizeCanvas();
-    fitToScreen();
-    renderPixels();
+    refreshUI(nextTab);
+  } else {
+    renderTabsUI();
+    debouncedSaveWorkspace();
   }
-
-  renderTabsUI();
-  debouncedSaveWorkspace();
-  debounceExtractCanvasColors();
 }
 
 export function renameTab(id, newName) {

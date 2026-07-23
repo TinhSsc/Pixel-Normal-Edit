@@ -10,7 +10,7 @@ export function saveToolbarState() {
   // Bạn có thể thêm logic loại trừ lưu trữ ở đây, nhưng theo yêu cầu
   // việc quyết định reset cái gì sẽ do file toolbar-reset.js đảm nhận.
   // Tuy nhiên, ta vẫn có thể chặn lưu ở đây cho an toàn kép.
-  const NO_SAVE_TOOLS = ['crop'];
+  const NO_SAVE_TOOLS = ['crop', 'text'];
   if (NO_SAVE_TOOLS.includes(activeTool)) {
     activeTool = '';
   }

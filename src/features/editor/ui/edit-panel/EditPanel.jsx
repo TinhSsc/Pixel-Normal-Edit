@@ -5,15 +5,17 @@ import { editConfig } from './edit-manager.js';
 import { navigationConfig } from './navigation-manager.js';
 import { updateDOM, t } from '../../../../i18n/i18n.js';
 import { CustomDropdown } from '../../../../shared/ui/CustomDropdown';
+import { CustomNumberInput } from '../../../../shared/ui/CustomNumberInput';
 import ToolButton from '../toolbar/ToolButton';
 import { subscribeAnimationState, getAnimationState } from '../../engine/core/animation-state.js';
+import LocalImageStore from './LocalImageStore';
 
 function AnimationPreview() {
   const [animState, setAnimState] = useState(null);
   const canvasRef = React.useRef(null);
   const [playIdx, setPlayIdx] = useState(0);
   const [fps, setFps] = useState(10); // 10 FPS
-  
+
   useEffect(() => {
     setAnimState(getAnimationState());
     const unsub = subscribeAnimationState(setAnimState);
@@ -34,7 +36,7 @@ function AnimationPreview() {
     if (!frame) return;
     const canvasEl = canvasRef.current;
     if (!canvasEl) return;
-    
+
     canvasEl.width = frame.width;
     canvasEl.height = frame.height;
     const ctx2d = canvasEl.getContext('2d');
@@ -47,15 +49,14 @@ function AnimationPreview() {
   if (!animState || !animState.isAnimationMode) return null;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '10px' }}>
+    <div className="tool-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
       <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: '4px', padding: '8px', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '150px' }}>
         <canvas ref={canvasRef} style={{ width: '100%', height: '150px', objectFit: 'contain', imageRendering: 'pixelated' }} />
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', color: 'var(--text-muted)' }}>
         <span data-i18n="label.animationPage">{t('label.animationPage', playIdx % animState.frames.length + 1, animState.frames.length)}</span>
         <label style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-          <span data-i18n="label.speed">{t('label.speed')}</span>
-          <input type="number" min="1" max="60" value={fps} onChange={e => setFps(Math.max(1, parseInt(e.target.value) || 10))} style={{ width: '40px', background: 'var(--bg)', border: '1px solid var(--border)', color: 'var(--text-primary)', borderRadius: '2px', padding: '2px' }} />
+          <CustomNumberInput min={1} max={100} value={fps} onChange={e => setFps(Math.max(1, parseInt(e.target.value) || 10))} style={{ width: '90px', margin: '0 4px', height: '26px' }} />
           <span data-i18n="label.fps">{t('label.fps')}</span>
         </label>
       </div>
@@ -88,7 +89,7 @@ export default function EditPanel() {
   }, []);
 
   useEffect(() => {
-    let unbind = () => {};
+    let unbind = () => { };
     // Need a small timeout to let React render the new DOM elements first
     const timer = setTimeout(() => {
       unbind = bindPopups('.right-panel', 'right');
@@ -100,18 +101,21 @@ export default function EditPanel() {
   }, [hiddenEdits]);
 
   return (
-    <div className="right-panel" style={{ width: '100%', height: '100%', overflowY: 'auto', overflowX: 'hidden' }}>
+    <div className="right-panel" style={{ width: '100%', height: '100%', overflowY: 'auto', overflowX: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      <AnimationPreview />
       {[...navigationConfig.groups, ...editConfig.groups].map(group => {
         const isNavigation = navigationConfig.groups.some(g => g.id === group.id);
         const configToUse = isNavigation ? navigationConfig : editConfig;
-        
+
         const visibleTools = group.tools.filter(toolId => !hiddenEdits.includes(toolId));
         if (visibleTools.length === 0) return null;
 
         return (
-          <div className="tool-group" key={group.id}>
-            <div className="tool-group-title" onClick={(e) => e.target.closest('.tool-group').classList.toggle('collapsed')} style={{ cursor: 'pointer' }} data-i18n={group.titleKey}>{group.defaultTitle}</div>
-            <div className="tool-grid" style={{ gap: '10px' }}>
+          <div key={group.id} className="tool-group">
+            <div className="tool-group-title" onClick={(e) => e.target.closest('.tool-group').classList.toggle('collapsed')} style={{ cursor: 'pointer' }} data-i18n={group.labelKey}>
+              {t(group.labelKey) || group.defaultLabel}
+            </div>
+            <div className="tool-grid">
               {visibleTools.map(toolId => {
                 const tool = configToUse.tools[toolId];
                 if (!tool) return null;
@@ -144,7 +148,7 @@ export default function EditPanel() {
                     <div className={`popup-bridge-${tool.popupPosition}`}>
                       <div className="tool-popup" style={tool.type === 'button' ? { width: 'max-content' } : {}}>
                         <label style={{ fontSize: '11px', color: 'var(--text-muted)', fontWeight: 600 }} data-i18n={tool.popupContent.labelKey}>{tool.popupContent.defaultTitle}</label>
-                        <CustomDropdown 
+                        <CustomDropdown
                           id={tool.popupContent.selectId}
                           style={{ minWidth: '100px' }}
                           options={tool.popupContent.options.map((opt) => ({
@@ -162,9 +166,13 @@ export default function EditPanel() {
         );
       })}
 
-      <div className="panel-section" style={{ marginTop: 'auto' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', borderBottom: '1px solid #444', paddingBottom: '5px' }}>
-          <h3 style={{ margin: 0, border: 'none', padding: 0 }} data-i18n="label.sourceImage">{t('label.sourceImage') || 'Ảnh gốc'}</h3>
+      <div>
+        <LocalImageStore />
+      </div>
+
+      <div className="tool-group" style={{ marginTop: 'auto' }}>
+        <div className="tool-group-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'default' }}>
+          <span data-i18n="label.sourceImage">{t('label.sourceImage') || 'Ảnh gốc'}</span>
           <div style={{ display: 'flex', gap: '6px' }}>
             <button id="setBgBtn" className="btn" style={{ padding: '4px 8px', fontSize: '11px' }} data-i18n="tooltip.setBg">
               <Icon name={ICONS.IMAGE_PLUS} style={{ width: '14px', height: '14px' }} />
@@ -178,7 +186,6 @@ export default function EditPanel() {
             </button>
           </div>
         </div>
-        <AnimationPreview />
         <img id="imagePreview" style={{ display: 'none' }} alt="" />
       </div>
     </div>

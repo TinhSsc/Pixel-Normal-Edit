@@ -5,6 +5,15 @@ export function hexToRgb(hex) {
   return { r, g, b };
 }
 
+export function hexToUint32(hex) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  const a = 255;
+  // This uses the little-endian format which is typical for Canvas ImageData
+  return ((a << 24) | (b << 16) | (g << 8) | r) >>> 0;
+}
+
 export function colorDistance(r1, g1, b1, a1 = 255, r2, g2, b2, a2 = 255) {
   return Math.abs(r1 - r2) + Math.abs(g1 - g2) + Math.abs(b1 - b2) + Math.abs(a1 - a2);
 }

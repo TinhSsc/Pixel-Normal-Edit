@@ -1,4 +1,5 @@
 import { Icon, ICONS } from '../../../../shared/ui/icons';
+import { CustomNumberInput } from '../../../../shared/ui/CustomNumberInput';
 import React, { useEffect } from 'react';
 import { t } from '../../../../i18n/i18n.js';
 import { bindPopups } from '../../engine/core/popup-manager.js';
@@ -16,8 +17,8 @@ export default function ToolbarPanel() {
 
   return (
     <div className="toolbar" style={{ width: '100%', height: '100%', overflowY: 'auto', overflowX: 'hidden' }}>
-      <div id="mobile-animation-strip-portal" className="mobile-only" style={{ width: '100%', order: -1, marginBottom: '15px' }}></div>
-      <div className="tool-group" style={{ paddingBottom: '15px', borderBottom: '1px solid #3e3e4a', marginBottom: '15px', width: '100%' }}>
+      <div id="mobile-animation-strip-portal" className="mobile-only" style={{ width: '100%', order: -1 }}></div>
+      <div className="tool-group">
         <div className="color-picker-wrapper">
           <input type="color" id="colorPicker" className="color-input primary-color" defaultValue="#000000" data-i18n="tooltip.primaryColor" />
           <input type="color" id="colorPicker2" className="color-input secondary-color" defaultValue="#ffffff" data-i18n="tooltip.secondaryColor" />
@@ -35,7 +36,7 @@ export default function ToolbarPanel() {
             <div className="popup-bridge-bottom">
               <div className="tool-popup">
                 <label data-i18n="tooltip.pencilSize"><span data-i18n="label.pencilSize">{t('label.pencilSize') || 'Cỡ bút'}</span></label>
-                <input type="number" id="pixelPenSize" min="1" max="20" defaultValue="1" />
+                <CustomNumberInput id="pixelPenSize" min={1} max={20} defaultValue={1} />
               </div>
             </div>
           </div>
@@ -44,7 +45,7 @@ export default function ToolbarPanel() {
             <div className="popup-bridge-bottom">
               <div className="tool-popup">
                 <label data-i18n="tooltip.pencilSize"><span data-i18n="label.pencilSize">{t('label.pencilSize') || 'Cỡ bút'}</span></label>
-                <input type="number" id="highlightPenSize" min="1" max="20" defaultValue="1" />
+                <CustomNumberInput id="highlightPenSize" min={1} max={20} defaultValue={1} />
               </div>
             </div>
           </div>
@@ -53,7 +54,7 @@ export default function ToolbarPanel() {
             <div className="popup-bridge-bottom">
               <div className="tool-popup">
                 <label data-i18n="tooltip.pencilSize"><span data-i18n="label.pencilSize">{t('label.pencilSize') || 'Cỡ bút'}</span></label>
-                <input type="number" id="blendBrushSize" min="1" max="20" defaultValue="1" />
+                <CustomNumberInput id="blendBrushSize" min={1} max={20} defaultValue={1} />
               </div>
             </div>
           </div>
@@ -62,9 +63,9 @@ export default function ToolbarPanel() {
             <div className="popup-bridge-bottom">
               <div className="tool-popup">
                 <label data-i18n="tooltip.spraySize"><span data-i18n="label.spraySize">{t('label.spraySize') || 'Kích thước'}</span></label>
-                <input type="number" id="sprayPenSize" min="1" max="50" defaultValue="10" />
+                <CustomNumberInput id="sprayPenSize" min={1} max={50} defaultValue={10} />
                 <label data-i18n="tooltip.sprayDensity"><span data-i18n="label.sprayDensity">{t('label.sprayDensity') || 'Mật độ'}</span></label>
-                <input type="number" id="sprayPenDensity" min="1" max="100" defaultValue="10" />
+                <CustomNumberInput id="sprayPenDensity" min={1} max={100} defaultValue={10} />
               </div>
             </div>
           </div>
@@ -73,7 +74,7 @@ export default function ToolbarPanel() {
             <div className="popup-bridge-bottom">
               <div className="tool-popup">
                 <label data-i18n="tooltip.eraserSize"><span data-i18n="label.eraserSize">{t('label.eraserSize') || 'Cỡ tẩy'}</span></label>
-                <input type="number" id="eraserSize" min="1" max="20" defaultValue="1" />
+                <CustomNumberInput id="eraserSize" min={1} max={20} defaultValue={1} />
               </div>
             </div>
           </div>
@@ -91,7 +92,7 @@ export default function ToolbarPanel() {
             <div className="popup-bridge-bottom">
               <div className="tool-popup">
                 <label data-i18n="tooltip.replaceTolerance"><span data-i18n="magicEraser.tolerance">{t('magicEraser.tolerance') || 'Sai lệch màu'}</span></label>
-                <input type="number" id="replaceTolerance" min="0" max="255" defaultValue="0" />
+                <CustomNumberInput id="replaceTolerance" min={0} max={255} defaultValue={0} />
               </div>
             </div>
           </div>
@@ -101,7 +102,7 @@ export default function ToolbarPanel() {
             <div className="popup-bridge-bottom">
               <div className="tool-popup">
                 <label data-i18n="label.outlineThick">{t('label.outlineThick') || 'Độ dày viền'}</label>
-                <input type="number" id="outlineThickness" min="1" max="10" defaultValue="1" />
+                <CustomNumberInput id="outlineThickness" min={1} max={10} defaultValue={1} />
               </div>
             </div>
           </div>
@@ -116,7 +117,7 @@ export default function ToolbarPanel() {
             <div className="popup-bridge-bottom">
               <div className="tool-popup">
                 <label data-i18n="label.shapeThick">{t('label.shapeThick') || 'Độ dày nét'}</label>
-                <input type="number" className="shape-thickness" min="1" max="20" defaultValue="1" />
+                <CustomNumberInput className="shape-thickness" min={1} max={20} defaultValue={1} />
               </div>
             </div>
           </div>
@@ -125,7 +126,7 @@ export default function ToolbarPanel() {
             <div className="popup-bridge-bottom">
               <div className="tool-popup">
                 <label data-i18n="label.outlineThick">{t('label.outlineThick') || 'Độ dày viền'}</label>
-                <input type="number" className="shape-thickness" min="1" max="20" defaultValue="1" />
+                <CustomNumberInput className="shape-thickness" min={1} max={20} defaultValue={1} />
               </div>
             </div>
           </div>
@@ -134,7 +135,7 @@ export default function ToolbarPanel() {
             <div className="popup-bridge-bottom">
               <div className="tool-popup">
                 <label data-i18n="label.outlineThick">{t('label.outlineThick') || 'Độ dày viền'}</label>
-                <input type="number" className="shape-thickness" min="1" max="20" defaultValue="1" />
+                <CustomNumberInput className="shape-thickness" min={1} max={20} defaultValue={1} />
               </div>
             </div>
           </div>

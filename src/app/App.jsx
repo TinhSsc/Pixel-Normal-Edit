@@ -62,6 +62,7 @@ function App() {
   const getRoute = () => window.location.hash.replace('#', '');
   const [route, setRoute] = useState(getRoute());
   const [currentUser, setCurrentUserState] = useState(getCurrentUser());
+  const [aiStatus, setAiStatus] = useState(null); // Trạng thái AI: { type: 'connected'|'drawing', text: '...' }
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -130,6 +131,14 @@ function App() {
 
     return () => window.removeEventListener('resize', handleResize);
 
+  }, []);
+
+  useEffect(() => {
+    const handleAiStatus = (e) => {
+      setAiStatus(e.detail);
+    };
+    window.addEventListener('ai-connection-status', handleAiStatus);
+    return () => window.removeEventListener('ai-connection-status', handleAiStatus);
   }, []);
 
 
@@ -343,6 +352,31 @@ function App() {
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <h1 style={{ margin: 0, fontSize: '24px', color: 'var(--text-primary)' }}>{t('app.title') || "Pixel Normal Edit"}</h1>
+              
+              {aiStatus && (
+                <div style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '6px', 
+                  fontSize: '11px', 
+                  padding: '2px 8px', 
+                  borderRadius: '12px', 
+                  background: aiStatus.type === 'connected' ? 'var(--success, #2e7d32)' : 'var(--warning, #ed6c02)',
+                  color: '#fff',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  whiteSpace: 'nowrap'
+                }} title="AI Agent Status">
+                  <span style={{ 
+                    width: '6px', 
+                    height: '6px', 
+                    borderRadius: '50%', 
+                    backgroundColor: aiStatus.type === 'connected' ? '#a5d6a7' : '#ffb74d',
+                    display: 'inline-block'
+                  }}></span>
+                  <span>{aiStatus.text}</span>
+                </div>
+              )}
+
               <button 
                 className="btn" 
                 style={{ padding: '4px', display: 'flex', alignItems: 'center' }} 

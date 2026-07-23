@@ -606,3 +606,67 @@ input[type="color"] {
  50% { opacity: 0; transform: scale(.8) rotateY(180deg); }
  100% { opacity: 1; transform: scale(1) rotateY(360deg); }
 }
+
+/* Custom Number Input (Stepper) */
+.custom-number-input {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  overflow: hidden;
+  height: 38px;
+  width: 80px; /* Chiều rộng mặc định gọn gàng hơn */
+}
+
+.cni-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  width: 24px;
+  height: 50%;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cni-btn:first-child {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.cni-controls {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border-left: 1px solid var(--color-border);
+}
+
+.cni-btn:hover:not(:disabled) {
+  background: var(--color-surface-alt);
+  color: var(--color-primary);
+}
+
+.cni-btn:active:not(:disabled) {
+  background: var(--color-border);
+}
+
+.cni-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.cni-display {
+  flex: 1;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-primary);
+  background: transparent;
+  border: none;
+  outline: none;
+  min-width: 0; /* Cho phép co lại trong flex container */
+  width: 100%; /* Đảm bảo không bị phình to do intrinsic width của input */
+}

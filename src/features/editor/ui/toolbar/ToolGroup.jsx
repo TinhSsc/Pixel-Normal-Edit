@@ -50,7 +50,7 @@ export default function ToolGroup({ groupConfig, toolsConfig }) {
 
   if (groupConfig.type === 'custom' && groupConfig.id === 'colors') {
     return (
-      <div className="tool-group" style={{ paddingBottom: '15px', borderBottom: '1px solid #3e3e4a', marginBottom: '15px', width: '100%' }}>
+      <div className="tool-group">
         <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
           <div className="color-picker-wrapper" style={{ flexShrink: 0 }}>
             <input type="color" id="colorPicker" className="color-input primary-color" defaultValue="#000000" data-i18n="tooltip.primaryColor" />

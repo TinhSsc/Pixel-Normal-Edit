@@ -21,6 +21,7 @@ export const ICONS = {
   MINUS: 'minus',
   PLUS: 'plus',
   CHEVRON_DOWN: 'chevron-down',
+  CHEVRON_UP: 'chevron-up',
   MAXIMIZE: 'maximize',
   MOUSE_POINTER_2: 'mouse-pointer-2',
   COPY: 'copy',
@@ -59,5 +60,6 @@ export const ICONS = {
   LAYOUT_GRID: 'layout-grid',
   FILE_ARCHIVE: 'file-archive',
   EYE: 'eye',
-  EYE_OFF: 'eye-off'
+  EYE_OFF: 'eye-off',
+  TYPE: 'type'
 };

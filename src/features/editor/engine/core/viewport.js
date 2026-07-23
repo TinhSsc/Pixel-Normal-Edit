@@ -1,5 +1,5 @@
 import { ctx, GRID_WIDTH, GRID_HEIGHT, pixelMap, previewPixels, offscreenData32 } from './state.js';
-import { updatePreviewTransform } from './preview-group-manager.js';
+import { updatePreviewTransform, getPreviewItems } from './preview-group-manager.js';
 
 let zoom = 1;
 let panX = 0;
@@ -10,51 +10,15 @@ export function getPan() { return { x: panX, y: panY }; }
 
 export function setZoom(z) { zoom = z; }
 export function setPan(x, y) {
-  const canvas = document.getElementById("pixelCanvas");
-  const wrap = canvas?.parentElement;
-  
-  if (!wrap) {
-    panX = Math.round(x); 
-    panY = Math.round(y);
-    return;
-  }
-  
-  const ww = wrap.clientWidth;
-  const wh = wrap.clientHeight;
-  const cw = GRID_WIDTH * zoom;
-  const ch = GRID_HEIGHT * zoom;
-  
-  let newX = x;
-  let newY = y;
-  
-  const isMobile = window.innerWidth <= 768;
-
-  if (isMobile) {
-    // Relaxed boundaries for mobile to avoid "hitting a wall" when dragging
-    newX = Math.max(-cw + 40, Math.min(newX, ww - 40));
-    newY = Math.max(-ch + 40, Math.min(newY, wh - 40));
-  } else {
-    // Original restricted logic for desktop
-    if (cw <= ww) {
-      newX = Math.max(0, Math.min(newX, ww - cw));
-    } else {
-      newX = Math.max(ww - cw, Math.min(newX, 0));
-    }
-    
-    if (ch <= wh) {
-      newY = Math.max(0, Math.min(newY, wh - ch));
-    } else {
-      newY = Math.max(wh - ch, Math.min(newY, 0));
-    }
-  }
-  
-  panX = Math.round(newX); 
-  panY = Math.round(newY); 
+  panX = Math.round(x); 
+  panY = Math.round(y); 
 }
 
 export function getMinZoom() {
   const MIN_SCREEN_SIZE = 32;
-  return Math.max(0.01, MIN_SCREEN_SIZE / Math.max(GRID_WIDTH, GRID_HEIGHT));
+  const previewItems = getPreviewItems();
+  const totalCount = previewItems.length + 1;
+  return Math.max(0.01, MIN_SCREEN_SIZE / Math.max(GRID_WIDTH * totalCount, GRID_HEIGHT));
 }
 
 export function getMaxZoom() {
@@ -79,7 +43,9 @@ export function fitToScreen() {
 
   const scaleX = ww / GRID_WIDTH;
   const scaleY = wh / GRID_HEIGHT;
+  
   zoom = Math.min(scaleX, scaleY) * 0.95;
+  zoom = Math.max(getMinZoom(), Math.min(getMaxZoom(), zoom));
 
   panX = Math.round((ww - GRID_WIDTH * zoom) / 2);
   panY = Math.round((wh - GRID_HEIGHT * zoom) / 2);
@@ -174,6 +140,8 @@ export function applyTransform(canvas) {
   
   const showGridFlag = document.getElementById('showGrid')?.checked;
   updatePreviewTransform(panX, panY, zoom, GRID_WIDTH, GRID_HEIGHT, showGridFlag);
+  
+  window.dispatchEvent(new CustomEvent('viewport-changed', { detail: { zoom, panX, panY } }));
 }
 
 export function getCellPx(clientX, clientY) {

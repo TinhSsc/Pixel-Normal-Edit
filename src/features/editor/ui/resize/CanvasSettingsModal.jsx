@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { CustomNumberInput } from '../../../../shared/ui/CustomNumberInput';
 import { Icon, ICONS } from '../../../../shared/ui/icons';
 import { GRID_WIDTH, GRID_HEIGHT, setStatus } from '../../engine/core/state.js';
 import { setGridSize } from '../../engine/actions/grid-size-select.js';
@@ -129,20 +130,16 @@ export default function CanvasSettingsModal({ isOpen, onClose }) {
           <div style={{ display: 'flex', gap: '12px' }}>
             <div style={{ flex: 1 }}>
               <label style={{ display: 'block', fontSize: '10px', fontWeight: 'bold', color: 'var(--color-text-muted)', marginBottom: '6px', textTransform: 'uppercase' }} data-i18n="label.width">{t('label.width') || 'Width'}</label>
-              <input 
-                type="number" 
+              <CustomNumberInput 
                 value={width} 
                 onChange={handleWidthChange} 
-                style={{ width: '100%', background: 'var(--color-bg)', border: '1px solid var(--color-border)', borderRadius: '8px', padding: '8px 12px', color: 'var(--color-text-bright)', fontWeight: 500, fontSize: '13px', outline: 'none' }} 
               />
             </div>
             <div style={{ flex: 1 }}>
               <label style={{ display: 'block', fontSize: '10px', fontWeight: 'bold', color: 'var(--color-text-muted)', marginBottom: '6px', textTransform: 'uppercase' }} data-i18n="label.height">{t('label.height') || 'Height'}</label>
-              <input 
-                type="number" 
+              <CustomNumberInput 
                 value={height} 
                 onChange={handleHeightChange} 
-                style={{ width: '100%', background: 'var(--color-bg)', border: '1px solid var(--color-border)', borderRadius: '8px', padding: '8px 12px', color: 'var(--color-text-bright)', fontWeight: 500, fontSize: '13px', outline: 'none' }} 
               />
             </div>
           </div>

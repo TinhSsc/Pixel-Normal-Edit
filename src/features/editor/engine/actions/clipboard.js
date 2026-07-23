@@ -1,6 +1,6 @@
 import { 
   selectionBox, floatingSelection, clipboardData, setClipboardData, setFloatingSelection,
-  pixelMap, GRID_WIDTH, GRID_HEIGHT, setCurrentTool, setStatus
+  pixelMap, GRID_WIDTH, GRID_HEIGHT, setCurrentTool, setStatus, setSelectionBox
 } from '../core/state.js';
 import { extractSelectionToFloating, commitFloatingSelection, clearSelection } from '../tools/select.js';
 import { renderPixels } from '../core/render.js';
@@ -11,6 +11,7 @@ export function handleCopy() {
   if (floatingSelection) {
     const { width, height, pixels } = floatingSelection;
     setClipboardData({ width, height, pixels: new Uint32Array(pixels) });
+    window.dispatchEvent(new CustomEvent('local-clipboard-added', { detail: { width, height, pixels: new Uint32Array(pixels) } }));
     setStatus(t('status.copied') || 'Đã sao chép');
   } else if (selectionBox) {
     const { x, y, width, height } = selectionBox;
@@ -27,6 +28,7 @@ export function handleCopy() {
       }
     }
     setClipboardData({ width, height, pixels });
+    window.dispatchEvent(new CustomEvent('local-clipboard-added', { detail: { width, height, pixels } }));
     setStatus(t('status.copied') || 'Đã sao chép');
   }
 }
@@ -65,6 +67,9 @@ export function handlePaste() {
   // If there is an existing floating selection, commit it first
   if (floatingSelection) {
     commitFloatingSelection();
+  }
+  if (selectionBox) {
+    setSelectionBox(null);
   }
 
   const { width, height, pixels } = clipboardData;

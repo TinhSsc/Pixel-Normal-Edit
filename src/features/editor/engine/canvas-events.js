@@ -12,6 +12,8 @@ import { usePixelPen } from './tools/pen/pixel-pen.js';
 import { useHighlightPen } from './tools/pen/highlight-pen.js';
 import { useBlendBrush } from './tools/pen/blend-brush.js';
 import { useSprayPen } from './tools/pen/spray-pen.js';
+import { useDitherBrush } from './tools/pen/dither-brush.js';
+import { useSoftBrush } from './tools/pen/soft-brush.js';
 import { useEraser } from './tools/eraser.js';
 import { usePicker } from './tools/picker.js';
 import { useFill } from './tools/fill.js';
@@ -23,7 +25,7 @@ import { useCircleTool } from './tools/circle.js';
 import { useHandTool } from './tools/hand.js';
 import { useReplaceColor } from './tools/replace-color.js';
 import { useSelectTool } from './tools/select.js';
-
+import { useTextTool } from './tools/text.js';
 let isDrawing = false;
 let lastCell = null;
 let panStart = null;
@@ -94,6 +96,10 @@ function updateBrushCursor(e, cell) {
     size = parseInt(document.getElementById('highlightPenSize')?.value || '1', 10);
   } else if (currentTool === 'blend-brush') {
     size = parseInt(document.getElementById('blendBrushSize')?.value || '1', 10);
+  } else if (currentTool === 'dither-brush') {
+    size = parseInt(document.getElementById('ditherBrushSize')?.value || '1', 10);
+  } else if (currentTool === 'soft-brush') {
+    size = parseInt(document.getElementById('softBrushSize')?.value || '3', 10);
   } else if (currentTool === 'spray-pen') {
     size = parseInt(document.getElementById('sprayPenSize')?.value || '10', 10);
   } else if (['line', 'rect', 'circle'].includes(currentTool)) {
@@ -135,7 +141,7 @@ function updateBrushCursor(e, cell) {
   cursor.style.zIndex = '999';
   cursor.style.boxSizing = 'border-box';
 
-  const penTools = ['pixel-pen', 'highlight-pen', 'blend-brush', 'spray-pen', 'eraser'];
+  const penTools = ['pixel-pen', 'highlight-pen', 'blend-brush', 'spray-pen', 'dither-brush', 'soft-brush', 'eraser'];
   if (penTools.includes(currentTool)) {
     const shape = document.getElementById('globalPenShape')?.value || 'circle';
 
@@ -252,6 +258,8 @@ let lastParticleTime = 0;
 let lastMoveEvent = null;
 
 function onPointerDown(e) {
+  if (e.target.closest('.text-tool-overlay-ui')) return;
+
   if (isTaskRunning()) {
     abortCurrentTask();
     setStatus(t('status.taskAborted'));
@@ -484,6 +492,8 @@ function dispatchTool(tool, event, cell, color, e, prevCell) {
     case 'pixel-pen': usePixelPen(event, cell, color, prevCell); break;
     case 'highlight-pen': useHighlightPen(event, cell, color, prevCell); break;
     case 'blend-brush': useBlendBrush(event, cell, color, prevCell); break;
+    case 'dither-brush': useDitherBrush(event, cell, color, prevCell); break;
+    case 'soft-brush': useSoftBrush(event, cell, color, prevCell); break;
     case 'spray-pen': useSprayPen(event, cell, color); break;
     case 'eraser': useEraser(event, cell, prevCell); break;
     case 'picker': if (event === 'down') usePicker(cell); break;
@@ -496,6 +506,7 @@ function dispatchTool(tool, event, cell, color, e, prevCell) {
     case 'circle': useCircleTool(event, cell, color, prevCell); break;
     case 'hand': useHandTool(event, cell, e); break;
     case 'select': useSelectTool(event, cell, color, prevCell); break;
+    case 'text': useTextTool(event, cell, color, prevCell); break;
   }
 }
 

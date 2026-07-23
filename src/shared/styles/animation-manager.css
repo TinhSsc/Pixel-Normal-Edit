@@ -4,7 +4,7 @@
  * Module CSS dùng chung cho tất cả animation/transition trong app.
  * 
  * Cách sử dụng:
- * 1. Import trong style.css: @import './shared/styles/animation-manager.css';
+ * 1. Import trong style.css: import './shared/styles/animation-manager.css';
  * 2. Thêm class tương ứng vào element HTML
  * 3. Animation có thể bật/tắt qua class .animations-enabled / .animations-disabled trên <html>
  */

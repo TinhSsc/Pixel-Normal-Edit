@@ -492,7 +492,7 @@ window.addEventListener('toolbar-mounted', () => {
   });
 
   document.body.addEventListener('change', (e) => {
-    const ids = ['colorPicker', 'colorPicker2', 'pixelPenSize', 'highlightPenSize', 'blendBrushSize', 'eraserSize', 'outlineThickness', 'globalPenShape', 'sprayPenSize', 'sprayPenDensity', 'replaceTolerance'];
+    const ids = ['colorPicker', 'colorPicker2', 'pixelPenSize', 'highlightPenSize', 'blendBrushSize', 'ditherBrushSize', 'softBrushSize', 'eraserSize', 'outlineThickness', 'globalPenShape', 'sprayPenSize', 'sprayPenDensity', 'replaceTolerance'];
     if (ids.includes(e.target.id)) {
       saveToolbarState();
     }

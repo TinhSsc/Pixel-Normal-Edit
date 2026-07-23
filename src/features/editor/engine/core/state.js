@@ -134,3 +134,20 @@ export function setCurrentTool(tool, variant = null) {
   currentVariant = variant;
   window.dispatchEvent(new CustomEvent('tool-changed', { detail: { tool, variant } }));
 }
+
+export let textToolState = {
+  isActive: false,
+  isEditing: false,
+  box: null, // {x, y, w, h} in grid coordinates
+  text: "",
+  font: "Arial",
+  size: 16,
+  bold: false,
+  italic: false,
+  color: "#000000"
+};
+
+export function setTextToolState(newState) {
+  textToolState = { ...textToolState, ...newState };
+  window.dispatchEvent(new CustomEvent('text-tool-updated', { detail: textToolState }));
+}

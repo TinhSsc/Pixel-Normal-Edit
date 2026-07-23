@@ -45,12 +45,28 @@ export function bindPopups(containerSelector, side = 'left') {
         
         let left;
         const popupWidth = popup.offsetWidth || 150;
+        const toolPopup = popup.querySelector('.tool-popup');
+        
+        if (toolPopup) {
+          toolPopup.classList.remove('arrow-left', 'arrow-right');
+        }
+
         if (side === 'left') {
           left = rect.right + 10;
-          if (left + popupWidth > window.innerWidth) left = rect.left - popupWidth - 10;
+          if (left + popupWidth > window.innerWidth) {
+            left = rect.left - popupWidth - 10;
+            if (toolPopup) toolPopup.classList.add('arrow-right');
+          } else {
+            if (toolPopup) toolPopup.classList.add('arrow-left');
+          }
         } else {
           left = rect.left - popupWidth - 10;
-          if (left < 0) left = rect.right + 10;
+          if (left < 0) {
+            left = rect.right + 10;
+            if (toolPopup) toolPopup.classList.add('arrow-left');
+          } else {
+            if (toolPopup) toolPopup.classList.add('arrow-right');
+          }
         }
         popup.style.left = left + 'px';
       };

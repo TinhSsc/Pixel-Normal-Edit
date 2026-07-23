@@ -145,3 +145,5 @@ export async function getLocalDirectoryHandle() {
     return null;
   }
 }
+
+export { set as setItem, get as getItem };
