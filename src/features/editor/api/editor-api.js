@@ -18,6 +18,7 @@ import { generateWorkspaceJsonBlob } from '../io/export/export-json.js';
 import { exportAnimation } from '../io/export/export-animation.js';
 import { executeCommand, executeCommandBatch } from './command-bus.js';
 import { getElementValue, setElementValue } from '../../../shared/lib/dom-utils.js';
+import { mcpClient } from './mcp-firebase-client.js';
 
 export const EditorAPI = {
   capabilities: {
@@ -165,6 +166,7 @@ export const EditorAPI = {
       },
       setPixel: (x, y, colorHex, options = {}) => {
         writePixel(x, y, colorHex, options);
+        renderPixels();
       },
       fill: async (x, y, colorHex) => {
         await useFill({ x, y }, colorHex);
@@ -292,4 +294,24 @@ export function initEditorAPI() {
     configurable: true
   });
   console.log('Pixel Normal Edit Public API is ready at window.PixelNormalEditAPI');
+  
+  // Khởi tạo MCP Firebase Client với bảo mật Session ID
+  const urlParams = new URLSearchParams(window.location.search);
+  let sessionId = urlParams.get('mcp_session');
+  
+  if (!sessionId) {
+    // Generate secure random UUID (36 chars)
+    sessionId = crypto.randomUUID();
+    // Update URL without reloading page
+    const newUrl = new URL(window.location.href);
+    newUrl.searchParams.set('mcp_session', sessionId);
+    window.history.replaceState({}, '', newUrl.toString());
+  }
+
+  mcpClient.initialize(EditorAPI.commandBus, sessionId);
+  
+  // Phát sự kiện để cập nhật giao diện
+  window.dispatchEvent(new CustomEvent('ai-connection-status', {
+    detail: { type: 'connected', text: `AI Session ID: ${sessionId}`, sessionId }
+  }));
 }

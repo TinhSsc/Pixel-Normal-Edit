@@ -354,18 +354,31 @@ function App() {
               <h1 style={{ margin: 0, fontSize: '24px', color: 'var(--text-primary)' }}>{t('app.title') || "Pixel Normal Edit"}</h1>
               
               {aiStatus && (
-                <div style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: '6px', 
-                  fontSize: '11px', 
-                  padding: '2px 8px', 
-                  borderRadius: '12px', 
-                  background: aiStatus.type === 'connected' ? 'var(--success, #2e7d32)' : 'var(--warning, #ed6c02)',
-                  color: '#fff',
-                  border: '1px solid rgba(255,255,255,0.2)',
-                  whiteSpace: 'nowrap'
-                }} title="AI Agent Status">
+                <button 
+                  onClick={() => {
+                    const sessionId = aiStatus.sessionId || new URLSearchParams(window.location.search).get('mcp_session');
+                    const cmd = `node mcp-firebase-bridge/index.js "${sessionId}"`;
+                    navigator.clipboard.writeText(cmd).then(() => {
+                      alert('Đã copy lệnh chạy MCP Bridge vào Clipboard!\n\n' + cmd);
+                    });
+                  }}
+                  style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: '6px', 
+                    fontSize: '11px', 
+                    padding: '4px 10px', 
+                    borderRadius: '12px', 
+                    background: aiStatus.type === 'connected' ? 'var(--success, #2e7d32)' : 'var(--warning, #ed6c02)',
+                    color: '#fff',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    whiteSpace: 'nowrap',
+                    cursor: 'pointer',
+                    outline: 'none',
+                    fontFamily: 'monospace'
+                  }} 
+                  title="Click để copy lệnh chạy MCP"
+                >
                   <span style={{ 
                     width: '6px', 
                     height: '6px', 
@@ -374,7 +387,8 @@ function App() {
                     display: 'inline-block'
                   }}></span>
                   <span>{aiStatus.text}</span>
-                </div>
+                  <Icon name={ICONS.COPY} style={{ width: 12, height: 12, marginLeft: 4 }} />
+                </button>
               )}
 
               <button 
