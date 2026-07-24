@@ -7,14 +7,36 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies
 node_modules
-.agents/*
+mcp-firebase-bridge/node_modules
+
+# Build outputs
 dist
 dist-ssr
-*.local
-.env
 
-# Editor directories and files
+# Environment variables — KHÔNG commit, dùng .env.example thay thế
+.env
+.env.*
+!.env.example
+
+# Local config files
+*.local
+
+# Agent / AI config (session IDs, personal configs)
+.agents/*
+!.agents/AGENTS.md
+
+# Firebase local emulator
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
+# Vercel
+.vercel
+
+# Editor directories
 .vscode/*
 !.vscode/extensions.json
 .idea
@@ -25,8 +47,11 @@ dist-ssr
 *.sln
 *.sw?
 
+# Project-specific
 .impeccable
-
 DOCS/*
-
 debug/*
+scratch-skills2.txt
+
+# Temp files từ AI commands
+tmp-cmd.json

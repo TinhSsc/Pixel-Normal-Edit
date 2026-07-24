@@ -19,11 +19,18 @@ const app = initializeApp({
   appId: parseEnv('VITE_FIREBASE_APP_ID')
 });
 const db = getFirestore(app);
-const SESSION = 'f0e039be-0f7d-46dd-a70f-c413e87ecd79';
+// SESSION: đọc từ env hoặc CLI arg — KHÔNG hardcode vào đây
+const SESSION = process.env.MCP_SESSION || process.argv[2];
+if (!SESSION) {
+  console.error('❌ Cần truyền session ID: node draw-animation.mjs <session-id>');
+  console.error('   Hoặc đặt biến: MCP_SESSION=<uuid> node draw-animation.mjs');
+  process.exit(1);
+}
 
 async function cmd(data, timeout = 15000) {
   const id = Math.random().toString(36).slice(2) + Date.now();
-  const ref = doc(db, `mcp_commands_${SESSION}`, id);
+  const ref = doc(db, 'mcp_sessions', SESSION, 'commands', id);
+
   await setDoc(ref, { ...data, status: 'pending', timestamp: Date.now() });
   return new Promise((resolve, reject) => {
     const t = setTimeout(() => { unsub(); reject(new Error(`Timeout: ${data.action}`)); }, timeout);

@@ -1,0 +1,31 @@
+rules_version = '2';
+// Pixel Normal Edit — Firestore Security Rules
+// Deploy: firebase deploy --only firestore:rules
+//
+// Cấu trúc đúng:
+//   mcp_sessions (collection)
+//     └── {sessionId} (document = UUID)
+//           └── commands (subcollection)
+//                 └── {docId} (command document)
+//
+// TTL auto-cleanup: bật trong Firebase Console
+//   Firestore → Data → TTL Policies → Add TTL Policy
+//   Collection group: commands    Field: expiresAt
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // MCP sessions — chỉ cho phép UUID-format session ID
+    match /mcp_sessions/{sessionId}/commands/{docId} {
+      allow read, write: if
+        // Session ID phải là UUID đầy đủ
+        sessionId.matches('[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}')
+        // Giới hạn kích thước document: max 50KB
+        && request.resource.size() < 50 * 1024;
+    }
+
+    // Block ALL other collections
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
