@@ -66,7 +66,11 @@ const languages = {
     "toolVariant.outline": "Outline",
     "toolVariant.line": "Line",
     "toolVariant.rect": "Rectangle",
-    "toolVariant.circle": "Circle"
+    "toolVariant.circle": "Circle",
+    "settings.aiConnection": "AI Connection (MCP)",
+    "status.mcpConnected": "Status: MCP Connected",
+    "status.mcpWaiting": "Waiting for connection...",
+    "btn.copyMcpCmd": "Copy MCP Command"
   },
   vi: {
     "group.settings": "Cài đặt",
@@ -101,7 +105,11 @@ const languages = {
     "toolVariant.outline": "Tạo viền",
     "toolVariant.line": "Đường thẳng",
     "toolVariant.rect": "Hình chữ nhật",
-    "toolVariant.circle": "Hình tròn"
+    "toolVariant.circle": "Hình tròn",
+    "settings.aiConnection": "Kết nối AI (MCP)",
+    "status.mcpConnected": "Trạng thái: đã kết nối mcp",
+    "status.mcpWaiting": "Đang chờ kết nối...",
+    "btn.copyMcpCmd": "Copy lệnh chạy MCP"
   }
 };
 

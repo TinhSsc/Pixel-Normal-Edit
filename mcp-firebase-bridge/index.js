@@ -25,12 +25,12 @@ const http                       = require('http');
 dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
 const db = getFirestore(initializeApp({
-  apiKey: process.env.VITE_FIREBASE_API_KEY,
-  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.VITE_FIREBASE_APP_ID,
+  apiKey: process.env.VITE_FIREBASE_API_KEY || 'AIzaSyBSrvCt58Jhsh14wbC2bD2KLFUUVbAVim0',
+  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN || 'pixel-normal-edit.firebaseapp.com',
+  projectId: process.env.VITE_FIREBASE_PROJECT_ID || 'pixel-normal-edit',
+  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET || 'pixel-normal-edit.firebasestorage.app',
+  messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '397075334229',
+  appId: process.env.VITE_FIREBASE_APP_ID || '1:397075334229:web:b02eede3fc7b41d02f80dc',
 }));
 
 const SESSION = process.argv[2] || process.env.MCP_SESSION || 'default-session';

@@ -312,6 +312,6 @@ export function initEditorAPI() {
   
   // Phát sự kiện để cập nhật giao diện
   window.dispatchEvent(new CustomEvent('ai-connection-status', {
-    detail: { type: 'connected', text: `AI Session ID: ${sessionId}`, sessionId }
+    detail: { type: 'waiting', text: `Đang chờ kết nối...`, sessionId }
   }));
 }

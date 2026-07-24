@@ -474,4 +474,9 @@ export default {
   "tooltip.pin": "Ghim",
   "tooltip.unpin": "Bỏ ghim",
   "tooltip.deleteImage": "Xóa",
+  "settings.aiConnection": "Kết nối AI (MCP)",
+  "status.mcpConnected": "Trạng thái: đã kết nối mcp",
+  "status.mcpWaiting": "Đang chờ kết nối...",
+  "btn.copyMcpCmd": "Copy lệnh chạy MCP",
+
 };

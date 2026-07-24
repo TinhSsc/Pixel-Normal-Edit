@@ -12,9 +12,22 @@ import { loginWithGoogle } from '../auth/logic/firebase/auth-api.js';
 export default function GlobalSettingsModal() {
   const [currentUser, setCurrentUser] = useState(null);
   const [tabCounterVal, setTabCounterVal] = useState(1);
-  const [activeTab, setActiveTab] = useState('tab-appearance');
+  const [activeTab, setActiveTab] = useState('tab-account');
   const [autoSaveDest, setAutoSaveDest] = useState(localStorage.getItem('auto_save_destination') || 'drive');
   const [localDirName, setLocalDirName] = useState(null);
+  const [aiStatus, setAiStatus] = useState(null);
+
+  useEffect(() => {
+    const handleAiStatus = (e) => setAiStatus(e.detail);
+    window.addEventListener('ai-connection-status', handleAiStatus);
+    
+    const sessionId = new URLSearchParams(window.location.search).get('mcp_session');
+    if (sessionId) {
+      setAiStatus({ type: 'waiting', sessionId });
+    }
+    
+    return () => window.removeEventListener('ai-connection-status', handleAiStatus);
+  }, []);
 
   const handleGoogle = async () => {
     try {
@@ -364,6 +377,27 @@ export default function GlobalSettingsModal() {
                     <div style={{ minWidth: '200px' }}>
                       <GoogleButton onCredential={handleGoogle} />
                     </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div style={{ background: 'var(--color-surface)', padding: '20px', borderRadius: '12px', border: '1px solid var(--color-border)', marginBottom: '16px' }}>
+              <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }}>{t('settings.aiConnection') || 'Kết nối AI (MCP)'}</div>
+              <div className="setting-group" style={{ marginBottom: '0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--color-surface-alt)', borderRadius: '8px', flexWrap: 'wrap', gap: '12px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Icon name={ICONS.CODE} style={{ color: aiStatus ? 'var(--success)' : 'var(--text-muted)' }} />
+                    <span style={{ fontSize: '13px', color: aiStatus ? 'var(--success)' : 'var(--text-muted)' }}>
+                      {aiStatus && aiStatus.type === 'connected' ? `AI Session ID: ${aiStatus.sessionId}` : (aiStatus ? `Đang chờ kết nối... (${aiStatus.sessionId})` : 'Chưa có Session ID')}
+                    </span>
+                  </div>
+                  {aiStatus && (
+                    <button className="btn btn-primary" style={{ padding: '6px 12px', fontSize: '13px' }} onClick={() => {
+                      const cmd = `npx @pixel-normal-edit/mcp "${aiStatus.sessionId}"`;
+                      navigator.clipboard.writeText(cmd).then(() => {
+                        alert((t('status.copyMcpCmd') || 'Đã copy lệnh chạy MCP Bridge vào Clipboard!') + '\n\n' + cmd);
+                      });
+                    }}>{t('btn.copyMcpCmd') || 'Copy lệnh chạy MCP'}</button>
                   )}
                 </div>
               </div>

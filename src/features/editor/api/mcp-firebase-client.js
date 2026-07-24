@@ -101,6 +101,9 @@ class MCPFirebaseClient {
           // ── Execute ───────────────────────────────────────────────
           let result = null;
           if (this.commandBus && typeof this.commandBus.execute === 'function') {
+            window.dispatchEvent(new CustomEvent('ai-connection-status', {
+              detail: { type: 'connected', text: 'Trạng thái: đã kết nối mcp', sessionId: this.sessionId }
+            }));
             result = await this.commandBus.execute(commandData);
           } else {
             console.warn('[MCP Firebase] commandBus not initialized');

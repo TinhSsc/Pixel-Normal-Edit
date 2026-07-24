@@ -14,6 +14,7 @@ export default function AccountTab() {
   const [autoSaveDest, setAutoSaveDest] = useState(localStorage.getItem('auto_save_destination') || 'drive');
   const [driveEmail, setDriveEmail] = useState(sessionStorage.getItem('drive_user_email') || '');
   const [isDriveConnected, setIsDriveConnected] = useState(!!getDriveToken());
+  const [aiStatus, setAiStatus] = useState(null);
 
   const handleGoogle = async () => {
     try {
@@ -80,6 +81,18 @@ export default function AccountTab() {
     };
     checkDir();
     return () => window.removeEventListener('local-dir-changed', handleLocalDirChange);
+  }, []);
+
+  useEffect(() => {
+    const handleAiStatus = (e) => setAiStatus(e.detail);
+    window.addEventListener('ai-connection-status', handleAiStatus);
+    
+    const sessionId = new URLSearchParams(window.location.search).get('mcp_session');
+    if (sessionId) {
+      setAiStatus({ type: 'connected', sessionId });
+    }
+    
+    return () => window.removeEventListener('ai-connection-status', handleAiStatus);
   }, []);
 
   return (
@@ -195,6 +208,28 @@ export default function AccountTab() {
             <option value="drive">{t('settings.autoSaveDest.drive') || 'Chỉ lưu vào Google Drive'}</option>
             <option value="both">{t('settings.autoSaveDest.both') || 'Lưu vào cả Thư mục cục bộ và Google Drive'}</option>
           </select>
+        </div>
+      </div>
+
+      <div style={{ background: 'var(--color-surface)', padding: '20px', borderRadius: '12px', border: '1px solid var(--color-border)', marginTop: '16px' }}>
+        <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }}>{t('settings.aiConnection') || 'Kết nối AI (MCP)'}</div>
+        <div className="setting-group" style={{ marginBottom: '0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--color-surface-alt)', borderRadius: '8px', flexWrap: 'wrap', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Icon name={ICONS.CODE} style={{ color: aiStatus ? 'var(--success)' : 'var(--text-muted)' }} />
+              <span style={{ fontSize: '13px', color: aiStatus ? 'var(--success)' : 'var(--text-muted)' }}>
+                {aiStatus ? `AI Session ID: ${aiStatus.sessionId}` : 'Chưa có Session ID'}
+              </span>
+            </div>
+            {aiStatus && (
+              <button className="btn btn-primary" style={{ padding: '6px 12px', fontSize: '13px' }} onClick={() => {
+                const cmd = `node mcp-firebase-bridge/index.js "${aiStatus.sessionId}"`;
+                navigator.clipboard.writeText(cmd).then(() => {
+                  alert('Đã copy lệnh chạy MCP Bridge vào Clipboard!\n\n' + cmd);
+                });
+              }}>Copy lệnh chạy MCP</button>
+            )}
+          </div>
         </div>
       </div>
 

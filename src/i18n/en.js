@@ -469,4 +469,9 @@ export default {
   "tooltip.pin": "Pin",
   "tooltip.unpin": "Unpin",
   "tooltip.deleteImage": "Delete",
+  "settings.aiConnection": "AI Connection (MCP)",
+  "status.mcpConnected": "Status: MCP Connected",
+  "status.mcpWaiting": "Waiting for connection...",
+  "btn.copyMcpCmd": "Copy MCP Command",
+
 };
