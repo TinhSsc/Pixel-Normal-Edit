@@ -16,11 +16,20 @@ service cloud.firestore {
 
     // MCP sessions — chỉ cho phép UUID-format session ID
     match /mcp_sessions/{sessionId}/commands/{docId} {
-      allow read, write: if
-        // Session ID phải là UUID đầy đủ
-        sessionId.matches('[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}')
-        // Giới hạn kích thước document: max 50KB
-        && request.resource.size() < 50 * 1024;
+      function validSession() {
+        return sessionId.matches('^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$') || sessionId.matches('^[a-zA-Z0-9_-]{8,}$');
+      }
+      
+      // Read & delete không có request.resource
+      allow read, delete: if validSession();
+      
+      // Create & update mới kiểm tra dung lượng (max 50KB)
+      allow create, update: if validSession() && request.resource.size() < 50 * 1024;
+    }
+
+    // Cho phép đọc/ghi document mcp_sessions/{sessionId} (heartbeat)
+    match /mcp_sessions/{sessionId} {
+      allow read, write: if sessionId.matches('^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$') || sessionId.matches('^[a-zA-Z0-9_-]{8,}$');
     }
 
     // Block ALL other collections

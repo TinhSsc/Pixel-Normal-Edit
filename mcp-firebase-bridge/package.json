@@ -1,18 +1,23 @@
 {
   "name": "@pixel-normal-edit/mcp",
-  "version": "2.0.0",
+  "version": "2.0.4",
   "description": "MCP server for Pixel Normal Edit canvas - enables AI agents to draw pixel art",
   "main": "index.js",
   "bin": {
     "pixel-normal-edit-mcp": "index.js"
   },
   "scripts": {
-    "start":     "node index.js",
-    "mcp":       "node index.js",
-    "mcp:http":  "node index.js --http",
+    "start": "node index.js",
+    "mcp": "node index.js",
+    "mcp:http": "node index.js --http",
     "mcp:setup": "node setup.js"
   },
-  "keywords": ["mcp", "pixel-art", "ai", "canvas"],
+  "keywords": [
+    "mcp",
+    "pixel-art",
+    "ai",
+    "canvas"
+  ],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
@@ -20,7 +25,7 @@
     "@modelcontextprotocol/sdk": "^1.29.0",
     "dotenv": "^17.4.2",
     "firebase": "^12.16.0",
+    "jimp": "^1.6.1",
     "zod": "^4.4.3"
   }
 }
-

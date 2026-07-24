@@ -479,4 +479,11 @@ export default {
   "status.mcpWaiting": "Đang chờ kết nối...",
   "btn.copyMcpCmd": "Copy lệnh chạy MCP",
 
+  "settings.mcpOptionA": "Tùy chọn A: Dành cho Claude Desktop",
+  "settings.mcpOptionADesc": "Thêm cấu hình này vào file claude_desktop_config.json của bạn:",
+  "settings.mcpOptionB": "Tùy chọn B: Dành cho Cursor (Dạng lệnh Terminal)",
+  "settings.mcpOptionBDesc": "Chạy lệnh này trong Terminal để khởi động máy chủ MCP:",
+  "btn.copied": "Đã copy!",
+  "btn.copy": "Copy",
+
 };

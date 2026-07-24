@@ -11,10 +11,6 @@ This file contains custom behavior and constraints for AI agents working on this
 
 ## Default AI Skills
 Always assume and utilize the following skills by default when working on this project:
-- **`react-patterns`** & **`ui-skills`**: For building/refactoring React components.
-- **`javascript-mastery`**: For core canvas logic and vanilla JS operations.
-- **`clean-code`**: To maintain SRP and project cleanliness.
-- **`debugger`**: When troubleshooting Canvas-React sync issues.
 - **`check-syntax`**: Tự động kiểm tra và sửa lỗi cú pháp sau khi viết hoặc sửa code.
 - **`sync-i18n`**: Tự động đồng bộ và kiểm tra key đa ngôn ngữ mỗi khi có cập nhật giao diện.
 - **`redesign`**: Dành cho các tác vụ thay đổi, thiết kế lại giao diện (redesign).

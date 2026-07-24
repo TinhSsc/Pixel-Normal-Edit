@@ -70,7 +70,13 @@ const languages = {
     "settings.aiConnection": "AI Connection (MCP)",
     "status.mcpConnected": "Status: MCP Connected",
     "status.mcpWaiting": "Waiting for connection...",
-    "btn.copyMcpCmd": "Copy MCP Command"
+    "btn.copyMcpCmd": "Copy MCP Command",
+    "settings.mcpOptionA": "Option A: For Claude Desktop",
+    "settings.mcpOptionADesc": "Add this configuration to your claude_desktop_config.json file:",
+    "settings.mcpOptionB": "Option B: For Cursor (Terminal Command)",
+    "settings.mcpOptionBDesc": "Run this command in your Terminal to start the MCP server:",
+    "btn.copied": "Copied!",
+    "btn.copy": "Copy"
   },
   vi: {
     "group.settings": "Cài đặt",
@@ -109,7 +115,13 @@ const languages = {
     "settings.aiConnection": "Kết nối AI (MCP)",
     "status.mcpConnected": "Trạng thái: đã kết nối mcp",
     "status.mcpWaiting": "Đang chờ kết nối...",
-    "btn.copyMcpCmd": "Copy lệnh chạy MCP"
+    "btn.copyMcpCmd": "Copy lệnh chạy MCP",
+    "settings.mcpOptionA": "Tùy chọn A: Dành cho Claude Desktop",
+    "settings.mcpOptionADesc": "Thêm cấu hình này vào file claude_desktop_config.json của bạn:",
+    "settings.mcpOptionB": "Tùy chọn B: Dành cho Cursor (Dạng lệnh Terminal)",
+    "settings.mcpOptionBDesc": "Chạy lệnh này trong Terminal để khởi động máy chủ MCP:",
+    "btn.copied": "Đã copy!",
+    "btn.copy": "Copy"
   }
 };
 

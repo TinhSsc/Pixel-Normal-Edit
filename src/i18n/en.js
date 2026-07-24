@@ -474,4 +474,11 @@ export default {
   "status.mcpWaiting": "Waiting for connection...",
   "btn.copyMcpCmd": "Copy MCP Command",
 
+  "settings.mcpOptionA": "Option A: For Claude Desktop",
+  "settings.mcpOptionADesc": "Add this configuration to your claude_desktop_config.json file:",
+  "settings.mcpOptionB": "Option B: For Cursor (Terminal Command)",
+  "settings.mcpOptionBDesc": "Run this command in your Terminal to start the MCP server:",
+  "btn.copied": "Copied!",
+  "btn.copy": "Copy",
+
 };

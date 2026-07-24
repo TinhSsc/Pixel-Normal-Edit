@@ -84,7 +84,7 @@ function setHeaderStatus(statusText) {
       if (statusText === 'saved-drive') text += ' (Drive)';
       else if (statusText === 'saved-local') text += ' (Máy)';
       else if (statusText === 'saved-both') text += ' (Cả hai)';
-      
+
       indicator.innerHTML = `<i data-lucide="check" style="width:12px;height:12px"></i> <span>${text}</span>`;
       indicator.style.color = 'var(--success)';
       setTimeout(() => { if (indicator.innerHTML.includes('check')) indicator.innerHTML = ''; }, 3000);
@@ -336,7 +336,7 @@ export function saveCurrentTabState() {
     css: canvas?.style.getPropertyValue('--bg-url') || '',
     hasBg: canvas?.classList.contains('has-bg') || false
   };
-  
+
   tab.animation = getAnimationState();
 }
 
@@ -357,15 +357,15 @@ function loadTabState(tab) {
       canvas.style.removeProperty('--bg-url');
     }
   }
-  
+
   if (tab.bg.src && tab.bg.hasBg) {
     setPreviewBackground(tab.bg.src);
   } else {
     removePreviewBackground();
   }
-  
+
   updateBgButtonsUI();
-  
+
   // Pipeline khôi phục: Nếu có Animation, giao quyền quản lý dữ liệu cho Animation
   if (tab.animation && tab.animation.isAnimationMode) {
     setGridSizeParams(tab.grid.w, tab.grid.h, tab.grid.imgData, tab.grid.data32);
@@ -434,7 +434,7 @@ export function createNewTab() {
 
     refreshUI(newTab);
   } catch (err) {
-      alert(`${t('status.error') || 'Error'}: ${err.message}` + "\n" + err.stack);
+    alert(`${t('status.error') || 'Error'}: ${err.message}` + "\n" + err.stack);
   }
 }
 
@@ -443,7 +443,7 @@ export function createTabFromData(name, w, h, data32) {
     saveCurrentTabState();
     tabCounter++;
     const newId = generateId();
-    
+
     const newPixelMap = new Uint32Array(w * h);
     newPixelMap.set(data32);
 
@@ -456,7 +456,7 @@ export function createTabFromData(name, w, h, data32) {
     const imgData = tmpCtx.createImageData(w, h);
     new Uint32Array(imgData.data.buffer).set(data32);
     tmpCtx.putImageData(imgData, 0, 0);
-    
+
     newTab.grid.imgData = imgData;
     newTab.grid.data32 = new Uint32Array(imgData.data.buffer);
 

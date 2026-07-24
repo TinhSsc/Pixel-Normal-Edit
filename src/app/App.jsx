@@ -1,6 +1,7 @@
 import { Icon, ICONS } from '../shared/ui/icons';
 import { useEffect, useRef, useState, Suspense, lazy } from 'react';
 import { auth } from '../features/auth/logic/firebase/config.js';
+import { mcpClient } from '../features/editor/api/mcp-firebase-client.js';
 
 import { initEditor } from '../features/editor/engine/main.js';
 
@@ -25,7 +26,6 @@ const CropModal = lazy(() => import('../features/editor/ui/crop/CropModal.jsx'))
 const ResizeModal = lazy(() => import('../features/editor/ui/resize/ResizeModal.jsx'));
 import UploadModal from '../features/editor/ui/modals/UploadModal.jsx';
 import DownloadModal from '../features/editor/ui/modals/DownloadModal.jsx';
-
 const LoginPage = lazy(() => import('../features/auth/ui/LoginPage.jsx'));
 const RegisterPage = lazy(() => import('../features/auth/ui/RegisterPage.jsx'));
 const ForgotPasswordPage = lazy(() => import('../features/auth/ui/ForgotPasswordPage.jsx'));
@@ -114,6 +114,18 @@ function App() {
           name: user.displayName || user.email.split('@')[0],
           picture: user.photoURL || null
         });
+
+        // Tự động gán Session ID của MCP thành UID của tài khoản Google
+        const newUrl = new URL(window.location.href);
+        newUrl.searchParams.set('mcp_session', user.uid);
+        window.history.replaceState({}, '', newUrl.toString());
+        
+        if (mcpClient.commandBus) {
+          mcpClient.initialize(mcpClient.commandBus, user.uid);
+          window.dispatchEvent(new CustomEvent('ai-connection-status', {
+            detail: { type: 'waiting', text: 'Đang chờ kết nối...', sessionId: user.uid }
+          }));
+        }
       } else {
         setCurrentUserState(null);
       }

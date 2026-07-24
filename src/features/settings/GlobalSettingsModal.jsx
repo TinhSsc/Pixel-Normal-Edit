@@ -16,6 +16,37 @@ export default function GlobalSettingsModal() {
   const [autoSaveDest, setAutoSaveDest] = useState(localStorage.getItem('auto_save_destination') || 'drive');
   const [localDirName, setLocalDirName] = useState(null);
   const [aiStatus, setAiStatus] = useState(null);
+  const [copiedClaude, setCopiedClaude] = useState(false);
+  const [copiedCursor, setCopiedCursor] = useState(false);
+
+  const mcpSessionId = aiStatus ? aiStatus.sessionId : (new URLSearchParams(window.location.search).get('mcp_session') || localStorage.getItem('pixel_mcp_session') || 'unknown-session');
+  
+  const claudeConfig = `{
+  "mcpServers": {
+    "pixel-normal-edit": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@pixel-normal-edit/mcp",
+        "${mcpSessionId}"
+      ]
+    }
+  }
+}`;
+
+  const cursorCommand = `npx -y @pixel-normal-edit/mcp "${mcpSessionId}"`;
+
+  const copyToClipboard = (text, type) => {
+    navigator.clipboard.writeText(text).then(() => {
+      if (type === 'claude') {
+        setCopiedClaude(true);
+        setTimeout(() => setCopiedClaude(false), 2000);
+      } else {
+        setCopiedCursor(true);
+        setTimeout(() => setCopiedCursor(false), 2000);
+      }
+    });
+  };
 
   useEffect(() => {
     const handleAiStatus = (e) => setAiStatus(e.detail);
@@ -383,22 +414,56 @@ export default function GlobalSettingsModal() {
             </div>
             <div style={{ background: 'var(--color-surface)', padding: '20px', borderRadius: '12px', border: '1px solid var(--color-border)', marginBottom: '16px' }}>
               <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }}>{t('settings.aiConnection') || 'Kết nối AI (MCP)'}</div>
-              <div className="setting-group" style={{ marginBottom: '0' }}>
+              
+              <div className="setting-group" style={{ marginBottom: '16px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'var(--color-surface-alt)', borderRadius: '8px', flexWrap: 'wrap', gap: '12px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <Icon name={ICONS.CODE} style={{ color: aiStatus ? 'var(--success)' : 'var(--text-muted)' }} />
-                    <span style={{ fontSize: '13px', color: aiStatus ? 'var(--success)' : 'var(--text-muted)' }}>
-                      {aiStatus && aiStatus.type === 'connected' ? `AI Session ID: ${aiStatus.sessionId}` : (aiStatus ? `Đang chờ kết nối... (${aiStatus.sessionId})` : 'Chưa có Session ID')}
+                    <span style={{ fontSize: '13px', color: aiStatus ? 'var(--success)' : 'var(--text-muted)', fontWeight: 500 }}>
+                      {aiStatus && aiStatus.type === 'connected' ? (t('status.mcpConnected') || 'Trạng thái: đã kết nối mcp') : (t('status.mcpWaiting') || 'Đang chờ kết nối...')}
                     </span>
                   </div>
-                  {aiStatus && (
-                    <button className="btn btn-primary" style={{ padding: '6px 12px', fontSize: '13px' }} onClick={() => {
-                      const cmd = `npx @pixel-normal-edit/mcp "${aiStatus.sessionId}"`;
-                      navigator.clipboard.writeText(cmd).then(() => {
-                        alert((t('status.copyMcpCmd') || 'Đã copy lệnh chạy MCP Bridge vào Clipboard!') + '\n\n' + cmd);
-                      });
-                    }}>{t('btn.copyMcpCmd') || 'Copy lệnh chạy MCP'}</button>
-                  )}
+                  <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontFamily: 'monospace', background: 'var(--bg)', padding: '4px 8px', borderRadius: '4px' }}>
+                    Session: {mcpSessionId}
+                  </div>
+                </div>
+              </div>
+
+              <div className="setting-group" style={{ marginBottom: '16px' }}>
+                <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', color: 'var(--text-primary)' }}>{t('settings.mcpOptionA') || 'Tùy chọn A: Dành cho Claude Desktop'}</h4>
+                <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '8px', lineHeight: '1.5' }}>
+                  {t('settings.mcpOptionADesc') || 'Thêm cấu hình này vào file claude_desktop_config.json của bạn:'}
+                </p>
+                <div style={{ position: 'relative' }}>
+                  <pre style={{ background: 'var(--color-surface-alt)', padding: '12px', borderRadius: '8px', fontSize: '12px', overflowX: 'auto', border: '1px solid var(--color-border)', margin: 0, color: 'var(--text-primary)', whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
+                    <code>{claudeConfig}</code>
+                  </pre>
+                  <button 
+                    className="btn btn-primary" 
+                    style={{ position: 'absolute', top: '8px', right: '8px', padding: '4px 8px', fontSize: '11px', background: copiedClaude ? 'var(--success)' : 'var(--color-primary)' }}
+                    onClick={() => copyToClipboard(claudeConfig, 'claude')}
+                  >
+                    {copiedClaude ? (t('btn.copied') || 'Đã copy!') : (t('btn.copy') || 'Copy')}
+                  </button>
+                </div>
+              </div>
+
+              <div className="setting-group" style={{ marginBottom: '0' }}>
+                <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', color: 'var(--text-primary)' }}>{t('settings.mcpOptionB') || 'Tùy chọn B: Dành cho Cursor (Dạng lệnh Terminal)'}</h4>
+                <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '8px', lineHeight: '1.5' }}>
+                  {t('settings.mcpOptionBDesc') || 'Chạy lệnh này trong Terminal để khởi động máy chủ MCP:'}
+                </p>
+                <div style={{ position: 'relative' }}>
+                  <pre style={{ background: 'var(--color-surface-alt)', padding: '12px', borderRadius: '8px', fontSize: '12px', overflowX: 'auto', border: '1px solid var(--color-border)', margin: 0, color: 'var(--text-primary)', whiteSpace: 'pre-wrap', wordBreak: 'break-all', paddingRight: '70px' }}>
+                    <code>{cursorCommand}</code>
+                  </pre>
+                  <button 
+                    className="btn btn-primary" 
+                    style={{ position: 'absolute', top: '50%', transform: 'translateY(-50%)', right: '8px', padding: '4px 8px', fontSize: '11px', background: copiedCursor ? 'var(--success)' : 'var(--color-primary)' }}
+                    onClick={() => copyToClipboard(cursorCommand, 'cursor')}
+                  >
+                    {copiedCursor ? (t('btn.copied') || 'Đã copy!') : (t('btn.copy') || 'Copy')}
+                  </button>
                 </div>
               </div>
             </div>

@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /**
  * MCP Firebase Bridge v2
  * ─────────────────────────────────────────────────────────────────────────
@@ -11,26 +12,26 @@
  *  - Visual feedback via querySnapshot / exportBase64
  */
 
-const { McpServer }              = require('@modelcontextprotocol/sdk/server/mcp.js');
-const { StdioServerTransport }   = require('@modelcontextprotocol/sdk/server/stdio.js');
+const { McpServer } = require('@modelcontextprotocol/sdk/server/mcp.js');
+const { StdioServerTransport } = require('@modelcontextprotocol/sdk/server/stdio.js');
 const { StreamableHTTPServerTransport } = require('@modelcontextprotocol/sdk/server/streamableHttp.js');
-const { z }                      = require('zod');
-const { initializeApp }          = require('firebase/app');
+const { z } = require('zod');
+const { initializeApp } = require('firebase/app');
 const { getFirestore, doc, setDoc, onSnapshot } = require('firebase/firestore');
-const dotenv                     = require('dotenv');
-const path                       = require('path');
-const crypto                     = require('crypto');
-const http                       = require('http');
+const dotenv = require('dotenv');
+const path = require('path');
+const crypto = require('crypto');
+const http = require('http');
 
 dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
 const db = getFirestore(initializeApp({
-  apiKey: process.env.VITE_FIREBASE_API_KEY || 'AIzaSyBSrvCt58Jhsh14wbC2bD2KLFUUVbAVim0',
-  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN || 'pixel-normal-edit.firebaseapp.com',
-  projectId: process.env.VITE_FIREBASE_PROJECT_ID || 'pixel-normal-edit',
-  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET || 'pixel-normal-edit.firebasestorage.app',
-  messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '397075334229',
-  appId: process.env.VITE_FIREBASE_APP_ID || '1:397075334229:web:b02eede3fc7b41d02f80dc',
+  apiKey: 'AIzaSyBSrvCt58Jhsh14wbC2bD2KLFUUVbAVim0',
+  authDomain: 'pixel-normal-edit.firebaseapp.com',
+  projectId: 'pixel-normal-edit',
+  storageBucket: 'pixel-normal-edit.firebasestorage.app',
+  messagingSenderId: '397075334229',
+  appId: '1:397075334229:web:b02eede3fc7b41d02f80dc',
 }));
 
 const SESSION = process.argv[2] || process.env.MCP_SESSION || 'default-session';
@@ -488,9 +489,8 @@ const HTTP_PORT = process.env.HTTP_PORT || (process.argv.includes('--http') ? 34
 async function startStdio() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error('✅ Pixel Normal Edit MCP Bridge v2 (stdio mode)');
-  console.error(`   Session : ${SESSION}`);
-  console.error(`   Editor  : http://localhost:5173?mcp_session=${SESSION}`);
+  // Disabled console.error output because some MCP clients merge stdout and stderr,
+  // causing JSON parsing errors (e.g. invalid character 'â' looking for beginning of value)
 }
 
 async function startHttp(port) {
@@ -528,7 +528,7 @@ async function startHttp(port) {
   });
 
   app.listen(port, () => {
-    console.log(`\n🚀 Pixel Normal Edit MCP HTTP Server`);
+    console.log(`\nPixel Normal Edit MCP HTTP Server`);
     console.log(`   Endpoint : http://localhost:${port}/mcp`);
     console.log(`   Health   : http://localhost:${port}/health`);
     console.log(`   Session  : ${SESSION}`);
