@@ -76,7 +76,9 @@ const languages = {
     "settings.mcpOptionB": "Option B: For Cursor (Terminal Command)",
     "settings.mcpOptionBDesc": "Run this command in your Terminal to start the MCP server:",
     "btn.copied": "Copied!",
-    "btn.copy": "Copy"
+    "btn.copy": "Copy",
+    "layer.title": "Layers",
+    "layer.add": "Add Layer"
   },
   vi: {
     "group.settings": "Cài đặt",
@@ -121,7 +123,9 @@ const languages = {
     "settings.mcpOptionB": "Tùy chọn B: Dành cho Cursor (Dạng lệnh Terminal)",
     "settings.mcpOptionBDesc": "Chạy lệnh này trong Terminal để khởi động máy chủ MCP:",
     "btn.copied": "Đã copy!",
-    "btn.copy": "Copy"
+    "btn.copy": "Copy",
+    "layer.title": "Lớp (Layers)",
+    "layer.add": "Thêm Lớp"
   }
 };
 

@@ -114,6 +114,28 @@ export async function executeCommand(api, cmd) {
     case 'redo': api.activeDocument.history.redo(); return { success: true };
 
     // ─────────────────────────────────────────────────────────────────────
+    // LAYERS
+    // ─────────────────────────────────────────────────────────────────────
+    case 'layer.getLayers': return { success: true, result: api.activeDocument.layers.getLayers() };
+    case 'layer.getActiveLayerIndex': return { success: true, result: api.activeDocument.layers.getActiveLayerIndex() };
+    case 'layer.add': api.activeDocument.layers.addLayer(); return { success: true };
+    case 'layer.remove':
+      if (args.index !== undefined) api.activeDocument.layers.removeLayer(args.index);
+      return { success: true };
+    case 'layer.moveUp':
+      if (args.index !== undefined) api.activeDocument.layers.moveLayerUp(args.index);
+      return { success: true };
+    case 'layer.moveDown':
+      if (args.index !== undefined) api.activeDocument.layers.moveLayerDown(args.index);
+      return { success: true };
+    case 'layer.toggle':
+      if (args.index !== undefined) api.activeDocument.layers.toggleLayerVisibility(args.index);
+      return { success: true };
+    case 'layer.select':
+      if (args.index !== undefined) api.activeDocument.layers.selectLayer(args.index);
+      return { success: true };
+
+    // ─────────────────────────────────────────────────────────────────────
     // CANVAS
     // ─────────────────────────────────────────────────────────────────────
     case 'clear': api.activeDocument.canvas.clear(); return { success: true };
@@ -185,6 +207,19 @@ export async function executeCommand(api, cmd) {
     case 'erasePixel':
       if (args.x !== undefined && args.y !== undefined)
         api.activeDocument.draw.setPixel(args.x, args.y, null);
+      return { success: true };
+
+    case 'drawPixelsBulk':
+      if (Array.isArray(args.pixels) && args.pixels.length > 0) {
+        api.activeDocument.history.beginTransaction();
+        for (const p of args.pixels) {
+          if (p.x !== undefined && p.y !== undefined) {
+            api.activeDocument.draw.setPixel(p.x, p.y, p.color || null);
+          }
+        }
+        api.activeDocument.history.commitTransaction();
+        renderPixels();
+      }
       return { success: true };
 
     case 'getPixel':
@@ -627,6 +662,24 @@ export async function executeCommand(api, cmd) {
         version:'5.0',
         commands: COMMAND_SCHEMA,
       }};
+
+    // ─────────────────────────────────────────────────────────────────────
+    // WORKFLOW USER INPUT REQUEST
+    // ─────────────────────────────────────────────────────────────────────
+    case 'showUserInputRequest':
+      return new Promise((resolve) => {
+        const event = new CustomEvent('SHOW_USER_INPUT_REQUEST', {
+          detail: {
+            reqId: args.reqId,
+            type: args.type,
+            fields: args.fields,
+            resolve: (response) => {
+              resolve({ success: true, result: response });
+            }
+          }
+        });
+        window.dispatchEvent(event);
+      });
 
     default:
       throw new Error(`Unknown action: "${action}". Send {"action":"getCapabilities"} for full list.`);

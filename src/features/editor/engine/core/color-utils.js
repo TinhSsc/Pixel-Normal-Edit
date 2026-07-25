@@ -107,3 +107,53 @@ export function parseUint32ToHex(uint32) {
   const toHex = v => v.toString(16).padStart(2, '0');
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
 }
+
+export function blendUint32(bgUint32, fgUint32) {
+  if (fgUint32 === 0) return bgUint32; // Foreground is completely transparent
+  if (bgUint32 === 0) return fgUint32; // Background is completely transparent
+  
+  let bgR, bgG, bgB, bgA;
+  let fgR, fgG, fgB, fgA;
+
+  if (isLittleEndian) {
+    bgR = bgUint32 & 0xFF;
+    bgG = (bgUint32 >> 8) & 0xFF;
+    bgB = (bgUint32 >> 16) & 0xFF;
+    bgA = (bgUint32 >>> 24) & 0xFF;
+
+    fgR = fgUint32 & 0xFF;
+    fgG = (fgUint32 >> 8) & 0xFF;
+    fgB = (fgUint32 >> 16) & 0xFF;
+    fgA = (fgUint32 >>> 24) & 0xFF;
+  } else {
+    bgA = bgUint32 & 0xFF;
+    bgB = (bgUint32 >> 8) & 0xFF;
+    bgG = (bgUint32 >> 16) & 0xFF;
+    bgR = (bgUint32 >>> 24) & 0xFF;
+
+    fgA = fgUint32 & 0xFF;
+    fgB = (fgUint32 >> 8) & 0xFF;
+    fgG = (fgUint32 >> 16) & 0xFF;
+    fgR = (fgUint32 >>> 24) & 0xFF;
+  }
+
+  if (fgA === 255) return fgUint32; // Foreground is opaque
+
+  const alpha = fgA / 255;
+  const invAlpha = 1 - alpha;
+  const outA = fgA + bgA * invAlpha;
+  
+  if (outA === 0) return 0;
+  
+  const r = Math.round((fgR * fgA + bgR * bgA * invAlpha) / outA);
+  const g = Math.round((fgG * fgA + bgG * bgA * invAlpha) / outA);
+  const b = Math.round((fgB * fgA + bgB * bgA * invAlpha) / outA);
+  const finalA = Math.round(outA);
+
+  if (isLittleEndian) {
+    return ((finalA << 24) | (b << 16) | (g << 8) | r) >>> 0;
+  } else {
+    return ((r << 24) | (g << 16) | (b << 8) | finalA) >>> 0;
+  }
+}
+

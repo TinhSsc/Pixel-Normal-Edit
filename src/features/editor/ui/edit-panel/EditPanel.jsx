@@ -9,6 +9,7 @@ import { CustomNumberInput } from '../../../../shared/ui/CustomNumberInput';
 import ToolButton from '../toolbar/ToolButton';
 import { subscribeAnimationState, getAnimationState } from '../../engine/core/animation-state.js';
 import LocalImageStore from './LocalImageStore';
+import { blendUint32 } from '../../engine/core/color-utils.js';
 
 function AnimationPreview() {
   const [animState, setAnimState] = useState(null);
@@ -42,7 +43,22 @@ function AnimationPreview() {
     const ctx2d = canvasEl.getContext('2d');
     const imageData = ctx2d.createImageData(frame.width, frame.height);
     const data32 = new Uint32Array(imageData.data.buffer);
-    data32.set(frame.pixelMap);
+    
+    if (frame.layers && frame.layers.length > 0) {
+      const bgPixelMap = new Uint32Array(frame.width * frame.height);
+      for (let layer of frame.layers) {
+        if (!layer.visible) continue;
+        for (let i = 0; i < bgPixelMap.length; i++) {
+          if (layer.pixelMap[i] !== 0) {
+            bgPixelMap[i] = blendUint32(bgPixelMap[i], layer.pixelMap[i]);
+          }
+        }
+      }
+      data32.set(bgPixelMap);
+    } else if (frame.pixelMap) {
+      data32.set(frame.pixelMap);
+    }
+
     ctx2d.putImageData(imageData, 0, 0);
   }, [playIdx, animState]);
 

@@ -1,8 +1,8 @@
-import { ctx, GRID_WIDTH, GRID_HEIGHT, pixelMap, previewPixels, offscreenImageData, offscreenData32, selectionBox, floatingSelection } from './state.js';
+import { ctx, GRID_WIDTH, GRID_HEIGHT, layers, pixelMap, previewPixels, offscreenImageData, offscreenData32, selectionBox, floatingSelection } from './state.js';
 import { getZoom, getPan, applyTransform } from './viewport.js';
 import { getCellPx } from './viewport.js';
 import { syncPreviewPixels } from './preview-group-manager.js';
-import { parseColorToUint32 } from './color-utils.js';
+import { parseColorToUint32, blendUint32 } from './color-utils.js';
 import { bresenhamLine } from '../algorithms/line-algo.js';
 import { circlePoints } from '../algorithms/circle-algo.js';
 import { isMirrorModeActive } from './pixel-writer.js';
@@ -113,7 +113,17 @@ export function renderPixels(isPreviewOnly = false) {
 
   if (!isPreviewOnly || forceFullRender) {
     // 1. FULL RENDER PATH
-    offscreenData32.set(pixelMap);
+    offscreenData32.fill(0);
+    for (let i = 0; i < layers.length; i++) {
+      const layer = layers[i];
+      if (!layer.visible) continue;
+      const lMap = layer.pixelMap;
+      for (let j = 0; j < lMap.length; j++) {
+        if (lMap[j] !== 0) {
+          offscreenData32[j] = blendUint32(offscreenData32[j], lMap[j]);
+        }
+      }
+    }
 
     if (previewPixels) {
       for (let i = 0; i < previewPixels.length; i++) {
@@ -160,7 +170,13 @@ export function renderPixels(isPreviewOnly = false) {
   for (let y = updateRect.y; y < updateRect.y + updateRect.h; y++) {
     const rowOffset = y * GRID_WIDTH;
     for (let x = updateRect.x; x < updateRect.x + updateRect.w; x++) {
-      offscreenData32[rowOffset + x] = pixelMap[rowOffset + x];
+      let blended = 0;
+      for (let i = 0; i < layers.length; i++) {
+        if (layers[i].visible) {
+          blended = blendUint32(blended, layers[i].pixelMap[rowOffset + x]);
+        }
+      }
+      offscreenData32[rowOffset + x] = blended;
     }
   }
 

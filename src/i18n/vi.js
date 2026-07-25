@@ -486,4 +486,7 @@ export default {
   "btn.copied": "Đã copy!",
   "btn.copy": "Copy",
 
+  "layer.title": "Lớp (Layers)",
+  "layer.add": "Thêm Lớp",
+
 };

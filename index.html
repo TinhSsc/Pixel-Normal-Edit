@@ -25,6 +25,15 @@
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="https://apis.google.com/js/api.js" async defer></script>
   <script>
+    // Tự động xoá dữ liệu bị lỗi một lần duy nhất trong phiên duyệt web
+    if (!sessionStorage.getItem('ai_cleared_local_data_v1')) {
+      localStorage.clear();
+      indexedDB.deleteDatabase('PixelArtEditorDB');
+      sessionStorage.setItem('ai_cleared_local_data_v1', '1');
+      console.log("AI: Cleared corrupted local data!");
+    }
+  </script>
+  <script>
     (function() {
       var theme = localStorage.getItem('pixel-edit-theme');
       if (theme) {

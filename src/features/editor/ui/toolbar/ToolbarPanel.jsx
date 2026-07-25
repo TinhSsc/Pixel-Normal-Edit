@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { bindPopups } from '../../engine/core/popup-manager.js';
 import ToolGroup from './ToolGroup';
+import LayerControl from './LayerControl';
 import { toolbarConfig } from "../../engine/tool-registry/toolbar-manager.js";
 
 export default function ToolbarPanel() {
@@ -34,6 +35,7 @@ export default function ToolbarPanel() {
       {toolbarConfig.groups.map(group => (
         <ToolGroup key={group.id} groupConfig={group} toolsConfig={toolbarConfig.tools} />
       ))}
+      <LayerControl />
     </div>
   );
 }

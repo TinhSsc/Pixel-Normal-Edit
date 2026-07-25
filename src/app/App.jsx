@@ -24,6 +24,7 @@ import EditPanel from '../features/editor/ui/edit-panel/EditPanel.jsx';
 import GlobalSettingsModal from '../features/settings/GlobalSettingsModal.jsx';
 const CropModal = lazy(() => import('../features/editor/ui/crop/CropModal.jsx'));
 const ResizeModal = lazy(() => import('../features/editor/ui/resize/ResizeModal.jsx'));
+const UserInputModal = lazy(() => import('../features/editor/ui/modals/UserInputModal.jsx'));
 import UploadModal from '../features/editor/ui/modals/UploadModal.jsx';
 import DownloadModal from '../features/editor/ui/modals/DownloadModal.jsx';
 const LoginPage = lazy(() => import('../features/auth/ui/LoginPage.jsx'));
@@ -521,6 +522,7 @@ function App() {
         <GlobalSettingsModal />
         <CropModal />
         <ResizeModal />
+        <UserInputModal />
       </Suspense>
 
     </>

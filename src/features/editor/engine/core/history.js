@@ -3,6 +3,7 @@ let redoStack = [];
 let currentStroke = null;
 
 import { debounceExtractCanvasColors } from './color-palette.js';
+import { activeLayerIndex, layers, resetLayers } from './state.js';
 
 export function resetHistory() {
   undoStack = [];
@@ -21,7 +22,7 @@ export function setHistoryState(state) {
 }
 
 export function beginStroke() {
-  currentStroke = { keys: [], oldColors: [], newColors: [] };
+  currentStroke = { keys: [], oldColors: [], newColors: [], layerIndex: activeLayerIndex };
 }
 
 export function recordChange(idx, oldColor, newColor) {
@@ -42,7 +43,8 @@ export function commitStroke(pixelMap) {
   undoStack.push({
     keys: new Uint32Array(currentStroke.keys),
     oldColors: new Uint32Array(currentStroke.oldColors),
-    newColors: new Uint32Array(currentStroke.newColors)
+    newColors: new Uint32Array(currentStroke.newColors),
+    layerIndex: currentStroke.layerIndex
   });
   
   redoStack = [];
@@ -61,14 +63,39 @@ export function pushStrokeDirectly(stroke) {
   debounceExtractCanvasColors();
 }
 
-export function undo(pixelMap, renderFn) {
+export function pushLayerState(oldLayers, oldActiveIndex, newLayers, newActiveIndex) {
+  const cloneLayer = (ls) => ls.map(l => ({ ...l, pixelMap: new Uint32Array(l.pixelMap) }));
+  undoStack.push({
+    type: 'LAYER_STATE',
+    oldLayers: cloneLayer(oldLayers),
+    oldActiveIndex,
+    newLayers: cloneLayer(newLayers),
+    newActiveIndex
+  });
+  redoStack = [];
+}
+
+export function undo(pixelMap_ignored, renderFn) {
   if (undoStack.length === 0) return false;
   const stroke = undoStack.pop();
   redoStack.push(stroke);
   
+  if (stroke.type === 'LAYER_STATE') {
+    resetLayers(stroke.oldLayers, stroke.oldActiveIndex);
+    window.dispatchEvent(new CustomEvent('layer-changed', { detail: { activeLayerIndex: stroke.oldActiveIndex, layers: stroke.oldLayers } }));
+    renderFn();
+    debounceExtractCanvasColors();
+    window.dispatchEvent(new Event('history-undone'));
+    return true;
+  }
+  
+  const layer = layers[stroke.layerIndex] || layers[activeLayerIndex];
+  if (!layer) return false;
+  const targetMap = layer.pixelMap;
+  
   for (let i = 0; i < stroke.keys.length; i++) {
     const idx = stroke.keys[i];
-    pixelMap[idx] = stroke.oldColors[i];
+    targetMap[idx] = stroke.oldColors[i];
   }
   
   renderFn();
@@ -77,14 +104,26 @@ export function undo(pixelMap, renderFn) {
   return true;
 }
 
-export function redo(pixelMap, renderFn) {
+export function redo(pixelMap_ignored, renderFn) {
   if (redoStack.length === 0) return false;
   const stroke = redoStack.pop();
   undoStack.push(stroke);
   
+  if (stroke.type === 'LAYER_STATE') {
+    resetLayers(stroke.newLayers, stroke.newActiveIndex);
+    window.dispatchEvent(new CustomEvent('layer-changed', { detail: { activeLayerIndex: stroke.newActiveIndex, layers: stroke.newLayers } }));
+    renderFn();
+    debounceExtractCanvasColors();
+    return true;
+  }
+  
+  const layer = layers[stroke.layerIndex] || layers[activeLayerIndex];
+  if (!layer) return false;
+  const targetMap = layer.pixelMap;
+  
   for (let i = 0; i < stroke.keys.length; i++) {
     const idx = stroke.keys[i];
-    pixelMap[idx] = stroke.newColors[i];
+    targetMap[idx] = stroke.newColors[i];
   }
   
   renderFn();

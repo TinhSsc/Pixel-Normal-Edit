@@ -13,13 +13,14 @@
 //   tạo Uint32Array hay ImageData riêng.
 
 import {
-    pixelMap,
+    layers,
+    activeLayerIndex,
     groupMap,
     offscreenImageData,
     offscreenData32,
     GRID_WIDTH,
     GRID_HEIGHT,
-    resetMaps,
+    resetLayers,
     setGridSizeParams,
 } from "./state.js";
 import { getHistoryState, setHistoryState } from './history.js';
@@ -76,7 +77,14 @@ export function getAnimationState() {
     return {
         frames: frames.map(f => ({
             id: f.id,
-            pixelMap: new Uint32Array(f.pixelMap),
+            layers: f.layers.map(l => ({
+                id: l.id,
+                name: l.name,
+                visible: l.visible,
+                locked: l.locked,
+                pixelMap: new Uint32Array(l.pixelMap)
+            })),
+            activeLayerIndex: f.activeLayerIndex,
             groupMap: Array.from(f.groupMap.entries()),
             width: f.width,
             height: f.height,
@@ -104,9 +112,29 @@ export function setAnimationState(state) {
         const parsedId = parseInt(f.id.replace('frame_', ''), 10);
         if (!isNaN(parsedId) && parsedId > maxId) maxId = parsedId;
 
+        let fLayers = f.layers;
+        if (!fLayers && f.pixelMap) {
+            fLayers = [{
+                id: `layer_${Date.now()}_0`,
+                name: 'Layer 0',
+                visible: true,
+                locked: false,
+                pixelMap: new Uint32Array(f.pixelMap)
+            }];
+        } else if (fLayers) {
+            fLayers = fLayers.map(l => ({
+                id: l.id,
+                name: l.name,
+                visible: l.visible,
+                locked: l.locked,
+                pixelMap: new Uint32Array(l.pixelMap)
+            }));
+        }
+
         return {
             id: f.id,
-            pixelMap: new Uint32Array(f.pixelMap),
+            layers: fLayers,
+            activeLayerIndex: f.activeLayerIndex || 0,
             groupMap: new Map(f.groupMap),
             width: f.width,
             height: f.height,
@@ -190,7 +218,14 @@ export function initAnimationFromCurrentState() {
         frames = [
             {
                 id: createFrameId(),
-                pixelMap: pixelMap.slice(),
+                layers: layers.map(l => ({
+                    id: l.id,
+                    name: l.name,
+                    visible: l.visible,
+                    locked: l.locked,
+                    pixelMap: l.pixelMap.slice()
+                })),
+                activeLayerIndex,
                 groupMap: new Map(groupMap),
                 width: GRID_WIDTH,
                 height: GRID_HEIGHT,
@@ -216,7 +251,14 @@ export function initAnimationFromCurrentState() {
 export function addFrame(width = GRID_WIDTH, height = GRID_HEIGHT) {
     const newFrame = {
         id: createFrameId(),
-        pixelMap: new Uint32Array(width * height),
+        layers: [{
+            id: `layer_${Date.now()}_0`,
+            name: 'Layer 0',
+            visible: true,
+            locked: false,
+            pixelMap: new Uint32Array(width * height)
+        }],
+        activeLayerIndex: 0,
         groupMap: new Map(),
         width,
         height,
@@ -260,11 +302,14 @@ export function syncCurrentStateToFrame() {
     if (!oldFrame) return null;
 
     const frame = { ...oldFrame };
-    if (frame.pixelMap.length === pixelMap.length) {
-        frame.pixelMap.set(pixelMap);
-    } else {
-        frame.pixelMap = pixelMap.slice();
-    }
+    frame.layers = layers.map(l => ({
+        id: l.id,
+        name: l.name,
+        visible: l.visible,
+        locked: l.locked,
+        pixelMap: l.pixelMap.slice()
+    }));
+    frame.activeLayerIndex = activeLayerIndex;
     frame.groupMap = new Map(groupMap);
     frame.width = GRID_WIDTH;
     frame.height = GRID_HEIGHT;
@@ -290,7 +335,7 @@ export function loadFrameToCurrentState(index) {
     if (!frame) return null;
 
     setActiveFrameIndex(index);
-    resetMaps(frame.pixelMap, new Map(frame.groupMap));
+    resetLayers(frame.layers, frame.activeLayerIndex, new Map(frame.groupMap));
     setHistoryState(
         frame.historyState || { undoStack: [], redoStack: [], currentStroke: null }
     );
@@ -338,7 +383,14 @@ export function goToFrame(index) {
 export function insertFrameAt(index, width = GRID_WIDTH, height = GRID_HEIGHT) {
     const newFrame = {
         id: createFrameId(),
-        pixelMap: new Uint32Array(width * height),
+        layers: [{
+            id: `layer_${Date.now()}_0`,
+            name: 'Layer 0',
+            visible: true,
+            locked: false,
+            pixelMap: new Uint32Array(width * height)
+        }],
+        activeLayerIndex: 0,
         groupMap: new Map(),
         width,
         height,
@@ -381,43 +433,44 @@ export function resizeAnimation(w, h, mode = 'clear', dx = 0, dy = 0) {
         const frame = frames[i];
         const oldW = frame.width;
         const oldH = frame.height;
-        const oldData32 = frame.pixelMap;
 
-        const offscreenCanvas = document.createElement('canvas');
-        offscreenCanvas.width = w;
-        offscreenCanvas.height = h;
-        const newCtx = offscreenCanvas.getContext('2d', { willReadFrequently: true });
-        
-        if (mode === 'keep' || mode === 'scale') {
-            const tmpCanvas = document.createElement('canvas');
-            tmpCanvas.width = oldW;
-            tmpCanvas.height = oldH;
-            const tmpCtx = tmpCanvas.getContext('2d');
-            const oldImgData = new ImageData(oldW, oldH);
-            new Uint32Array(oldImgData.data.buffer).set(oldData32);
-            tmpCtx.putImageData(oldImgData, 0, 0);
+        frame.layers.forEach(layer => {
+            const oldData32 = layer.pixelMap;
+            const offscreenCanvas = document.createElement('canvas');
+            offscreenCanvas.width = w;
+            offscreenCanvas.height = h;
+            const newCtx = offscreenCanvas.getContext('2d', { willReadFrequently: true });
             
-            if (mode === 'scale') {
-                newCtx.imageSmoothingEnabled = false;
-                newCtx.drawImage(tmpCanvas, 0, 0, w, h);
-            } else {
-                newCtx.drawImage(tmpCanvas, dx, dy);
+            if (mode === 'keep' || mode === 'scale') {
+                const tmpCanvas = document.createElement('canvas');
+                tmpCanvas.width = oldW;
+                tmpCanvas.height = oldH;
+                const tmpCtx = tmpCanvas.getContext('2d');
+                const oldImgData = new ImageData(oldW, oldH);
+                new Uint32Array(oldImgData.data.buffer).set(oldData32);
+                tmpCtx.putImageData(oldImgData, 0, 0);
+                
+                if (mode === 'scale') {
+                    newCtx.imageSmoothingEnabled = false;
+                    newCtx.drawImage(tmpCanvas, 0, 0, w, h);
+                } else {
+                    newCtx.drawImage(tmpCanvas, dx, dy);
+                }
             }
-        }
 
-        const newData = newCtx.getImageData(0, 0, w, h);
-        const newData32 = new Uint32Array(newData.data.buffer);
+            const newData = newCtx.getImageData(0, 0, w, h);
+            const newData32 = new Uint32Array(newData.data.buffer);
+            
+            if (mode === 'clear') {
+                layer.pixelMap = new Uint32Array(w * h);
+            } else {
+                layer.pixelMap = new Uint32Array(newData32);
+            }
+        });
         
         frame.width = w;
         frame.height = h;
-        
-        if (mode === 'clear') {
-            frame.pixelMap = new Uint32Array(w * h);
-            frame.groupMap = new Map();
-        } else {
-            frame.pixelMap = new Uint32Array(newData32);
-            frame.groupMap = new Map(); // Actually, scaling groups is tricky, so clearing group mapping is safer during resize
-        }
+        frame.groupMap = new Map(); // clear group map when resizing
     }
     
     // Load the active frame back into the canvas to reflect new size/pixels

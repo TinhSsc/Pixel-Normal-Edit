@@ -77,7 +77,15 @@ export const offscreenCtx = offscreenCanvas.getContext('2d', { willReadFrequentl
 export let offscreenImageData = null;
 export let offscreenData32 = null;
 
-export let pixelMap = new Uint32Array(GRID_WIDTH * GRID_HEIGHT);
+export let layers = [{
+  id: 'layer_0',
+  name: 'Layer 0',
+  visible: true,
+  locked: false,
+  pixelMap: new Uint32Array(GRID_WIDTH * GRID_HEIGHT)
+}];
+export let activeLayerIndex = 0;
+export let pixelMap = layers[0].pixelMap;
 export let groupMap = new Map();
 export let previewPixels = null;
 
@@ -110,7 +118,50 @@ export function resetMaps(newPixelMap = null, newGroupMap = new Map()) {
       pixelMap = new Uint32Array(GRID_WIDTH * GRID_HEIGHT);
     }
   }
+  if (layers[activeLayerIndex]) {
+    layers[activeLayerIndex].pixelMap = pixelMap;
+  }
   groupMap = newGroupMap;
+}
+
+export function resetLayers(newLayers, activeIndex, newGroupMap = new Map()) {
+  layers = newLayers.map(l => ({...l, pixelMap: new Uint32Array(l.pixelMap)}));
+  activeLayerIndex = activeIndex;
+  if (!layers[activeLayerIndex]) {
+     layers[activeLayerIndex] = {
+        id: `layer_${Date.now()}`,
+        name: 'Layer 0',
+        visible: true,
+        locked: false,
+        pixelMap: new Uint32Array(GRID_WIDTH * GRID_HEIGHT)
+     };
+  }
+  pixelMap = layers[activeLayerIndex].pixelMap;
+  groupMap = newGroupMap;
+  window.dispatchEvent(new CustomEvent('layer-changed', { detail: { activeLayerIndex, layers } }));
+}
+
+export function setActiveLayerIndex(index) {
+  if (index < 0 || index >= layers.length) return;
+  activeLayerIndex = index;
+  pixelMap = layers[activeLayerIndex].pixelMap;
+  window.dispatchEvent(new CustomEvent('layer-changed', { detail: { activeLayerIndex, layers } }));
+}
+
+export function updateLayersInfo(newLayers) {
+  layers = newLayers;
+  if (activeLayerIndex >= layers.length) activeLayerIndex = Math.max(0, layers.length - 1);
+  if (layers.length === 0) {
+    layers.push({
+      id: `layer_${Date.now()}`,
+      name: 'Layer 0',
+      visible: true,
+      locked: false,
+      pixelMap: new Uint32Array(GRID_WIDTH * GRID_HEIGHT)
+    });
+  }
+  pixelMap = layers[activeLayerIndex].pixelMap;
+  window.dispatchEvent(new CustomEvent('layer-changed', { detail: { activeLayerIndex, layers } }));
 }
 
 export function setPreviewPixels(pixels) {

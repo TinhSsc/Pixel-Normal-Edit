@@ -3,6 +3,8 @@
  * Quản lý mọi tương tác, DOM, API liên quan đến khung preview của ứng dụng.
  */
 
+import { blendUint32 } from './color-utils.js';
+
 const GAP = 32;
 
 let previewItems = [
@@ -152,7 +154,7 @@ export function syncPreviewPixels(mainCanvas, GRID_WIDTH, GRID_HEIGHT) {
         pctx.clearRect(0, 0, GRID_WIDTH, GRID_HEIGHT);
         pctx.drawImage(mainCanvas, 0, 0);
       }
-    } else if (item.type === 'frame-preview' && item.frame && item.frame.pixelMap && item.dirty) {
+    } else if (item.type === 'frame-preview' && item.frame && item.dirty) {
       const previewCanvas = document.getElementById(item.id);
       if (previewCanvas) {
         previewCanvas.width = GRID_WIDTH;
@@ -162,7 +164,22 @@ export function syncPreviewPixels(mainCanvas, GRID_WIDTH, GRID_HEIGHT) {
         pctx.clearRect(0, 0, GRID_WIDTH, GRID_HEIGHT);
         const imgData = pctx.createImageData(GRID_WIDTH, GRID_HEIGHT);
         const data32 = new Uint32Array(imgData.data.buffer);
-        data32.set(item.frame.pixelMap);
+        
+        if (item.frame.layers && item.frame.layers.length > 0) {
+            const bgPixelMap = new Uint32Array(GRID_WIDTH * GRID_HEIGHT);
+            for (let layer of item.frame.layers) {
+                if (!layer.visible) continue;
+                for (let i = 0; i < bgPixelMap.length; i++) {
+                    if (layer.pixelMap[i] !== 0) {
+                        bgPixelMap[i] = blendUint32(bgPixelMap[i], layer.pixelMap[i]);
+                    }
+                }
+            }
+            data32.set(bgPixelMap);
+        } else if (item.frame.pixelMap) {
+            data32.set(item.frame.pixelMap);
+        }
+        
         pctx.putImageData(imgData, 0, 0);
         item.dirty = false;
       }

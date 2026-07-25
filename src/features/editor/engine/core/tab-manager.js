@@ -1,4 +1,4 @@
-import { pixelMap, groupMap, GRID_WIDTH, GRID_HEIGHT, offscreenImageData, offscreenData32, setGridSizeParams, resetMaps, els } from './state.js';
+import { pixelMap, groupMap, GRID_WIDTH, GRID_HEIGHT, offscreenImageData, offscreenData32, setGridSizeParams, resetMaps, els, resetLayers, layers, activeLayerIndex } from './state.js';
 import { getHistoryState, setHistoryState } from './history.js';
 import { renderPixels } from './render.js';
 import { resizeCanvas, fitToScreen } from './viewport.js';
@@ -21,11 +21,24 @@ let tabs = [];
 let activeTabId = null;
 let tabCounter = 1;
 
-function createTabObject(id, name, w, h, pixelMapData = null) {
+function createTabObject(id, name, w, h, pixelMapData = null, layersData = null, activeLayerIndexData = 0) {
+  let initialLayers = layersData;
+  if (!initialLayers) {
+    initialLayers = [{
+      id: `layer_0`,
+      name: 'Layer 0',
+      visible: true,
+      locked: false,
+      pixelMap: pixelMapData || new Uint32Array(w * h)
+    }];
+  }
+
   return {
     id,
     name,
-    pixelMap: pixelMapData || new Uint32Array(w * h),
+    pixelMap: pixelMapData || initialLayers[0].pixelMap,
+    layers: initialLayers,
+    activeLayerIndex: activeLayerIndexData,
     groupMap: new Map(),
     history: { undoStack: [], redoStack: [], currentStroke: null },
     grid: { w, h, imgData: null, data32: null },
@@ -300,6 +313,8 @@ export function initTabs(savedData = null) {
       id: generateId(),
       name: (t('tab.newCanvas') || 'New Canvas') + ' 1',
       pixelMap: pixelMap,
+      layers: layers.map(l => ({...l, pixelMap: new Uint32Array(l.pixelMap)})),
+      activeLayerIndex: activeLayerIndex,
       groupMap: groupMap,
       history: getHistoryState(),
       grid: { w: GRID_WIDTH, h: GRID_HEIGHT, imgData: offscreenImageData, data32: offscreenData32 },
@@ -326,6 +341,8 @@ export function saveCurrentTabState() {
   if (!tab) return;
 
   tab.pixelMap = new Uint32Array(pixelMap);
+  tab.layers = layers.map(l => ({...l, pixelMap: new Uint32Array(l.pixelMap)}));
+  tab.activeLayerIndex = activeLayerIndex;
   tab.groupMap = groupMap;
   tab.history = getHistoryState();
   tab.grid = { w: GRID_WIDTH, h: GRID_HEIGHT, imgData: offscreenImageData, data32: offscreenData32 };
@@ -373,7 +390,7 @@ function loadTabState(tab) {
     loadFrameToCurrentState(tab.animation.activeFrameIndex || 0);
   } else {
     // Không có Animation, nạp dữ liệu lưới mặc định
-    resetMaps(new Uint32Array(tab.pixelMap), tab.groupMap);
+    resetLayers(tab.layers, tab.activeLayerIndex, tab.groupMap);
     setHistoryState(tab.history);
     setGridSizeParams(tab.grid.w, tab.grid.h, tab.grid.imgData, tab.grid.data32);
     setAnimationState(tab.animation || null);
@@ -412,21 +429,24 @@ export function switchTab(id) {
   }
 }
 
-export function createNewTab() {
+export function createNewTab(name, width = 32, height = 32) {
+  if (name && typeof name !== 'string') {
+    name = null;
+  }
   try {
     clearPendingSave();
     saveCurrentTabState();
 
     tabCounter++;
-    const DEFAULT_SIZE = 32;
     const newId = generateId();
-    const newTab = createTabObject(newId, (t('tab.newCanvas') || 'New Canvas') + ' ' + tabCounter, DEFAULT_SIZE, DEFAULT_SIZE);
+    const tabName = name || ((t('tab.newCanvas') || 'New Canvas') + ' ' + tabCounter);
+    const newTab = createTabObject(newId, tabName, width, height);
 
     const tmpCanvas = document.createElement('canvas');
-    tmpCanvas.width = DEFAULT_SIZE;
-    tmpCanvas.height = DEFAULT_SIZE;
+    tmpCanvas.width = width;
+    tmpCanvas.height = height;
     const tmpCtx = tmpCanvas.getContext('2d');
-    newTab.grid.imgData = tmpCtx.getImageData(0, 0, DEFAULT_SIZE, DEFAULT_SIZE);
+    newTab.grid.imgData = tmpCtx.getImageData(0, 0, width, height);
     newTab.grid.data32 = new Uint32Array(newTab.grid.imgData.data.buffer);
 
     tabs.push(newTab);

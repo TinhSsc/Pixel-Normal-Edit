@@ -53,6 +53,8 @@ export async function saveWorkspace(tabs, activeTabId) {
       id: tab.id,
       name: tab.name,
       pixelMap: tab.pixelMap,
+      layers: tab.layers,
+      activeLayerIndex: tab.activeLayerIndex,
       groupMap: Array.from(tab.groupMap.entries()),
       history: tab.history,
       grid: { w: tab.grid.w, h: tab.grid.h },
@@ -90,10 +92,26 @@ export async function loadWorkspace() {
         });
       }
 
+      let migratedLayers = tab.layers;
+      let migratedActiveLayerIndex = tab.activeLayerIndex || 0;
+      
+      if (!migratedLayers || migratedLayers.length === 0) {
+        // Fallback for legacy format that didn't save layers
+        migratedLayers = [{
+          id: `layer_0`,
+          name: 'Layer 0',
+          visible: true,
+          locked: false,
+          pixelMap: migratedPixelMap
+        }];
+      }
+
       return {
         id: tab.id,
         name: tab.name,
         pixelMap: migratedPixelMap,
+        layers: migratedLayers,
+        activeLayerIndex: migratedActiveLayerIndex,
         groupMap: new Map(tab.groupMap),
         history: tab.history,
         grid: { w: tab.grid.w, h: tab.grid.h, imgData: null, data32: null }, // Reconstructed later

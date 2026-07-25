@@ -2,10 +2,11 @@ import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Icon, ICONS } from '../../../../shared/ui/icons';
 import { t } from '../../../../i18n/i18n';
+import { blendUint32 } from '../../engine/core/color-utils.js';
 
 function drawFrameThumbnail(canvasEl, frame) {
   if (!canvasEl || !frame) return;
-  const { width, height, pixelMap } = frame;
+  const { width, height, layers, pixelMap } = frame;
   if (!width || !height) return;
 
   canvasEl.width = width;
@@ -13,7 +14,22 @@ function drawFrameThumbnail(canvasEl, frame) {
   const ctx2d = canvasEl.getContext('2d');
   const imageData = ctx2d.createImageData(width, height);
   const data32 = new Uint32Array(imageData.data.buffer);
-  data32.set(pixelMap);
+  
+  if (layers && layers.length > 0) {
+    const bgPixelMap = new Uint32Array(width * height);
+    for (let layer of layers) {
+      if (!layer.visible) continue;
+      for (let i = 0; i < bgPixelMap.length; i++) {
+        if (layer.pixelMap[i] !== 0) {
+          bgPixelMap[i] = blendUint32(bgPixelMap[i], layer.pixelMap[i]);
+        }
+      }
+    }
+    data32.set(bgPixelMap);
+  } else if (pixelMap) {
+    data32.set(pixelMap);
+  }
+  
   ctx2d.putImageData(imageData, 0, 0);
 }
 function FrameThumbnail({ frame, index, isActive, onClick, onInsertBefore, onInsertAfter, onRemove, onReorder, isNew, isRemoving }) {

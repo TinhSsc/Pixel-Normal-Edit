@@ -2,8 +2,9 @@ import { undo, redo, canUndo, canRedo, beginStroke, commitStroke } from '../engi
 import { zoomIn, zoomOut, fitToScreen, getZoom, getPan, setZoom, setPan } from '../engine/core/viewport.js';
 import { setGridSize } from '../engine/actions/grid-size-select.js';
 import { autoTrimCanvas } from '../engine/actions/trim.js';
-import { currentTool, setCurrentTool, GRID_WIDTH, GRID_HEIGHT, pixelMap, resetMaps } from '../engine/core/state.js';
+import { currentTool, setCurrentTool, GRID_WIDTH, GRID_HEIGHT, pixelMap, resetMaps, layers, activeLayerIndex } from '../engine/core/state.js';
 import { getTabs, getActiveTabId, switchTab, createTabFromData, createNewTab, closeTab, renameTab, performQuickSave, syncToDrive, syncToLocal, debouncedSaveWorkspace } from '../engine/core/tab-manager.js';
+import { addLayer, removeLayer, moveLayerUp, moveLayerDown, toggleLayerVisibility, selectLayer } from '../engine/core/layer-manager.js';
 import { getAnimationState, activeFrameIndex, addFrame, removeFrame, goToFrame, nextFrame, prevFrame, reorderFrame, isAnimationMode, initAnimationFromCurrentState, insertFrameAt } from '../engine/core/animation-state.js';
 import { ModeManager } from '../engine/core/mode-manager.js';
 
@@ -42,7 +43,7 @@ export const EditorAPI = {
       if (options.pixelMap) {
         createTabFromData(options.pixelMap, options.width || 32, options.height || 32, options.name);
       } else {
-        createNewTab();
+        createNewTab(options.name, options.width, options.height);
       }
     },
     closeTab: (tabId, force = false) => closeTab(tabId, force),
@@ -96,6 +97,24 @@ export const EditorAPI = {
       zoomIn: () => zoomIn(),
       zoomOut: () => zoomOut(),
       fitToScreen: () => fitToScreen()
+    },
+
+    layers: {
+      getLayers: () => layers.map((l, i) => ({
+        index: i,
+        id: l.id,
+        name: l.name,
+        visible: l.visible,
+        locked: l.locked,
+        isActive: i === activeLayerIndex
+      })),
+      getActiveLayerIndex: () => activeLayerIndex,
+      addLayer: () => addLayer(),
+      removeLayer: (index) => removeLayer(index),
+      moveLayerUp: (index) => moveLayerUp(index),
+      moveLayerDown: (index) => moveLayerDown(index),
+      toggleLayerVisibility: (index) => toggleLayerVisibility(index),
+      selectLayer: (index) => selectLayer(index)
     },
 
     animation: {

@@ -1,4 +1,4 @@
-import { collection, query, where, onSnapshot, updateDoc, deleteDoc, doc } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, updateDoc, deleteDoc, doc, getDocs } from 'firebase/firestore';
 import { db } from '../../auth/logic/firebase/config';
 
 // ── Security: whitelist of allowed actions ─────────────────────────────────
@@ -19,6 +19,7 @@ const ALLOWED_ACTIONS = new Set([
   'getModes','setGradient','setMirror','setGrid','setOnionSkin',
   'setTool','getTool','setToolParam','getToolParam','setColor','getColor','swapColors',
   'export','exportAnimation','undo','redo','getCapabilities',
+  'showUserInputRequest', 'drawPixelsBulk'
 ]);
 
 // ── Security: rate limiter (max 20 cmds/sec) ──────────────────────────────
@@ -66,6 +67,15 @@ class MCPFirebaseClient {
     console.log(`[MCP Firebase] Session: ${sessionId.slice(0,8)}...`);
 
     const commandsRef = collection(db, 'mcp_sessions', sessionId, 'commands');
+
+    // Clear old pending commands on connect to prevent freezing the browser
+    getDocs(commandsRef).then(snap => {
+      snap.forEach(d => {
+        deleteDoc(d.ref).catch(() => {});
+      });
+      console.log(`[MCP Firebase] Cleared ${snap.size} old commands for safety.`);
+    }).catch(console.error);
+
     const q = query(commandsRef, where('status', '==', 'pending'));
 
     this.unsubscribe = onSnapshot(q, (snapshot) => {
