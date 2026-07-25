@@ -20,7 +20,7 @@ const { registerTool } = require('../core/server');
  */
 function register(server) {
   registerTool(server, 'workflow_start',
-    `🚀 REQUIRED: Call this tool FIRST before drawing anything.
+    `REQUIRED: Call this tool FIRST before drawing anything.
 This tool initializes a drawing workflow with sequential steps for a specific mode.
 Modes: CREATE_IMAGE, EDIT_IMAGE, CREATE_ANIMATION`,
     { mode: z.enum([MODES.CREATE_IMAGE, MODES.EDIT_IMAGE, MODES.CREATE_ANIMATION]).describe('Workflow mode to start') },
@@ -28,7 +28,7 @@ Modes: CREATE_IMAGE, EDIT_IMAGE, CREATE_ANIMATION`,
       const session = require('../core/command-bus').SESSION;
       const state = workflow.start(session, p.mode);
       return {
-        content: [{ type: 'text', text: `🚀 **Workflow started in mode: ${p.mode}!**\n\n${workflow.getProgressReport(session)}\n\n---\nStart with step: **${state.steps[0].label}** → ${state.steps[0].description}` }]
+        content: [{ type: 'text', text: `**Workflow started in mode: ${p.mode}!**\n\n${workflow.getProgressReport(session)}\n\n---\nStart with step: **${state.steps[0].label}** → ${state.steps[0].description}` }]
       };
     });
 
@@ -40,24 +40,24 @@ Modes: CREATE_IMAGE, EDIT_IMAGE, CREATE_ANIMATION`,
       const report = workflow.getProgressReport(session);
       const current = workflow.getCurrentStep(session);
       if (!current) {
-        return { content: [{ type: 'text', text: '⚠️ Workflow has not started. Call **workflow_start** first.' }] };
+        return { content: [{ type: 'text', text: '  Workflow has not started. Call **workflow_start** first.' }] };
       }
       return {
         content: [{
           type: 'text',
-          text: `${report}\n\n👉 **Pending:** ${current.label} — ${current.description}`
+          text: `${report}\n\n  **Pending:** ${current.label} — ${current.description}`
         }]
       };
     });
 
   registerTool(server, 'workflow_advance',
-    '✅ Mark current step as complete and move to the next step. Only call AFTER successfully finishing the current step.',
+    '  Mark current step as complete and move to the next step. Only call AFTER successfully finishing the current step.',
     {},
     () => {
       const session = require('../core/command-bus').SESSION;
       const result = workflow.advance(session);
       if (!result.success) {
-        return { isError: true, content: [{ type: 'text', text: `❌ ${result.message}` }] };
+        return { isError: true, content: [{ type: 'text', text: `  ${result.message}` }] };
       }
       if (!result.nextStep) {
         return { content: [{ type: 'text', text: `🎉 ${result.message}` }] };
@@ -66,7 +66,7 @@ Modes: CREATE_IMAGE, EDIT_IMAGE, CREATE_ANIMATION`,
     });
 
   registerTool(server, 'workflow_validate',
-    `🔍 Check if the agent is allowed to perform a certain action.
+    `  Check if the agent is allowed to perform a certain action.
   Call this tool BEFORE performing operations to ensure correct workflow order.`,
     { stepId: z.string().describe('ID of the step to validate (e.g., "INITIALIZE_CANVAS")') },
     (p) => {
@@ -75,7 +75,7 @@ Modes: CREATE_IMAGE, EDIT_IMAGE, CREATE_ANIMATION`,
       if (!result.allowed) {
         return { isError: true, content: [{ type: 'text', text: result.message }] };
       }
-      return { content: [{ type: 'text', text: result.message || `✅ You can perform "${p.stepId}". Please proceed!` }] };
+      return { content: [{ type: 'text', text: result.message || `  You can perform "${p.stepId}". Please proceed!` }] };
     });
 
   registerTool(server, 'workflow_set_layer',
@@ -85,9 +85,9 @@ Modes: CREATE_IMAGE, EDIT_IMAGE, CREATE_ANIMATION`,
       const session = require('../core/command-bus').SESSION;
       const success = workflow.setLayerAndFrame(session, p.layer, undefined);
       if (!success) {
-        return { isError: true, content: [{ type: 'text', text: '❌ Workflow not started' }] };
+        return { isError: true, content: [{ type: 'text', text: '  Workflow not started' }] };
       }
-      return { content: [{ type: 'text', text: `✅ Active layer set to ${p.layer}` }] };
+      return { content: [{ type: 'text', text: `  Active layer set to ${p.layer}` }] };
     });
 
   registerTool(server, 'workflow_set_frame',
@@ -97,9 +97,9 @@ Modes: CREATE_IMAGE, EDIT_IMAGE, CREATE_ANIMATION`,
       const session = require('../core/command-bus').SESSION;
       const success = workflow.setLayerAndFrame(session, undefined, p.frame);
       if (!success) {
-        return { isError: true, content: [{ type: 'text', text: '❌ Workflow not started' }] };
+        return { isError: true, content: [{ type: 'text', text: '  Workflow not started' }] };
       }
-      return { content: [{ type: 'text', text: `✅ Active frame set to ${p.frame}` }] };
+      return { content: [{ type: 'text', text: `  Active frame set to ${p.frame}` }] };
     });
 
   registerTool(server, 'workflow_set_phase',
@@ -109,14 +109,14 @@ Modes: CREATE_IMAGE, EDIT_IMAGE, CREATE_ANIMATION`,
       const session = require('../core/command-bus').SESSION;
       const success = workflow.setPhase(session, p.phase);
       if (!success) {
-        return { isError: true, content: [{ type: 'text', text: '❌ Workflow not started' }] };
+        return { isError: true, content: [{ type: 'text', text: '  Workflow not started' }] };
       }
-      return { content: [{ type: 'text', text: `✅ Active phase set to ${p.phase}` }] };
+      return { content: [{ type: 'text', text: `  Active phase set to ${p.phase}` }] };
     });
 
   registerTool(server, 'workflow_setup_animation',
     'Declare animation metadata for tracking (fps, total_frames, loop).',
-    { 
+    {
       fps: z.number().int().optional().describe('Frames per second'),
       total_frames: z.number().int().optional().describe('Total frames in the animation'),
       loop: z.boolean().optional().describe('Whether the animation loops')
@@ -125,14 +125,14 @@ Modes: CREATE_IMAGE, EDIT_IMAGE, CREATE_ANIMATION`,
       const session = require('../core/command-bus').SESSION;
       const success = workflow.setAnimationMeta(session, p.fps, p.total_frames, p.loop);
       if (!success) {
-        return { isError: true, content: [{ type: 'text', text: '❌ Workflow not started' }] };
+        return { isError: true, content: [{ type: 'text', text: '  Workflow not started' }] };
       }
-      return { content: [{ type: 'text', text: `✅ Animation meta updated: FPS=${p.fps}, Frames=${p.total_frames}, Loop=${p.loop}` }] };
+      return { content: [{ type: 'text', text: `  Animation meta updated: FPS=${p.fps}, Frames=${p.total_frames}, Loop=${p.loop}` }] };
     });
 
   registerTool(server, 'workflow_create_input_request',
     'Pause the workflow and ask the user for specific input via the UI (e.g. CANVAS_SIZE, APPROVE_PLAN, SELECT_EDIT_REGION).',
-    { 
+    {
       type: z.enum(['CANVAS_SIZE', 'APPROVE_PLAN', 'REVIEW_RESULT', 'SELECT_EDIT_REGION', 'ANIMATION_SETUP']).describe('The type of request'),
       fields: z.record(z.any()).optional().describe('Context or fields for the request')
     },
@@ -140,15 +140,15 @@ Modes: CREATE_IMAGE, EDIT_IMAGE, CREATE_ANIMATION`,
       const { sendCommand, SESSION } = require('../core/command-bus');
       const reqId = workflow.createInputRequest(SESSION, p.type, p.fields || {});
       if (!reqId) {
-        return { isError: true, content: [{ type: 'text', text: '❌ Workflow not started' }] };
+        return { isError: true, content: [{ type: 'text', text: '  Workflow not started' }] };
       }
-      
+
       const res = await sendCommand({ action: 'showUserInputRequest', type: p.type, fields: p.fields || {}, reqId }, 35000);
-      
+
       if (!res.isError) {
         workflow.completeInputRequest(SESSION, reqId, res.content[0].text);
       }
-      
+
       return res;
     });
 
@@ -159,18 +159,18 @@ Modes: CREATE_IMAGE, EDIT_IMAGE, CREATE_ANIMATION`,
       const session = require('../core/command-bus').SESSION;
       const success = workflow.setApprovalRequired(session, p.required);
       if (!success) {
-        return { isError: true, content: [{ type: 'text', text: '❌ Workflow not started' }] };
+        return { isError: true, content: [{ type: 'text', text: '  Workflow not started' }] };
       }
-      return { content: [{ type: 'text', text: p.required ? '✅ Workflow paused, waiting for user approval.' : '✅ Workflow resumed.' }] };
+      return { content: [{ type: 'text', text: p.required ? '  Workflow paused, waiting for user approval.' : '  Workflow resumed.' }] };
     });
 
   registerTool(server, 'workflow_reset',
-    '🔄 Reset workflow to initial state. Clears all progress.',
+    '  Reset workflow to initial state. Clears all progress.',
     {},
     () => {
       const session = require('../core/command-bus').SESSION;
       workflow.reset(session);
-      return { content: [{ type: 'text', text: '🔄 Workflow reset. Please start from the beginning.' }] };
+      return { content: [{ type: 'text', text: '  Workflow reset. Please start from the beginning.' }] };
     });
 
   registerTool(server, 'validate_canvas_name',
@@ -181,9 +181,9 @@ Modes: CREATE_IMAGE, EDIT_IMAGE, CREATE_ANIMATION`,
     (p) => {
       const result = validateCanvasName(p.name);
       if (!result.valid) {
-        return { isError: true, content: [{ type: 'text', text: `❌ ${result.message}` }] };
+        return { isError: true, content: [{ type: 'text', text: `  ${result.message}` }] };
       }
-      return { content: [{ type: 'text', text: `✅ Name "${p.name}" is valid!` }] };
+      return { content: [{ type: 'text', text: `  Name "${p.name}" is valid!` }] };
     });
 
   registerTool(server, 'validate_canvas_size',
@@ -193,9 +193,9 @@ Modes: CREATE_IMAGE, EDIT_IMAGE, CREATE_ANIMATION`,
     (p) => {
       const result = validateCanvasSize(p.width, p.height);
       if (!result.valid) {
-        return { isError: true, content: [{ type: 'text', text: `❌ ${result.message}` }] };
+        return { isError: true, content: [{ type: 'text', text: `  ${result.message}` }] };
       }
-      return { content: [{ type: 'text', text: `✅ Size ${p.width}x${p.height} is valid!` }] };
+      return { content: [{ type: 'text', text: `  Size ${p.width}x${p.height} is valid!` }] };
     });
 }
 

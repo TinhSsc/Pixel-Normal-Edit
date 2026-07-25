@@ -19,7 +19,7 @@ function register(server) {
     {},
     () => ({ action: 'getActiveTabId' }));
 
-  server.tool('workspace_create_tab',
+  registerTool(server, 'workspace_create_tab',
     'Create a new blank canvas tab',
     {
       name: z.string().optional().describe('Tab name'),
@@ -29,11 +29,12 @@ function register(server) {
     async (p) => {
       if (p.width === undefined || p.height === undefined) {
         return {
+          action: 'noop',
           isError: true,
           content: [{ type: 'text', text: 'Please provide the width and height dimensions (resize) when creating a new canvas.' }]
         };
       }
-      return sendCommand({ action: 'createTab', ...p });
+      return { action: 'createTab', ...p };
     }
   );
 
