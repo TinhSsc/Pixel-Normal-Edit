@@ -1,6 +1,6 @@
 {
   "name": "@pixel-normal-edit/mcp",
-  "version": "2.7.0",
+  "version": "2.8.0",
   "description": "MCP server for Pixel Normal Edit canvas - enables AI agents to draw pixel art",
   "main": "index.js",
   "bin": {
