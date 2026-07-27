@@ -8,6 +8,7 @@ This file contains custom behavior and constraints for AI agents working on this
 2. **Background Image Restrictions**: Do NOT allow AI-generated images to be set directly as the canvas background. Ensure that any `set-background` logic verifies that the image source is a user-uploaded image, not an AI generation block.
 3. **Vietnamese Language Support**: The project uses Vietnamese as the primary language (configured in `src/js/lang/i18n.js`). Maintain Vietnamese translations for all user-facing UI elements, tooltips, and alerts.
 4. **Legacy JS to React Integration**: Keep in mind that legacy vanilla JS logic (previously in `js/`) has been ported to interact with React components. When fixing bugs, ensure React component state stays in sync with vanilla JS canvas event listeners.
+5. **STRICT ENFORCEMENT - NEVER HACK THE WORKFLOW ENGINE**: You are STRICTLY FORBIDDEN from using `node -e`, bash scripts, or any other terminal commands to manually mutate the state of the workflow engine (`workflow.js`), override properties like `DISABLE_ALL`, or inject mock data into Firebase. If you hit a roadblock in the workflow, YOU MUST use the provided MCP tools (e.g., `workflow_create_input_request`) and wait for the user to respond or for the 30-second auto-fallback to trigger. Bypassing the engine will cause catastrophic UI failures and is considered a severe violation of these rules.
 
 ## Default AI Skills
 Always assume and utilize the following skills by default when working on this project:

@@ -22,7 +22,12 @@ function register(server) {
       dx: z.number().int().default(0).describe('X offset for content when extending'),
       dy: z.number().int().default(0).describe('Y offset for content when extending')
     },
-    (p) => ({ action: 'resize', ...p }));
+    (p) => {
+      const session = require('../core/command-bus').SESSION;
+      const workflow = require('../rules/workflow');
+      workflow.setStepFlag(session, 'canvas_initialized', true);
+      return { action: 'resize', ...p };
+    });
 
   registerTool(server, 'canvas_clear',
     'Erase all pixels on the current canvas frame',
@@ -33,6 +38,17 @@ function register(server) {
     'Auto-trim transparent borders from canvas',
     {},
     () => ({ action: 'trim' }));
+  registerTool(server, 'region_clear',
+    'Erase a specific rectangular region of pixels. Use this for local repairs instead of canvas_clear.',
+    {
+      x: z.number().int().describe('Top-left X coordinate'),
+      y: z.number().int().describe('Top-left Y coordinate'),
+      w: z.number().int().min(1).describe('Width of the region to clear'),
+      h: z.number().int().min(1).describe('Height of the region to clear'),
+      explicitReset: z.boolean().default(false).describe('Must be true if clearing > 25% of the canvas area'),
+      explicitResetReason: z.string().optional().describe('Required if explicitReset is true')
+    },
+    (p) => ({ action: 'clearRegion', ...p }));
 }
 
 module.exports = { register };

@@ -27,8 +27,6 @@ require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') }
 
 const { createServer } = require('./core/server');
 const { registerAll: registerCoreTools } = require('./tools/index');
-const { registerAll: registerArtTree } = require('./domains/art-tree/index');
-const { registerAll: registerRules } = require('./rules/index');
 
 // ── Initialize ────────────────────────────────────────────────────────────
 const server = createServer();
@@ -36,11 +34,6 @@ const server = createServer();
 // ── Register Core Tools ───────────────────────────────────────────────────
 registerCoreTools(server);
 
-// ── Register Rules / Workflow Tools (BẮT BUỘC: chạy trước khi vẽ) ────────
-registerRules(server);
-
-// ── Register Domain Modules ───────────────────────────────────────────────
-registerArtTree(server);
 // Future domains: registerPixelArt(server), registerCharacterDrawing(server), etc.
 
 // ── Start Transport ───────────────────────────────────────────────────────

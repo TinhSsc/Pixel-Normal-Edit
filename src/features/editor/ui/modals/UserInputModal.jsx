@@ -4,7 +4,7 @@ import { Icon, ICONS } from '../../../../shared/ui/icons';
 
 const UserInputModal = () => {
   const [request, setRequest] = useState(null);
-  const [timeLeft, setTimeLeft] = useState(30);
+  const [timeLeft, setTimeLeft] = useState(60);
   const [formData, setFormData] = useState({});
 
   useEffect(() => {
@@ -21,7 +21,7 @@ const UserInputModal = () => {
       
       setRequest({ reqId, type, fields, resolve });
       setFormData(defaultData);
-      setTimeLeft(30);
+      setTimeLeft(60);
     };
 
     window.addEventListener('SHOW_USER_INPUT_REQUEST', handleRequest);
@@ -58,7 +58,7 @@ const UserInputModal = () => {
     }
     
     if (isAuto) {
-      responseText += ' (Auto-submitted by system due to 30s timeout)';
+      responseText += ' (Auto-submitted by system due to 15s timeout)';
     }
 
     request.resolve(responseText);
@@ -74,8 +74,8 @@ const UserInputModal = () => {
   if (!request) return null;
 
   return (
-    <div className="modal-overlay" style={{ display: 'flex', zIndex: 99999 }}>
-      <div className="modal" style={{ width: '400px', maxWidth: '90%' }}>
+    <div className="modal-overlay">
+      <div className="modal-content user-input-modal">
         <div className="modal-header">
           <h3 className="modal-title">
             <Icon name={ICONS.HELP} style={{ width: 20, height: 20, marginRight: 8 }} />
@@ -83,79 +83,71 @@ const UserInputModal = () => {
           </h3>
         </div>
         
-        <div className="modal-body">
-          <p style={{ marginBottom: '16px', color: 'var(--text-secondary)' }}>
+        <div className="modal-body user-input-body">
+          <p className="user-input-description">
             The AI assistant is waiting for your input to proceed.
           </p>
 
           {request.type === 'CANVAS_SIZE' && (
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: 4, fontSize: 12 }}>Width</label>
+            <div className="user-input-size-row">
+              <div className="user-input-field-group">
+                <label className="user-input-label">Width</label>
                 <input 
                   type="number" 
                   value={formData.width || ''} 
                   onChange={(e) => setFormData({...formData, width: e.target.value})}
-                  className="input-field" 
-                  style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
+                  className="user-input-field" 
+                  placeholder="512"
                 />
               </div>
-              <div style={{ flex: 1 }}>
-                <label style={{ display: 'block', marginBottom: 4, fontSize: 12 }}>Height</label>
+              <div className="user-input-field-group">
+                <label className="user-input-label">Height</label>
                 <input 
                   type="number" 
                   value={formData.height || ''} 
                   onChange={(e) => setFormData({...formData, height: e.target.value})}
-                  className="input-field" 
-                  style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
+                  className="user-input-field" 
+                  placeholder="512"
                 />
               </div>
             </div>
           )}
 
           {(request.type === 'APPROVE_PLAN' || request.type === 'REVIEW_RESULT') && (
-            <div style={{ display: 'flex', gap: '10px' }}>
+            <div className="user-input-approval-row">
               <button 
                 onClick={() => setFormData({...formData, approval: 'APPROVE'})}
-                style={{ 
-                  flex: 1, padding: '10px', 
-                  backgroundColor: formData.approval === 'APPROVE' ? 'var(--success)' : 'var(--bg-secondary)',
-                  color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer'
-                }}
+                className={`user-input-approve-btn ${formData.approval === 'APPROVE' ? 'active' : ''}`}
               >
+                <Icon name={ICONS.CLOUD_CHECK} style={{ width: 16, height: 16 }} />
                 Approve
               </button>
               <button 
                 onClick={() => setFormData({...formData, approval: 'REJECT'})}
-                style={{ 
-                  flex: 1, padding: '10px', 
-                  backgroundColor: formData.approval === 'REJECT' ? '#d32f2f' : 'var(--bg-secondary)',
-                  color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer'
-                }}
+                className={`user-input-reject-btn ${formData.approval === 'REJECT' ? 'active' : ''}`}
               >
+                <Icon name={ICONS.X} style={{ width: 16, height: 16 }} />
                 Reject
               </button>
             </div>
           )}
 
           {/* Progress Bar for Timeout */}
-          <div style={{ marginTop: '20px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '4px', color: 'var(--text-muted)' }}>
+          <div className="user-input-timer">
+            <div className="user-input-timer-header">
               <span>Auto-submitting in:</span>
-              <span>{timeLeft}s</span>
+              <span className="user-input-timer-count">{timeLeft}s</span>
             </div>
-            <div style={{ width: '100%', height: '4px', backgroundColor: 'var(--bg-secondary)', borderRadius: '2px', overflow: 'hidden' }}>
-              <div style={{ 
-                height: '100%', 
-                backgroundColor: 'var(--primary, #1976d2)', 
-                width: `${(timeLeft / 30) * 100}%`,
-                transition: 'width 1s linear'
-              }}></div>
+            <div className="user-input-progress-track">
+              <div 
+                className="user-input-progress-bar"
+                style={{ width: `${(timeLeft / 60) * 100}%` }}
+              ></div>
             </div>
           </div>
         </div>
 
-        <div className="modal-footer">
+        <div className="modal-footer user-input-footer">
           <button className="btn" onClick={handleCancel}>Cancel</button>
           <button className="btn btn-primary" onClick={() => handleSubmit(false)}>Submit</button>
         </div>

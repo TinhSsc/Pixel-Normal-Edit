@@ -1,4 +1,4 @@
-import { collection, query, where, onSnapshot, updateDoc, deleteDoc, doc, getDocs } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, updateDoc, deleteDoc, doc, getDocs, setDoc } from 'firebase/firestore';
 import { db } from '../../auth/logic/firebase/config';
 
 // ── Security: whitelist of allowed actions ─────────────────────────────────
@@ -65,6 +65,12 @@ class MCPFirebaseClient {
     if (this.unsubscribe) this.unsubscribe();
 
     console.log(`[MCP Firebase] Session: ${sessionId.slice(0,8)}...`);
+    
+    // Save current url to session document so the bridge knows where the user is
+    setDoc(doc(db, 'mcp_sessions', sessionId), {
+      currentUrl: window.location.href,
+      lastActive: Date.now()
+    }, { merge: true }).catch(console.error);
 
     const commandsRef = collection(db, 'mcp_sessions', sessionId, 'commands');
 
@@ -97,11 +103,17 @@ class MCPFirebaseClient {
         console.debug(`[MCP Firebase] cmd=${commandData.action} id=${docId.slice(0,8)}`);
 
         try {
-          if (!commandData || typeof commandData.action !== 'string')
-            throw new Error("Invalid command: missing 'action'");
+          if (!commandData || typeof commandData.action !== 'string') {
+            console.warn("[MCP Firebase] Invalid command structure, dropping immediately.", docId, commandData);
+            scheduleDelete(docRef, 0);
+            return;
+          }
 
-          if (!ALLOWED_ACTIONS.has(commandData.action))
-            throw new Error(`Action '${commandData.action}' is not allowed`);
+          if (!ALLOWED_ACTIONS.has(commandData.action)) {
+            console.warn(`[MCP Firebase] Action '${commandData.action}' is not allowed, dropping.`);
+            scheduleDelete(docRef, 0);
+            return;
+          }
 
           if (commandData.data && Array.isArray(commandData.data)) {
             if (commandData.data.length > 256 || (commandData.data[0] || '').length > 256)

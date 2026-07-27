@@ -19,6 +19,16 @@ function register(server) {
     { x: z.number().int().optional().describe('X destination (default: original X)'),
       y: z.number().int().optional().describe('Y destination (default: original Y)') },
     (p) => ({ action: 'pasteRegion', ...p }));
+
+  registerTool(server, 'edit_capture_before',
+    'Capture a snapshot of the region BEFORE an edit. Used to validate diffs later.',
+    { affectedRegion: z.object({ x: z.number().int(), y: z.number().int(), w: z.number().int(), h: z.number().int() }) },
+    (p) => ({ action: 'editCaptureBefore', ...p }));
+
+  registerTool(server, 'edit_validate_diff',
+    'Compare current state against the captured BEFORE state to ensure NO pixels outside affectedRegion were changed.',
+    {},
+    () => ({ action: 'editValidateDiff' }));
 }
 
 module.exports = { register };

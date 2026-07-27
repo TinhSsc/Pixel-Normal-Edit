@@ -27,13 +27,7 @@ function register(server) {
       height: z.number().int().min(1).max(256).optional().describe('Canvas height (max 256)')
     },
     async (p) => {
-      if (p.width === undefined || p.height === undefined) {
-        return {
-          action: 'noop',
-          isError: true,
-          content: [{ type: 'text', text: 'Please provide the width and height dimensions (resize) when creating a new canvas.' }]
-        };
-      }
+      // If width/height are missing, the web client will use default sizes, and the AI can resize later.
       return { action: 'createTab', ...p };
     }
   );

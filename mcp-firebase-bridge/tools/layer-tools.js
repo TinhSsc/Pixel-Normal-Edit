@@ -60,6 +60,14 @@ function register(server) {
       return { content: [{ type: 'text', text: `✓ Layer ${p.index} moved ${p.direction}.` }] };
     });
 
+  registerTool(server, 'layer_clear',
+    'Clear all pixels and evidence on a specific layer without removing the layer itself.',
+    { index: z.number().int().describe('The index of the layer to clear') },
+    async (p) => {
+      await sendCommand({ action: 'layer.clear', index: p.index });
+      return { content: [{ type: 'text', text: `✓ Layer ${p.index} cleared.` }] };
+    });
+
   registerTool(server, 'layer_toggle_visibility',
     'Toggle the visibility of a layer by its index.',
     { index: z.number().int().describe('The index of the layer to toggle') },

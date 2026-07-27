@@ -6,7 +6,7 @@
  * then waits for the browser editor to respond with success/error.
  */
 const crypto = require('crypto');
-const { doc, setDoc, onSnapshot } = require('firebase/firestore');
+const { doc, setDoc, onSnapshot, getDoc } = require('firebase/firestore');
 const { db } = require('./firebase');
 
 const SESSION = process.argv[2] || process.env.MCP_SESSION || 'default-session';
@@ -26,11 +26,20 @@ async function sendCommand(payload, timeoutOverride = null) {
   await setDoc(ref, { ...payload, status: 'pending', timestamp: Date.now() });
 
   return new Promise((resolve) => {
-    const timer = setTimeout(() => {
+    const timer = setTimeout(async () => {
       unsub();
+      
+      let fallbackUrl = `http://localhost:5173/?mcp_session=${SESSION}`;
+      try {
+        const sessionSnap = await getDoc(doc(db, 'mcp_sessions', SESSION));
+        if (sessionSnap.exists() && sessionSnap.data().currentUrl) {
+          fallbackUrl = sessionSnap.data().currentUrl;
+        }
+      } catch (e) {}
+
       resolve({
         isError: true,
-        content: [{ type: 'text', text: `⏱ Timeout (${actualTimeout}ms). Is the browser tab open with session: ${SESSION}?` }]
+        content: [{ type: 'text', text: `⏱ Timeout (${actualTimeout}ms). The browser tab is not open or not responding. You MUST tell the user to open or F5 this URL in their browser: ${fallbackUrl}` }]
       });
     }, actualTimeout);
 

@@ -9,7 +9,85 @@ let _anchors   = new Map();   // name → { x, y }
 let _clipboard = null;         // { w, h, data: Uint32Array }
 let _stamps    = new Map();   // name → { palette, data[] }  (named sprites)
 
+class ObjectEvidenceStore {
+  constructor() {
+    this.store = new Map(); // key: "frame,layer,x,y" -> objectId
+  }
+
+  recordPixel(objectId, frameIndex, layerIndex, x, y, isDelete = false) {
+    const key = `${frameIndex},${layerIndex},${x},${y}`;
+    if (isDelete) {
+      this.store.delete(key);
+    } else if (objectId) {
+      this.store.set(key, objectId);
+    }
+  }
+
+  queryActualBBox(objectId, frameIndex, layerIndex) {
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    let count = 0;
+    const prefix = `${frameIndex},${layerIndex},`;
+    
+    for (const [key, obj] of this.store.entries()) {
+      if (key.startsWith(prefix) && obj === objectId) {
+        const parts = key.split(',');
+        const px = Number(parts[2]);
+        const py = Number(parts[3]);
+        if (px < minX) minX = px;
+        if (px > maxX) maxX = px;
+        if (py < minY) minY = py;
+        if (py > maxY) maxY = py;
+        count++;
+      }
+    }
+    
+    if (count === 0) return { count: 0 };
+    return { x: minX, y: minY, w: maxX - minX + 1, h: maxY - minY + 1, count };
+  }
+
+  clearLayer(frameIndex, layerIndex) {
+    const prefix = `${frameIndex},${layerIndex},`;
+    for (const key of this.store.keys()) {
+      if (key.startsWith(prefix)) {
+        this.store.delete(key);
+      }
+    }
+  }
+}
+
+window.__evidenceStore = window.__evidenceStore || new ObjectEvidenceStore();
+
+function setPixelTracked(x, y, color, objectId) {
+  const a = window.__lastApiInstance;
+  if (!a) throw new Error("api is not defined");
+  a.activeDocument.draw.setPixel(x, y, color);
+  
+  if (objectId !== undefined) {
+    const frameIndex = a.activeDocument.animation.getActiveFrameIndex();
+    const layerIndex = a.activeDocument.layers.activeLayerIndex;
+    window.__evidenceStore.recordPixel(objectId, frameIndex, layerIndex, x, y, color === null);
+  }
+}
+
 // ── Internal helpers ───────────────────────────────────────────────────────
+
+/** Remove protruding L-shape corners from 8-connected outline to make it 'perfect' */
+function removeJaggies(pointsArray) {
+  const set = new Set(pointsArray.map(p => p.x + ',' + p.y));
+  const isPt = (x, y) => set.has(x + ',' + y);
+  return pointsArray.filter(p => {
+    const { x, y } = p;
+    const n = isPt(x, y - 1), s = isPt(x, y + 1), e = isPt(x + 1, y), w = isPt(x - 1, y);
+    if ((n && e && !s && !w) || (n && w && !s && !e) || (s && e && !n && !w) || (s && w && !n && !e)) {
+      if (n && e && isPt(x+1, y-1)) return false;
+      if (n && w && isPt(x-1, y-1)) return false;
+      if (s && e && isPt(x+1, y+1)) return false;
+      if (s && w && isPt(x-1, y+1)) return false;
+    }
+    return true;
+  });
+}
+
 
 /** Bresenham ellipse — yields (x, y) outline points */
 function* ellipsePoints(cx, cy, rx, ry) {
@@ -88,9 +166,9 @@ function rgbaToU32({ r, g, b, a = 255 }) {
 
 function setDirect(px_, py_, color, api) {
   if (color === null || color === 'transparent') {
-    api.activeDocument.draw.setPixel(px_, py_, null);
+    setPixelTracked(px_, py_, null, args.objectId);
   } else {
-    api.activeDocument.draw.setPixel(px_, py_, color);
+    setPixelTracked(px_, py_, color, args.objectId);
   }
 }
 
@@ -99,6 +177,7 @@ function setDirect(px_, py_, color, api) {
 // ═══════════════════════════════════════════════════════════════════════════
 export async function executeCommand(api, cmd) {
   if (!cmd || typeof cmd !== 'object') throw new Error('Invalid command format');
+  window.__lastApiInstance = api;
   const { action, ...args } = cmd;
 
   switch (action) {
@@ -134,6 +213,25 @@ export async function executeCommand(api, cmd) {
     case 'layer.select':
       if (args.index !== undefined) api.activeDocument.layers.selectLayer(args.index);
       return { success: true };
+    case 'layer.clear':
+      if (args.index !== undefined) {
+        api.activeDocument.history.beginTransaction();
+        const prevLayer = api.activeDocument.layers.activeLayerIndex;
+        api.activeDocument.layers.selectLayer(args.index);
+        const size = api.activeDocument.canvas.getSize();
+        for (let r = 0; r < size.height; r++) {
+          for (let c = 0; c < size.width; c++) {
+            api.activeDocument.draw.erasePixel(c, r);
+          }
+        }
+        api.activeDocument.layers.selectLayer(prevLayer);
+        api.activeDocument.history.commitTransaction();
+        renderPixels();
+        
+        const frameIndex = api.activeDocument.animation.getActiveFrameIndex();
+        window.__evidenceStore.clearLayer(frameIndex, args.index);
+      }
+      return { success: true };
 
     // ─────────────────────────────────────────────────────────────────────
     // CANVAS
@@ -147,6 +245,96 @@ export async function executeCommand(api, cmd) {
         throw new Error("resize: required 'width', 'height'");
       api.activeDocument.canvas.resize(args.width, args.height, args.mode||'clear', args.dx||0, args.dy||0);
       return { success: true };
+
+    case 'clearRegion': {
+      const { x, y, w, h, explicitReset } = args;
+      const size = api.activeDocument.canvas.getSize();
+      if (w * h > size.width * size.height * 0.25 && !explicitReset) {
+        throw new Error(`clearRegion rejected: Region (${w}x${h}) exceeds 25% of canvas. Use explicitReset:true if this is intentional.`);
+      }
+      if (x < 0 || y < 0 || w <= 0 || h <= 0 || x + w > size.width || y + h > size.height) {
+        throw new Error(`clearRegion rejected: Region out of bounds.`);
+      }
+      api.activeDocument.history.beginTransaction();
+      const frameIndex = api.activeDocument.animation.getActiveFrameIndex();
+      const layerIndex = api.activeDocument.layers.activeLayerIndex;
+      for (let r = y; r < y + h; r++) {
+        for (let c = x; c < x + w; c++) {
+          api.activeDocument.draw.erasePixel(c, r);
+          window.__evidenceStore.recordPixel(null, frameIndex, layerIndex, c, r, true);
+        }
+      }
+      api.activeDocument.history.commitTransaction();
+      renderPixels();
+      
+      if (!window.__dirtyRegions) window.__dirtyRegions = [];
+      window.__dirtyRegions.push({x, y, w, h});
+      
+      return { success: true, cleared: {x,y,w,h} };
+    }
+
+    case 'queryActualBBox': {
+      const { objectId, frameIndex, layerIndex } = args;
+      if (frameIndex === undefined || layerIndex === undefined) {
+        throw new Error("queryActualBBox: required 'frameIndex', 'layerIndex'");
+      }
+      const result = window.__evidenceStore.queryActualBBox(objectId, frameIndex, layerIndex);
+      return { success: true, result };
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // EDIT & REGION TOOLS
+    // ─────────────────────────────────────────────────────────────────────
+    case 'editCaptureBefore': {
+      const { affectedRegion } = args;
+      if (!affectedRegion) throw new Error("editCaptureBefore: required 'affectedRegion'");
+      window.__editBeforeState = {
+        region: affectedRegion,
+        pixels: new Map() // 'x,y' -> color
+      };
+      
+      const size = api.activeDocument.canvas.getSize();
+      for (let r = 0; r < size.height; r++) {
+        for (let c = 0; c < size.width; c++) {
+          const color = api.activeDocument.draw.getPixel(c, r);
+          window.__editBeforeState.pixels.set(`${c},${r}`, color);
+        }
+      }
+      return { success: true };
+    }
+
+    case 'editValidateDiff': {
+      if (!window.__editBeforeState) {
+        throw new Error("editValidateDiff: No before state captured. Call editCaptureBefore first.");
+      }
+      const { region, pixels } = window.__editBeforeState;
+      const size = api.activeDocument.canvas.getSize();
+      let unexpectedChanges = 0;
+      
+      for (let r = 0; r < size.height; r++) {
+        for (let c = 0; c < size.width; c++) {
+          // Skip if inside affectedRegion
+          if (c >= region.x && c < region.x + region.w && r >= region.y && r < region.y + region.h) {
+            continue;
+          }
+          
+          const beforeColor = pixels.get(`${c},${r}`) || null;
+          const afterColor = api.activeDocument.draw.getPixel(c, r) || null;
+          
+          if (beforeColor !== afterColor) {
+            unexpectedChanges++;
+          }
+        }
+      }
+      
+      window.__editBeforeState = null; // Clear state after validation
+      
+      if (unexpectedChanges > 0) {
+        throw new Error(`VALIDATE_DIFF FAILED: Detected ${unexpectedChanges} unexpected pixel changes outside the affectedRegion (${region.x},${region.y} ${region.w}x${region.h}). ROLLBACK required.`);
+      }
+      
+      return { success: true, valid: true };
+    }
 
     // ─────────────────────────────────────────────────────────────────────
     // ANIMATION
@@ -201,12 +389,12 @@ export async function executeCommand(api, cmd) {
     // ─────────────────────────────────────────────────────────────────────
     case 'drawPixel':
       if (args.x !== undefined && args.y !== undefined && args.color)
-        api.activeDocument.draw.setPixel(args.x, args.y, args.color);
+        setPixelTracked(args.x, args.y, args.color, args.objectId);
       return { success: true };
 
     case 'erasePixel':
       if (args.x !== undefined && args.y !== undefined)
-        api.activeDocument.draw.setPixel(args.x, args.y, null);
+        setPixelTracked(args.x, args.y, null, args.objectId);
       return { success: true };
 
     case 'drawPixelsBulk':
@@ -214,7 +402,7 @@ export async function executeCommand(api, cmd) {
         api.activeDocument.history.beginTransaction();
         for (const p of args.pixels) {
           if (p.x !== undefined && p.y !== undefined) {
-            api.activeDocument.draw.setPixel(p.x, p.y, p.color || null);
+            setPixelTracked(p.x, p.y, p.color || null, args.objectId);
           }
         }
         api.activeDocument.history.commitTransaction();
@@ -229,25 +417,29 @@ export async function executeCommand(api, cmd) {
     case 'drawLine':
       if (args.x0!==undefined && args.y0!==undefined && args.x1!==undefined && args.y1!==undefined && args.color) {
         api.activeDocument.history.beginTransaction();
-        bresenhamLine(args.x0,args.y0,args.x1,args.y1,(x,y)=>api.activeDocument.draw.setPixel(x,y,args.color));
+        bresenhamLine(args.x0,args.y0,args.x1,args.y1,(x,y)=>setPixelTracked(x, y, args.color, args.objectId));
         api.activeDocument.history.commitTransaction(); renderPixels();
       }
       return { success: true };
 
-    case 'drawCircle':
-      if (args.cx!==undefined && args.cy!==undefined && args.r!==undefined && args.color) {
-        api.activeDocument.history.beginTransaction();
-        if (args.filled) {
-          for (let dy=-args.r; dy<=args.r; dy++) {
-            const dx = Math.round(Math.sqrt(args.r*args.r - dy*dy));
-            for (let x=args.cx-dx; x<=args.cx+dx; x++) api.activeDocument.draw.setPixel(x, args.cy+dy, args.color);
-          }
-        } else {
-          circlePoints(args.cx,args.cy,args.r,(x,y)=>api.activeDocument.draw.setPixel(x,y,args.color));
+    case 'drawCircle': {
+      const { cx, cy, r, color, filled=false, smooth=true } = args;
+      if (cx===undefined||cy===undefined||r===undefined||!color) throw new Error("drawCircle: required 'cx','cy','r','color'");
+      api.activeDocument.history.beginTransaction();
+      if (filled) {
+        for (let dy=-r; dy<=r; dy++) {
+          const dx = Math.round(Math.sqrt(r*r - dy*dy));
+          for (let x=cx-dx; x<=cx+dx; x++) setPixelTracked(x, cy+dy, color, args.objectId);
         }
-        api.activeDocument.history.commitTransaction(); renderPixels();
+      } else {
+        let pts = [];
+        circlePoints(cx, cy, r, (x,y) => pts.push({x,y}));
+        if (smooth) pts = removeJaggies(pts);
+        for (const p of pts) setPixelTracked(p.x, p.y, color, args.objectId);
       }
+      api.activeDocument.history.commitTransaction(); renderPixels();
       return { success: true };
+    }
 
     case 'fill':
       if (args.x!==undefined && args.y!==undefined && args.color)
@@ -257,22 +449,30 @@ export async function executeCommand(api, cmd) {
     // ── NEW: drawRect ──────────────────────────────────────────────────
     // { x, y, w, h, color, filled? }
     case 'drawRect': {
-      const { x=0, y=0, w, h, color, filled=false } = args;
+      const { x=0, y=0, w, h, color, filled=false, r=0 } = args;
       if (w===undefined||h===undefined||!color) throw new Error("drawRect: required 'x','y','w','h','color'");
       api.activeDocument.history.beginTransaction();
-      if (filled) {
-        for (let row=y; row<y+h; row++)
-          for (let col=x; col<x+w; col++) api.activeDocument.draw.setPixel(col,row,color);
-      } else {
+      let pts = [];
+      for (let row=y; row<y+h; row++) {
         for (let col=x; col<x+w; col++) {
-          api.activeDocument.draw.setPixel(col,y,color);
-          api.activeDocument.draw.setPixel(col,y+h-1,color);
-        }
-        for (let row=y+1; row<y+h-1; row++) {
-          api.activeDocument.draw.setPixel(x,row,color);
-          api.activeDocument.draw.setPixel(x+w-1,row,color);
+          if (r > 0) {
+            let cx = null, cy = null;
+            if (col < x+r && row < y+r) { cx=x+r; cy=y+r; }
+            else if (col > x+w-1-r && row < y+r) { cx=x+w-1-r; cy=y+r; }
+            else if (col < x+r && row > y+h-1-r) { cx=x+r; cy=y+h-1-r; }
+            else if (col > x+w-1-r && row > y+h-1-r) { cx=x+w-1-r; cy=y+h-1-r; }
+            if (cx!==null && cy!==null) {
+              if (Math.round(Math.sqrt((col-cx)**2 + (row-cy)**2)) > r) continue;
+            }
+          }
+          pts.push({x:col, y:row});
         }
       }
+      if (!filled) {
+         const set = new Set(pts.map(p => p.x+','+p.y));
+         pts = pts.filter(p => !set.has((p.x+1)+','+p.y) || !set.has((p.x-1)+','+p.y) || !set.has(p.x+','+(p.y+1)) || !set.has(p.x+','+(p.y-1)));
+      }
+      for (const p of pts) setPixelTracked(p.x, p.y, color, args.objectId);
       api.activeDocument.history.commitTransaction(); renderPixels();
       return { success: true };
     }
@@ -280,12 +480,17 @@ export async function executeCommand(api, cmd) {
     // ── NEW: drawEllipse ───────────────────────────────────────────────
     // { cx, cy, rx, ry, color, filled? }
     case 'drawEllipse': {
-      const { cx, cy, rx, ry, color, filled=false } = args;
+      const { cx, cy, rx, ry, color, filled=false, smooth=true } = args;
       if (cx===undefined||cy===undefined||rx===undefined||ry===undefined||!color)
         throw new Error("drawEllipse: required 'cx','cy','rx','ry','color'");
       api.activeDocument.history.beginTransaction();
-      if (filled) ellipseFilled(cx, cy, rx, ry, (x,y) => api.activeDocument.draw.setPixel(x,y,color));
-      else        for (const p of ellipsePoints(cx,cy,rx,ry)) api.activeDocument.draw.setPixel(p.x,p.y,color);
+      if (filled) {
+        ellipseFilled(cx, cy, rx, ry, (x,y) => setPixelTracked(x, y, color, args.objectId));
+      } else {
+        let pts = Array.from(ellipsePoints(cx,cy,rx,ry));
+        if (smooth) pts = removeJaggies(pts);
+        for (const p of pts) setPixelTracked(p.x, p.y, color, args.objectId);
+      }
       api.activeDocument.history.commitTransaction(); renderPixels();
       return { success: true };
     }
@@ -296,8 +501,8 @@ export async function executeCommand(api, cmd) {
       const { points=[], color, filled=false } = args;
       if (!points.length||!color) throw new Error("drawPolygon: required 'points' array and 'color'");
       api.activeDocument.history.beginTransaction();
-      if (filled) polygonFilled(points, (x,y) => api.activeDocument.draw.setPixel(x,y,color));
-      else        polygonOutline(points, (x,y) => api.activeDocument.draw.setPixel(x,y,color));
+      if (filled) polygonFilled(points, (x,y) => setPixelTracked(x, y, color, args.objectId));
+      else        polygonOutline(points, (x,y) => setPixelTracked(x, y, color, args.objectId));
       api.activeDocument.history.commitTransaction(); renderPixels();
       return { success: true };
     }
@@ -313,7 +518,7 @@ export async function executeCommand(api, cmd) {
       let count = 0;
       for (let y=0; y<size.height; y++)
         for (let x=0; x<size.width; x++)
-          if (map[y*size.width+x] === fromU32) { api.activeDocument.draw.setPixel(x,y,args.to); count++; }
+          if (map[y*size.width+x] === fromU32) { setPixelTracked(x, y, args.to, args.objectId); count++; }
       api.activeDocument.history.commitTransaction(); renderPixels();
       return { success: true, result: { replaced: count } };
     }
@@ -334,8 +539,8 @@ export async function executeCommand(api, cmd) {
         const g = Math.round(fC.g + t*(tC.g-fC.g));
         const b = Math.round(fC.b + t*(tC.b-fC.b));
         const hex = '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
-        if (direction === 'h') for (let row=y; row<y+h; row++) api.activeDocument.draw.setPixel(x+i,row,hex);
-        else                   for (let col=x; col<x+w; col++) api.activeDocument.draw.setPixel(col,y+i,hex);
+        if (direction === 'h') for (let row=y; row<y+h; row++) setPixelTracked(x+i, row, hex, args.objectId);
+        else                   for (let col=x; col<x+w; col++) setPixelTracked(col, y+i, hex, args.objectId);
       }
       api.activeDocument.history.commitTransaction(); renderPixels();
       return { success: true };
@@ -377,7 +582,7 @@ export async function executeCommand(api, cmd) {
             r=rgb2.r; g=rgb2.g; b=rgb2.b;
           } else throw new Error(`Unknown filter: ${type}`);
           const hex='#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
-          api.activeDocument.draw.setPixel(px,py,hex);
+          setPixelTracked(px, py, hex, args.objectId);
         }
       }
       api.activeDocument.history.commitTransaction(); renderPixels();
@@ -411,7 +616,7 @@ export async function executeCommand(api, cmd) {
         const line=data[row];
         for (let col=0; col<line.length; col++) {
           const color=palette[line[col]];
-          if (color!==undefined && color!==null) api.activeDocument.draw.setPixel(ox+col,oy+row,color);
+          if (color!==undefined && color!==null) setPixelTracked(ox+col, oy+row, color, args.objectId);
         }
       }
       api.activeDocument.history.commitTransaction(); renderPixels();
@@ -437,7 +642,7 @@ export async function executeCommand(api, cmd) {
         const line=stamp.data[row];
         for (let col=0; col<line.length; col++) {
           const color=pal[line[col]];
-          if (color!==undefined&&color!==null) api.activeDocument.draw.setPixel((args.x||0)+col,(args.y||0)+row,color);
+          if (color!==undefined&&color!==null) setPixelTracked((args.x||0)+col, (args.y||0)+row, color, args.objectId);
         }
       }
       api.activeDocument.history.commitTransaction(); renderPixels();
@@ -475,7 +680,7 @@ export async function executeCommand(api, cmd) {
       for (let row=0; row<h; row++)
         for (let col=0; col<w; col++) {
           const u32=data[row*w+col];
-          api.activeDocument.draw.setPixel(x+col,y+row, u32===0 ? null : parseUint32ToHex(u32));
+          setPixelTracked(x+col, y+row, u32===0 ? null : parseUint32ToHex(u32, args.objectId));
         }
       api.activeDocument.history.commitTransaction(); renderPixels();
       return { success: true, result: { pastedAt:{x,y}, size:{w,h} } };
@@ -504,9 +709,9 @@ export async function executeCommand(api, cmd) {
       const a=_anchors.get(args.anchor);
       if (!a) throw new Error(`Anchor '${args.anchor}' not found`);
       if (args.dx0!==undefined) {
-        bresenhamLine(a.x+args.dx0,a.y+args.dy0,a.x+args.dx1,a.y+args.dy1,(x,y)=>api.activeDocument.draw.setPixel(x,y,args.color));
+        bresenhamLine(a.x+args.dx0,a.y+args.dy0,a.x+args.dx1,a.y+args.dy1,(x,y)=>setPixelTracked(x, y, args.color, args.objectId));
       } else {
-        api.activeDocument.draw.setPixel(a.x+(args.dx||0),a.y+(args.dy||0),args.color);
+        setPixelTracked(a.x+(args.dx||0), a.y+(args.dy||0), args.color, args.objectId);
       }
       renderPixels();
       return { success: true };

@@ -13,9 +13,20 @@ function register(server) {
     `Get an ASCII art representation of the current canvas frame. Use this to "see" what you've drawn before continuing.
 Returns: { ascii, legend, width, height } where each symbol in ascii maps to a hex color via legend.
 Increase scale to get a smaller grid (scale=2 means 1 char = 2×2 pixels).`,
-    { scale: z.number().int().min(1).max(8).default(1).describe('Downscale factor (1=full resolution)'),
-      maxColors: z.number().int().min(2).max(32).default(12).describe('Max distinct colors in legend') },
+    { 
+      scale: z.number().int().min(1).max(8).default(1).describe('Downscale factor (GLOBAL CHECK: 2-4, LOCAL CHECK: 1)'),
+      maxColors: z.number().int().min(2).max(32).default(12).describe('Max distinct colors in legend'),
+      x: z.number().int().optional().describe('Top-left X for local region check'),
+      y: z.number().int().optional().describe('Top-left Y for local region check'),
+      w: z.number().int().optional().describe('Width for local region check'),
+      h: z.number().int().optional().describe('Height for local region check')
+    },
     (p) => ({ action: 'querySnapshot', ...p }));
+
+  registerTool(server, 'query_actual_bbox',
+    'Get the actual bounding box and pixel count for a specific objectId based on draw metadata (used for validation)',
+    { objectId: z.string().describe('The objectId to query') },
+    (p) => ({ action: 'queryActualBBox', objectId: p.objectId }));
 
   registerTool(server, 'query_bounding_box',
     'Get the bounding box of all non-transparent pixels {minX, minY, maxX, maxY, width, height}',
