@@ -2,8 +2,8 @@
 
 > A high-performance, browser-based pixel art editor and image tool suite built for game developers and pixel artists who demand speed and precision.
 
-[![GitHub license](https://img.shields.io/github/license/TinhSsc/Pixel-Normal-Edit.svg)](https://github.com/TinhSsc/Pixel-Normal-Edit/blob/main/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/TinhSsc/Pixel-Normal-Edit.svg)](https://github.com/TinhSsc/Pixel-Normal-Edit)
+[![GitHub license](https://img.shields.io/github/license/TinhSsc/Pixel-Normal-Edit.svg?v=1)](https://github.com/TinhSsc/Pixel-Normal-Edit/blob/main/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/TinhSsc/Pixel-Normal-Edit.svg?v=1)](https://github.com/TinhSsc/Pixel-Normal-Edit)
 [![Website](https://img.shields.io/website?url=https%3A%2F%2Fpixel-normal-edit.web.app%2F&label=Live%20Demo)](https://pixel-normal-edit.web.app/)
 
 ---
