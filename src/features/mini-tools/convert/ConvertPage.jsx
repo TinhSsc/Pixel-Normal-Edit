@@ -7,22 +7,15 @@ import { CanvasHelper } from '../shared/CanvasHelper';
 import SEOHeader from '../shared/SEOHeader';
 import { t } from '../../../i18n/i18n.js';
 import { ICONS } from '../../../shared/ui/icons/icons.js';
+import { LucideIcon, reloadLucideIcons } from '../../../shared/dom/lucide-utils';
 import RelatedTools from '../shared/RelatedTools';
 import SEOContentBlock from '../shared/SEOContentBlock';
-import { FORMAT_REGISTRY } from '../image-converter/format-registry.js';
-import { encodeImage } from '../image-converter/encoder.js';
-import { decodeImageWithAdvancedEngine } from '../image-converter/advanced-engine.js';
+import { FORMAT_REGISTRY } from '../../../shared/image/format-registry.js';
+import { encodeImage } from '../../../shared/image/encoder.js';
+import { decodeImageWithAdvancedEngine } from '../../../shared/image/advanced-engine.js';
+import { navigate, validateFile, isFileAdvanced } from '../../../shared/lib/file-utils.js';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
-
-const LucideIcon = ({ name, width = 18, height = 18, className = '', style = {} }) => {
-  return (
-    <span 
-      style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', ...style }} 
-      dangerouslySetInnerHTML={{ __html: `<i data-lucide="${name}" width="${width}" height="${height}" class="${className}"></i>` }} 
-    />
-  );
-};
 
 export default function ConvertPage() {
   const [filesData, setFilesData] = useState([]);
@@ -36,28 +29,8 @@ export default function ConvertPage() {
 
   const fileInputRef = useRef(null);
 
-  const navigate = (path) => { 
-    if (path === '') window.location.href = '/';
-    else window.location.href = `/?tool=${path}`; 
-  };
-
-  const validateFile = (file) => {
-    const ext = file.name.split('.').pop().toLowerCase();
-    const isSupported = FORMAT_REGISTRY.some(f => f.ext === ext || file.type === f.id || (f.ext === 'jpg' && ext === 'jpeg'));
-    if (!isSupported) {
-      throw new Error(t('convert.errors.unsupportedFile', `File không được hỗ trợ: ${file.name}`));
-    }
-    if (file.size > 50 * 1024 * 1024) {
-      throw new Error(t('convert.errors.fileTooLarge', `File quá lớn (tối đa 50MB): ${file.name}`));
-    }
-    return true;
-  };
-
-  const isFileAdvanced = (file) => {
-    const ext = file.name.split('.').pop().toLowerCase();
-    const formatInfo = FORMAT_REGISTRY.find(f => f.ext === ext || file.type === f.id || (f.ext === 'jpg' && ext === 'jpeg'));
-    return formatInfo ? formatInfo.advanced : false;
-  };
+  // Hydrate icons after mount
+  useEffect(() => { reloadLucideIcons(); }, []);
 
   const handleFiles = async (files) => {
     if (files && files.length > 0) {
@@ -65,7 +38,10 @@ export default function ConvertPage() {
       let errMsgs = [];
       for (const file of Array.from(files)) {
         try {
-          validateFile(file);
+          if (!file.type.startsWith('image/')) {
+            throw new Error(`File không được hỗ trợ: ${file.name}`);
+          }
+
           const advanced = isFileAdvanced(file);
           if (advanced && !advancedMode) {
              throw new Error(`File "${file.name}" yêu cầu bật Chế độ Nâng cao.`);

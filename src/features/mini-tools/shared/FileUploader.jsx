@@ -31,10 +31,7 @@ export default function FileUploader({
       throw new Error(`File không được hỗ trợ: ${file.name}`);
     }
 
-    // Kiểm tra dung lượng
-    if (file.size > MAX_SIZE) {
-      throw new Error(`File quá lớn (tối đa ${maxSizeMB}MB): ${file.name}`);
-    }
+
 
     return true;
   };
@@ -43,10 +40,10 @@ export default function FileUploader({
     try {
       validateFile(file);
 
-      // Kiểm tra kích thước ảnh
+      // Kiểm tra kích thước ảnh - chỉ cảnh báo, không chặn
       const img = await CanvasHelper.loadImage(URL.createObjectURL(file));
       if (img.naturalWidth > maxDimension || img.naturalHeight > maxDimension) {
-        throw new Error(`Ảnh quá lớn (tối đa ${maxDimension}px): ${img.naturalWidth}x${img.naturalHeight}`);
+        onError(new Error(`Cảnh báo: Ảnh "${file.name}" có kích thước rất lớn (${img.naturalWidth}x${img.naturalHeight}), có thể gây chậm trình duyệt.`));
       }
 
       onFileLoad(img, file);
@@ -78,7 +75,7 @@ export default function FileUploader({
              onChange={(e) => handleFiles(e.target.files)} />
       <div className="upload-icon">📁</div>
       <p className="upload-text">Kéo thả ảnh vào đây hoặc click để chọn</p>
-      <p className="upload-hint">Hỗ trợ: PNG, JPG, WebP, GIF, BMP, SVG, HEIC (tối đa {maxSizeMB}MB)</p>
+      <p className="upload-hint">Hỗ trợ: PNG, JPG, WebP, GIF, BMP, SVG, HEIC</p>
     </div>
   );
 }

@@ -8,6 +8,9 @@ const CompressPage = lazy(() => import('../features/mini-tools/compress/Compress
 const ResizePage = lazy(() => import('../features/mini-tools/resize/ResizePage.jsx'));
 const CropPage = lazy(() => import('../features/mini-tools/crop/CropPage.jsx'));
 const RotatePage = lazy(() => import('../features/mini-tools/rotate/RotatePage.jsx'));
+const FramesToMediaPage = lazy(() => import('../features/mini-tools/frames-to-media/FramesToMediaPage.jsx'));
+const MediaToFramesPage = lazy(() => import('../features/mini-tools/media-to-frames/MediaToFramesPage.jsx'));
+const GifSimplifyPage = lazy(() => import('../features/mini-tools/gif-simplify/GifSimplifyPage.jsx'));
 
 export default function ToolsApp() {
   const getRoute = () => {
@@ -18,7 +21,7 @@ export default function ToolsApp() {
   };
   const [route, setRoute] = useState(getRoute());
 
-  const MINI_TOOLS_ROUTES = ['home', 'convert', 'compress', 'resize', 'crop', 'rotate'];
+  const MINI_TOOLS_ROUTES = ['home', 'convert', 'compress', 'resize', 'crop', 'rotate', 'frames-to-media', 'media-to-frames', 'gif-simplify'];
 
   if (!MINI_TOOLS_ROUTES.includes(route)) {
     window.location.href = '/';
@@ -33,6 +36,9 @@ export default function ToolsApp() {
       {route === 'resize' && <ResizePage />}
       {route === 'crop' && <CropPage />}
       {route === 'rotate' && <RotatePage />}
+      {route === 'frames-to-media' && <FramesToMediaPage />}
+      {route === 'media-to-frames' && <MediaToFramesPage />}
+      {route === 'gif-simplify' && <GifSimplifyPage />}
     </Suspense>
   );
 }

@@ -13,7 +13,7 @@ import { DockviewReact } from 'dockview-react';
 import 'dockview-core/dist/styles/dockview.css';
 
 import { t } from '../i18n/i18n.js';
-import { reloadLucideIcons } from '../shared/dom/lucide-utils';
+import { reloadLucideIcons } from '../shared/dom/lucide-utils.jsx';
 import { initPopupBehavior } from '../shared/dom/popup-controller';
 
 

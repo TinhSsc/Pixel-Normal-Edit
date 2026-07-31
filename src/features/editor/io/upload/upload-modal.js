@@ -60,8 +60,9 @@ export function setupUploadModal() {
     
     if (filesArray.length === 0) return;
     if (filesArray.length > 50) {
-      alert(t('upload.maxFilesError') || "Vui lòng chọn tối đa 50 file để tránh quá tải bộ nhớ.");
-      return;
+      if (!window.confirm(`Bạn đang tải lên số lượng lớn (${filesArray.length} file). Điều này có thể làm chậm trình duyệt. Bạn có muốn tiếp tục?`)) {
+        return;
+      }
     }
     
     const hasZip = filesArray.some(f => f.name.endsWith('.zip'));

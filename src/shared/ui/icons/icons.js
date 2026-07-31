@@ -80,6 +80,7 @@ export const ICONS = {
   PHONE: 'phone',
   MAP_PIN: 'map-pin',
   IMAGE_REPEAT: 'image-repeat',
+  TIMER: 'timer',
   ARROW_RIGHT: 'arrow-right',
   STAR: 'star',
   MESSAGE_SQUARE: 'message-square',

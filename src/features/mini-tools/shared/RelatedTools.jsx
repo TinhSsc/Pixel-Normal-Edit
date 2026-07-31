@@ -2,49 +2,22 @@ import { useEffect } from 'react';
 import { t } from '../../../i18n/i18n.js';
 import { ICONS } from '../../../shared/ui/icons/icons.js';
 import { reloadLucideIcons } from '../../../shared/dom/lucide-utils';
+import { TOOLS } from '../../../shared/config/tools-registry.js';
 
 export default function RelatedTools({ currentTool }) {
   useEffect(() => {
     reloadLucideIcons();
   }, [currentTool]);
 
-  const tools = [
-    {
-      id: 'convert',
-      icon: ICONS.ARROW_LEFT_RIGHT,
-      title: t('home.tool.convert', 'Convert ảnh'),
-      desc: t('home.tool.convertDesc', 'Chuyển đổi giữa PNG, WebP, AVIF, JPG...'),
-      color: '#3b82f6'
-    },
-    {
-      id: 'compress',
-      icon: ICONS.FILE_ARCHIVE,
-      title: t('home.tool.compress', 'Nén ảnh'),
-      desc: t('home.tool.compressDesc', 'Giảm 60–90% dung lượng file mà không giảm chất lượng đáng kể.'),
-      color: '#10b981'
-    },
-    {
-      id: 'resize',
-      icon: ICONS.MAXIMIZE,
-      title: t('home.tool.resize', 'Resize ảnh'),
-      desc: t('home.tool.resizeDesc', 'Thay đổi kích thước tự do, theo tỉ lệ hoặc preset phổ biến.'),
-      color: '#f59e0b'
-    },
-    {
-      id: 'crop',
-      icon: ICONS.CROP,
-      title: t('home.tool.crop', 'Crop ảnh'),
-      desc: t('home.tool.cropDesc', 'Cắt vùng tùy chọn với preset tỉ lệ 1:1, 16:9, 4:3...'),
-      color: '#8b5cf6'
-    },
-    {
-      id: 'rotate',
-      icon: ICONS.ROTATE_CW,
-      title: t('home.tool.rotate', 'Xoay / Lật'),
-      desc: t('home.tool.rotateDesc', 'Xoay góc tùy chỉnh, lật ngang và dọc theo một cú click.'),
-      color: '#ef4444'
-    }
-  ].filter(t => t.id !== currentTool);
+  const tools = TOOLS
+    .filter(tt => tt.id !== '' && tt.id !== currentTool)
+    .map(tt => ({
+      id: tt.id,
+      icon: tt.icon,
+      title: t(tt.titleKey, tt.title),
+      desc: t(tt.descKey, tt.desc),
+      color: tt.color
+    }));
 
   return (
     <div className="related-tools anim-fade-in" style={{ marginTop: '80px', paddingTop: '40px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>

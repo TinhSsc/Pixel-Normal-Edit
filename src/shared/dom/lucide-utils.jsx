@@ -7,9 +7,23 @@
  * @module shared/dom/lucide-utils
  * 
  * @example
- * import { reloadLucideIcons } from '../../shared/dom/lucide-utils';
+ * import { reloadLucideIcons, LucideIcon } from '../../shared/dom/lucide-utils';
  * reloadLucideIcons();
  */
+import React from 'react';
+
+/**
+ * Component React LucideIcon dùng chung cho tất cả mini tools.
+ * Thay thế các định nghĩa inline LucideIcon ở 7 file.
+ */
+export function LucideIcon({ name, width = 18, height = 18, className = '', style = {} }) {
+  return (
+    <span
+      style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', ...style }}
+      dangerouslySetInnerHTML={{ __html: `<i data-lucide="${name}" width="${width}" height="${height}" class="${className}"></i>` }}
+    />
+  );
+}
 
 /**
  * Tạo lại tất cả Lucide icons trong DOM.

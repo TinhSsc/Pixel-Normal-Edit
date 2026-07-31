@@ -20,10 +20,11 @@
   --color-surface-alt: #21262d;
   --color-border: #30363d;
   --color-border-hover: #8b949e;
-  --color-primary: #63b3ed;
-  --color-primary-hover: #4299e1;
-  --color-primary-light: #90cdf4;
+  --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
+  --color-primary-light: #60a5fa;
   --color-success: #2ea043;
+  --color-danger: #f85149;
   --color-text: #c9d1d9;
   --color-text-muted: #8b949e;
   --color-text-bright: #ffffff;
@@ -34,9 +35,10 @@
   --color-overlay: rgba(1, 4, 9, 0.8);
   --color-overlay-sm: rgba(1, 4, 9, 0.4);
   --color-nav-bg: rgba(22, 27, 34, 0.9);
-  --color-primary-tint: rgba(99, 179, 237, 0.1);
+  --color-primary-tint: rgba(59, 130, 246, 0.12);
   --color-grid-line: rgba(255, 255, 255, 0.05);
-  --color-info: #63b3ed;
+  --color-surface-hover: rgba(255, 255, 255, 0.06);
+  --color-info: var(--color-primary);
   --color-sync: #8957e5;
   
   /* Custom checkerboard defaults (dark theme) */
@@ -51,10 +53,11 @@
   --color-surface-alt: #f3f4f6;
   --color-border: #d0d7de;
   --color-border-hover: #afb8c1;
-  --color-primary: #63b3ed;
-  --color-primary-hover: #4299e1;
-  --color-primary-light: #90cdf4;
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-light: #60a5fa;
   --color-success: #2da44e;
+  --color-danger: #cf222e;
   --color-text: #24292f;
   --color-text-muted: #57606a;
   --color-text-bright: #0f172a;
@@ -65,9 +68,10 @@
   --color-overlay: rgba(0, 0, 0, 0.5);
   --color-overlay-sm: rgba(0, 0, 0, 0.08);
   --color-nav-bg: rgba(255, 255, 255, 0.9);
-  --color-primary-tint: rgba(99, 179, 237, 0.1);
+  --color-primary-tint: rgba(37, 99, 235, 0.1);
   --color-grid-line: rgba(0, 0, 0, 0.04);
-  --color-info: #63b3ed;
+  --color-surface-hover: rgba(0, 0, 0, 0.04);
+  --color-info: var(--color-primary);
   --color-sync: #8957e5;
   
   /* Custom checkerboard defaults (light theme) */
@@ -86,6 +90,42 @@
   border-bottom-left-radius: 11px !important;
   border-bottom-right-radius: 11px !important;
 }
+
+/* ── Legacy alias layer ───────────────────────────────
+   Maps old variable names (previously defined only in the
+   unimported legacy-editor/index.css, or inline in JSX) onto
+   the modern design tokens, so every surface resolves to the
+   same palette regardless of theme. */
+:root,
+:root[data-theme="dark"],
+:root[data-theme="light"],
+:root[data-theme="custom"] {
+  --accent: var(--color-primary);
+  --accent-bg: var(--color-primary-tint);
+  --accent-border: var(--color-primary-light);
+  --border: var(--color-border);
+  --border-color: var(--color-border);
+  --surface-0: var(--color-bg);
+  --surface-1: var(--color-surface);
+  --surface-2: var(--color-surface-alt);
+  --surface-3: var(--color-surface-alt);
+  --text: var(--color-text);
+  --text-h: var(--color-text-bright);
+  --text-primary: var(--color-text);
+  --text-muted: var(--color-text-muted);
+  --color-text-primary: var(--color-text);
+  --color-error: var(--color-danger);
+  --success: var(--color-success);
+  --bg: var(--color-bg);
+  --code-bg: var(--color-surface-alt);
+  --social-bg: var(--color-surface-alt);
+  --shadow: var(--color-shadow-md);
+  --pixel-blue: var(--color-primary);
+  --sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --heading: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --mono: ui-monospace, Consolas, monospace;
+}
+
 
 :root .dockview-theme-dark .dv-tabs-and-actions-container,
 :root .dockview-theme-light .dv-tabs-and-actions-container {

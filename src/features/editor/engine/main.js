@@ -39,7 +39,7 @@ import { initMobilePopups } from '../dom-adapter/mobile-popups.js';
 import { initToolPopup } from '../ui/tool-popup/index.js';
 import { processImageBatch } from '../io/upload/upload-modal.js';
 import { updateDOM, toggleLang, t } from '../../../i18n/i18n.js';
-import { reloadLucideIcons, lucideIconHtml } from '../../../shared/dom/lucide-utils';
+import { reloadLucideIcons, lucideIconHtml } from '../../../shared/dom/lucide-utils.jsx';
 import { initMobilePopupTriggers } from '../../../shared/dom/popup-controller';
 
 import { saveToolbarState } from './core/toolbar-save.js';

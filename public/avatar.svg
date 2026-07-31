@@ -1,22 +1,22 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none">
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none">
   <!-- Outer dark background with subtle border -->
-  <rect width="40" height="40" rx="6" fill="#1a1d24"/>
-  <rect width="40" height="40" rx="6" fill="none" stroke="#2e3340" stroke-width="1.5"/>
+  <rect width="40" height="40" rx="6" fill="#0d1117"/>
+  <rect width="40" height="40" rx="6" fill="none" stroke="#30363d" stroke-width="1.5"/>
 
   <!-- Pixel grid gap = 3px, each cell = 10px, starting at x=3, y=3 -->
   <!-- Row 1, Col 1: dark -->
   <!-- Row 1, Col 2: cyan -->
-  <rect x="14" y="3" width="10" height="10" rx="1.5" fill="#87CEEB"/>
+  <rect x="14" y="3" width="10" height="10" rx="1.5" fill="#3b82f6"/>
   <!-- Row 1, Col 3: dark -->
 
   <!-- Row 2, Col 1: cyan -->
-  <rect x="3" y="14" width="10" height="13" rx="1.5" fill="#87CEEB"/>
+  <rect x="3" y="14" width="10" height="13" rx="1.5" fill="#3b82f6"/>
   <!-- Row 2, Col 2: cyan -->
-  <rect x="14" y="14" width="10" height="13" rx="1.5" fill="#87CEEB"/>
+  <rect x="14" y="14" width="10" height="13" rx="1.5" fill="#3b82f6"/>
   <!-- Row 2, Col 3: dark -->
 
   <!-- Row 3, Col 1: dark -->
   <!-- Row 3, Col 2: dark -->
   <!-- Row 3, Col 3: cyan -->
-  <rect x="27" y="28" width="10" height="10" rx="1.5" fill="#87CEEB"/>
+  <rect x="27" y="28" width="10" height="10" rx="1.5" fill="#3b82f6"/>
 </svg>

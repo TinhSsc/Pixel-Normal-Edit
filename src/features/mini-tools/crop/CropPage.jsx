@@ -3,27 +3,23 @@
  * Dùng react-easy-crop
  * Giao diện Dark theme, tối giản (Dựa trên HomePage)
  */
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import Cropper from 'react-easy-crop';
 import { CanvasHelper } from '../shared/CanvasHelper';
 import SEOHeader from '../shared/SEOHeader';
 import { t } from '../../../i18n/i18n.js';
 import { ICONS } from '../../../shared/ui/icons/icons.js';
+import { LucideIcon, reloadLucideIcons } from '../../../shared/dom/lucide-utils';
 import RelatedTools from '../shared/RelatedTools';
 import SEOContentBlock from '../shared/SEOContentBlock';
-
-const LucideIcon = ({ name, width = 18, height = 18, className = '', style = {} }) => {
-  return (
-    <span 
-      style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', ...style }} 
-      dangerouslySetInnerHTML={{ __html: `<i data-lucide="${name}" width="${width}" height="${height}" class="${className}"></i>` }} 
-    />
-  );
-};
+import { FORMAT_REGISTRY } from '../../../shared/image/format-registry.js';
+import { decodeImageWithAdvancedEngine } from '../../../shared/image/advanced-engine.js';
+import { navigate, validateFile, isFileAdvanced } from '../../../shared/lib/file-utils.js';
 
 export default function CropPage() {
   const [imageSrc, setImageSrc] = useState(null);
   const [originalFile, setOriginalFile] = useState(null);
+  const [advancedMode, setAdvancedMode] = useState(false);
   
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -38,33 +34,33 @@ export default function CropPage() {
   const croppedAreaPixelsRef = useRef(null);
   const fileInputRef = useRef(null);
 
-  const navigate = (path) => { 
-    if (path === '') window.location.href = '/';
-    else window.location.href = `/?tool=${path}`; 
-  };
+  // Hydrate icons after mount
+  useEffect(() => { reloadLucideIcons(); }, []);
 
   const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
     croppedAreaPixelsRef.current = croppedAreaPixels;
   }, []);
 
-  const validateFile = (file) => {
-    if (!file.type.startsWith('image/')) {
-      throw new Error(`Chỉ hỗ trợ file ảnh: ${file.name}`);
-    }
-    if (file.size > 50 * 1024 * 1024) {
-      throw new Error(`File quá lớn (tối đa 50MB): ${file.name}`);
-    }
-    return true;
-  };
-
-  const handleFiles = (files) => {
+  const handleFiles = async (files) => {
     if (files && files.length > 0) {
       const file = files[0];
       try {
         validateFile(file);
+        const advanced = isFileAdvanced(file);
+        if (advanced && !advancedMode) {
+          setError(`File "${file.name}" yêu cầu bật Chế độ Nâng cao để đọc.`);
+          return;
+        }
+        let src = URL.createObjectURL(file);
+        if (advanced) {
+          const decodedBlob = await decodeImageWithAdvancedEngine(file);
+          src = URL.createObjectURL(decodedBlob);
+        }
         setOriginalFile(file);
-        setImageSrc(URL.createObjectURL(file));
+        setImageSrc(src);
         setCroppedCanvas(null);
+        // Revoke old cropped src
+        if (croppedSrc) URL.revokeObjectURL(croppedSrc);
         setCroppedSrc(null);
         setZoom(1);
         setRotation(0);
@@ -93,15 +89,17 @@ export default function CropPage() {
       const image = await CanvasHelper.loadImage(imageSrc);
       const { x, y, width, height } = croppedAreaPixelsRef.current;
 
+      // Fix 1.4: When rotating 90 or 270 degrees, swap canvas dimensions
+      const isRotated = rotation % 180 !== 0;
       const canvas = document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
+      canvas.width = isRotated ? height : width;
+      canvas.height = isRotated ? width : height;
       const ctx = canvas.getContext('2d');
 
       if (rotation) {
-        ctx.translate(width / 2, height / 2);
+        ctx.translate(canvas.width / 2, canvas.height / 2);
         ctx.rotate((rotation * Math.PI) / 180);
-        ctx.translate(-width / 2, -height / 2);
+        ctx.translate(-canvas.width / 2, -canvas.height / 2);
       }
 
       ctx.drawImage(image, x, y, width, height, 0, 0, width, height);
@@ -119,8 +117,19 @@ export default function CropPage() {
 
   const handleDownload = async () => {
     if (!croppedCanvas) return;
+    // Fix 1.5: Always export PNG → use .png extension
     const blob = await CanvasHelper.toBlob(croppedCanvas, 'image/png');
-    CanvasHelper.downloadBlob(blob, `cropped_${originalFile?.name || 'image.png'}`);
+    const baseName = originalFile?.name?.split('.')[0] || 'cropped_image';
+    CanvasHelper.downloadBlob(blob, `${baseName}_cropped.png`);
+  };
+
+  const handleReset = () => {
+    if (imageSrc) URL.revokeObjectURL(imageSrc);
+    if (croppedSrc) URL.revokeObjectURL(croppedSrc);
+    setImageSrc(null);
+    setCroppedCanvas(null);
+    setCroppedSrc(null);
+    setOriginalFile(null);
   };
 
   return (
@@ -171,6 +180,13 @@ export default function CropPage() {
             {error}
           </div>
         )}
+
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', background: advancedMode ? 'rgba(139,92,246,0.1)' : '#161B22', padding: '8px 16px', borderRadius: '20px', border: advancedMode ? '1px solid rgba(139,92,246,0.3)' : '1px solid rgba(255,255,255,0.1)', transition: 'all 0.2s' }}>
+            <input type="checkbox" checked={advancedMode} onChange={(e) => setAdvancedMode(e.target.checked)} style={{ width: '16px', height: '16px', accentColor: '#8b5cf6', cursor: 'pointer' }} />
+            <span style={{ fontSize: '13px', fontWeight: 600, color: advancedMode ? '#8b5cf6' : '#8B949E' }}>Chế độ Nâng cao (TIFF, HEIC, RAW...)</span>
+          </label>
+        </div>
 
         {!imageSrc ? (
           <div 
@@ -298,7 +314,7 @@ export default function CropPage() {
                 </div>
               )}
 
-              <button onClick={() => { setImageSrc(null); setCroppedCanvas(null); setCroppedSrc(null); }} className="interact-btn" style={{ width: '100%', background: 'transparent', color: '#B8C0CC', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', borderRadius: '12px', fontWeight: 500, cursor: 'pointer', fontSize: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              <button onClick={handleReset} className="interact-btn" style={{ width: '100%', background: 'transparent', color: '#B8C0CC', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', borderRadius: '12px', fontWeight: 500, cursor: 'pointer', fontSize: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                 <LucideIcon name="refresh-cw" width="16" height="16" /> Chọn ảnh khác
               </button>
 
