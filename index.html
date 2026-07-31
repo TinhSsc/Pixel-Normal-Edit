@@ -68,7 +68,8 @@
       };
       try {
         var toolParam = new URLSearchParams(window.location.search).get('tool');
-        var tool = (toolParam && toolParam !== '') ? toolParam : 'home';
+        var lastTool = localStorage.getItem('last_visited_tool');
+        var tool = (toolParam && toolParam !== '') ? toolParam : (lastTool || 'home');
         var data = SEO[tool];
         if (data) {
           var url = window.location.origin + window.location.pathname + window.location.search;

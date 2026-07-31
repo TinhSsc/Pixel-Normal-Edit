@@ -16,6 +16,8 @@ export default function ToolsApp() {
   const getRoute = () => {
     const params = new URLSearchParams(window.location.search);
     if (params.has('tool') && params.get('tool') !== '') return params.get('tool');
+    const lastTool = localStorage.getItem('last_visited_tool');
+    if (lastTool && lastTool !== 'editor') return lastTool;
     return 'home';
   };
   const [route, setRoute] = useState(getRoute());
