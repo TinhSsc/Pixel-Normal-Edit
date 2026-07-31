@@ -8,19 +8,34 @@ function drawFrameToCanvas(frame, canvasCtx, offsetX, offsetY, options = { trans
     canvasCtx.fillStyle = '#ffffff';
     canvasCtx.fillRect(offsetX, offsetY, frame.width, frame.height);
   }
-  const imgData = new ImageData(frame.width, frame.height);
-  const data32 = new Uint32Array(imgData.data.buffer);
-  data32.set(frame.pixelMap);
-  
-  if (!options.transparent) {
-    const tmpCanvas = document.createElement('canvas');
-    tmpCanvas.width = frame.width;
-    tmpCanvas.height = frame.height;
-    tmpCanvas.getContext('2d').putImageData(imgData, 0, 0);
-    canvasCtx.drawImage(tmpCanvas, offsetX, offsetY);
-  } else {
-    canvasCtx.putImageData(imgData, offsetX, offsetY);
+
+  const frameCanvas = document.createElement('canvas');
+  frameCanvas.width = frame.width;
+  frameCanvas.height = frame.height;
+  const frameCtx = frameCanvas.getContext('2d');
+
+  if (frame.layers && frame.layers.length > 0) {
+    frame.layers.forEach(layer => {
+      if (layer.visible === false) return;
+      const imgData = new ImageData(frame.width, frame.height);
+      const data32 = new Uint32Array(imgData.data.buffer);
+      data32.set(layer.pixelMap);
+      
+      const layerCanvas = document.createElement('canvas');
+      layerCanvas.width = frame.width;
+      layerCanvas.height = frame.height;
+      layerCanvas.getContext('2d').putImageData(imgData, 0, 0);
+      
+      frameCtx.drawImage(layerCanvas, 0, 0);
+    });
+  } else if (frame.pixelMap) {
+    const imgData = new ImageData(frame.width, frame.height);
+    const data32 = new Uint32Array(imgData.data.buffer);
+    data32.set(frame.pixelMap);
+    frameCtx.putImageData(imgData, 0, 0);
   }
+
+  canvasCtx.drawImage(frameCanvas, offsetX, offsetY);
 }
 
 export function generateSpriteSheetBlob(tab, options = { transparent: true }) {
@@ -103,7 +118,42 @@ export function exportAnimation(tab, format, options = { transparent: true }) {
     }
 
     if (format === 'gif') {
-      return reject(new Error("Định dạng GIF cần được tích hợp thêm thư viện (như gif.js)."));
+      import('gifenc').then(({ GIFEncoder, quantize, applyPalette }) => {
+        try {
+          const frames = tab.animation.frames;
+          const fps = tab.animation.fps || 12;
+          const frameDuration = Math.round(1000 / fps);
+          const w = frames[0].width;
+          const h = frames[0].height;
+
+          const gif = GIFEncoder();
+          
+          for (let i = 0; i < frames.length; i++) {
+            const canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            
+            drawFrameToCanvas(frames[i], ctx, 0, 0, options);
+            const imgData = ctx.getImageData(0, 0, w, h);
+            
+            const format = options.transparent ? 'rgba4444' : 'rgb565';
+            const palette = quantize(imgData.data, 256, { format });
+            const index = applyPalette(imgData.data, palette, format);
+            
+            gif.writeFrame(index, w, h, { palette, delay: frameDuration, transparent: options.transparent });
+          }
+
+          gif.finish();
+          const buffer = gif.bytes();
+          resolve(new Blob([buffer], { type: 'image/gif' }));
+        } catch (err) {
+          reject(new Error("Lỗi khi tạo GIF: " + err.message));
+        }
+      }).catch(err => {
+        reject(new Error("Lỗi khi tải thư viện GIF: " + err.message));
+      });
+      return;
     }
 
     if (format === 'webm') {

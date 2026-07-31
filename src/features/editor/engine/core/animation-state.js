@@ -419,6 +419,28 @@ export function removeFrame(index) {
     return true;
 }
 
+export function removeMultipleFrames(indices) {
+    if (frames.length <= 1) return false;
+    
+    const sortedIndices = [...indices].sort((a, b) => b - a);
+    const validIndices = sortedIndices.filter(index => index >= 0 && index < frames.length);
+    
+    if (validIndices.length === 0) return false;
+    if (validIndices.length >= frames.length) {
+        // Giữ lại ít nhất 1 frame
+        validIndices.pop();
+    }
+
+    validIndices.forEach(index => {
+        frames.splice(index, 1);
+    });
+
+    const newIndex = Math.max(0, Math.min(activeFrameIndex, frames.length - 1));
+    loadFrameToCurrentState(newIndex);
+    notifyListeners();
+    return true;
+}
+
 /**
  * Thay đổi kích thước toàn bộ các frames trong animation.
  * Gọi từ grid-size-select.js khi người dùng đổi size canvas.

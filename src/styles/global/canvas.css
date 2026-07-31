@@ -86,12 +86,13 @@
 /* Checkerboard background for the pixel canvas */
 #pixelCanvas, .preview-canvas {
   background-image: conic-gradient(
-    var(--color-canvas-checker) 90deg,
+    var(--custom-checker-color, var(--color-canvas-checker)) 90deg,
     transparent 90deg 180deg,
-    var(--color-canvas-checker) 180deg 270deg,
+    var(--custom-checker-color, var(--color-canvas-checker)) 180deg 270deg,
     transparent 270deg
   );
-  background-size: calc(var(--checker-size, 2px) * var(--canvas-zoom, 1)) calc(var(--checker-size, 2px) * var(--canvas-zoom, 1));
+  background-size: calc(var(--custom-checker-size, 2px) * var(--canvas-zoom, 1)) 
+                  calc(var(--custom-checker-size, 2px) * var(--canvas-zoom, 1));
   background-position: 0 0;
 }
 
@@ -100,11 +101,12 @@
     linear-gradient(var(--color-overlay), var(--color-overlay)),
     var(--bg-url),
     conic-gradient(
-      var(--color-canvas-checker) 90deg,
+      var(--custom-checker-color, var(--color-canvas-checker)) 90deg,
       transparent 90deg 180deg,
-      var(--color-canvas-checker) 180deg 270deg,
+      var(--custom-checker-color, var(--color-canvas-checker)) 180deg 270deg,
       transparent 270deg
     );
-  background-size: 100% 100%, 100% 100%, calc(var(--checker-size, 2px) * var(--canvas-zoom, 1)) calc(var(--checker-size, 2px) * var(--canvas-zoom, 1));
+  background-size: 100% 100%, 100% 100%, calc(var(--custom-checker-size, 2px) * var(--canvas-zoom, 1)) 
+                                               calc(var(--custom-checker-size, 2px) * var(--canvas-zoom, 1));
   background-position: 0 0, 0 0, 0 0;
 }

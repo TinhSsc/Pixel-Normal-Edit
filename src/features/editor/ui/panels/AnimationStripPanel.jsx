@@ -32,7 +32,8 @@ function drawFrameThumbnail(canvasEl, frame) {
   
   ctx2d.putImageData(imageData, 0, 0);
 }
-function FrameThumbnail({ frame, index, isActive, onClick, onInsertBefore, onInsertAfter, onRemove, onReorder, isNew, isRemoving }) {
+
+function FrameThumbnail({ frame, index, isActive, isMultiSelected, onClick, onInsertBefore, onInsertAfter, onRemove, onReorder, isNew, isRemoving }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -85,7 +86,7 @@ function FrameThumbnail({ frame, index, isActive, onClick, onInsertBefore, onIns
           </button>
         )}
         <div
-          className={`animation-strip-frame${isActive ? ' active' : ''}${isNew ? ' frame-enter frame-highlight' : ''}`}
+          className={`animation-strip-frame${isActive ? ' active' : ''}${isMultiSelected && !isActive ? ' multi-selected' : ''}${isNew ? ' frame-enter frame-highlight' : ''}`}
           onClick={onClick}
           title={t('tooltip.frameNumber', index + 1)}
         >
@@ -113,6 +114,7 @@ export default function AnimationStripPanel({
   onToggleOnionSkin,
   onInsertFrame,
   onRemoveFrame,
+  onRemoveMultipleFrames,
   onReorderFrame,
   newFrameId,
   removingFrameId,
@@ -122,9 +124,49 @@ export default function AnimationStripPanel({
     return localStorage.getItem('animationStripCollapsed') === 'true';
   });
 
+  const [selectedIndices, setSelectedIndices] = useState(new Set([activeFrameIndex]));
+
   useEffect(() => {
     localStorage.setItem('animationStripCollapsed', isCollapsed);
   }, [isCollapsed]);
+
+  // Đảm bảo activeFrameIndex luôn nằm trong tập đã chọn nếu không chọn nhiều
+  useEffect(() => {
+    if (selectedIndices.size <= 1 && !selectedIndices.has(activeFrameIndex)) {
+      setSelectedIndices(new Set([activeFrameIndex]));
+    }
+  }, [activeFrameIndex, selectedIndices]);
+
+  // Lắng nghe phím tắt xóa hàng loạt
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
+      if ((e.key === 'Delete' || e.key === 'Backspace') && selectedIndices.size > 1) {
+        if (onRemoveMultipleFrames) {
+          onRemoveMultipleFrames(Array.from(selectedIndices));
+          setSelectedIndices(new Set([activeFrameIndex]));
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedIndices, activeFrameIndex, onRemoveMultipleFrames]);
+
+  const handleFrameClick = (index, e) => {
+    if (e.shiftKey) {
+      const newSelected = new Set(selectedIndices);
+      const min = Math.min(activeFrameIndex, index);
+      const max = Math.max(activeFrameIndex, index);
+      for (let i = min; i <= max; i++) {
+        newSelected.add(i);
+      }
+      setSelectedIndices(newSelected);
+    } else {
+      setSelectedIndices(new Set([index]));
+      onSelectFrame(index);
+    }
+  };
+
   const [frameToDelete, setFrameToDelete] = useState(null);
   const [dontAskAgain, setDontAskAgain] = useState(false);
 
@@ -183,7 +225,8 @@ export default function AnimationStripPanel({
               frame={frame}
               index={index}
               isActive={index === activeFrameIndex}
-              onClick={() => onSelectFrame(index)}
+              isMultiSelected={selectedIndices.has(index)}
+              onClick={(e) => handleFrameClick(index, e)}
               onInsertBefore={() => onInsertFrame(index)}
               onInsertAfter={() => onInsertFrame(index + 1)}
               onRemove={() => handleRemoveRequest(index)}

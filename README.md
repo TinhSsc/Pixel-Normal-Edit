@@ -8,6 +8,8 @@
 [![GitHub stars](https://img.shields.io/github/stars/TinhSsc/Pixel-Normal-Edit.svg)](https://github.com/TinhSsc/Pixel-Normal-Edit)
 [![CI](https://github.com/TinhSsc/Pixel-Normal-Edit/actions/workflows/ci.yml/badge.svg)](https://github.com/TinhSsc/Pixel-Normal-Edit/actions)
 
+---
+
 ## Overview
 
 Pixel Normal Edit is a specialized pixel art editor that runs entirely in the browser. It combines low-level memory optimizations (flat buffers, typed arrays) with GPU-accelerated rendering to deliver smooth, responsive editing even on canvases with millions of pixels.
@@ -16,7 +18,7 @@ It is designed for:
 
 - **Game developers** creating sprite sheets, tilesets, and 8/16-bit game assets.
 - **Pixel artists** who need a fast, focused tool without the overhead of desktop software.
-- **AI-assisted workflows** — the editor connects to AI agents via the [MCP Bridge](mcp-firebase-bridge/), allowing AI to draw on the canvas in real time.
+- **AI-assisted workflows** — the editor connects to AI agents via the MCP bridge, allowing AI to draw on the canvas in real time.
 
 ### Why Pixel Normal Edit?
 
@@ -27,19 +29,6 @@ It is designed for:
 | Flood fill freezes UI | Offloaded to a Web Worker (background thread) |
 | Heavy desktop software overhead | Runs in any modern browser — no install required |
 | AI can't see or draw on canvas | [Firebase MCP bridge](mcp-firebase-bridge/) exposes canvas to AI agents via Model Context Protocol |
-
-## Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Framework | [React 19](https://react.dev/), [Vite 8](https://vite.dev/) |
-| Rendering | HTML5 Canvas 2D API + CSS GPU-accelerated grid |
-| Data | [`Uint32Array`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint32Array) — colors encoded as 32-bit integers |
-| i18n | [i18next](https://www.i18next.com/) + [react-i18next](https://react.i18next.com/) |
-| Backend | [Firebase](https://firebase.google.com/) (Auth + Firestore) |
-| AI Bridge | [MCP](https://modelcontextprotocol.io/) — `@pixel-normal-edit/mcp` Node.js server |
-| Panel UI | [DockView React](https://dockview.dev/) |
-| Linting | [oxlint](https://oxc.rs/) |
 
 ## Features
 
@@ -78,81 +67,93 @@ Key optimizations:
 - **Grid**: Virtual grid via CSS on an overlay `<div>` — no canvas redraw needed when zooming/panning.
 - **Async chunky processing**: Large operations (clear, fill, replace) are split into chunks interleaved with `requestAnimationFrame` to keep the UI responsive.
 
-## Quick Start
+---
 
-### Prerequisites
+## AI Integration (MCP Bridge)
 
-- Node.js >= 18
-- npm (or pnpm / yarn)
+Pixel Normal Edit supports AI-driven drawing through the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/). The [`@pixel-normal-edit/mcp`](https://www.npmjs.com/package/@pixel-normal-edit/mcp) package acts as a bridge between AI agents (Claude Desktop, Cursor, Windsurf, Antigravity) and the canvas via Firebase Firestore.
 
-### Setup
-
-```bash
-# Clone the repository
-git clone https://github.com/TinhSsc/Pixel-Normal-Edit.git
-cd Pixel-Normal-Edit
-
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
+```
+┌─────────────┐     MCP tools      ┌──────────────────┐    Firestore     ┌──────────────────┐
+│  AI Agent   │ ──────────────────►│  @pixel-normal-  │ ────────────────►│  Pixel Normal    │
+│  (Claude,   │◄──────────────────│  edit/mcp bridge  │◄────────────────│  Edit (Browser)  │
+│  Cursor…)   │     MCP result     └──────────────────┘   real-time      └──────────────────┘
 ```
 
-Open the URL displayed in the terminal (usually [http://localhost:5173](http://localhost:5173)).
-
-### Build for Production
+### Quick Start (for AI users)
 
 ```bash
-npm run build
-npm run preview
+npx -y @pixel-normal-edit/mcp@latest YOUR_SESSION_ID
 ```
+
+Get your Session ID from **Pixel Normal Edit → Settings → Account → AI Connection (MCP)**.
+
+### Claude Desktop Configuration
+
+```json
+{
+  "mcpServers": {
+    "pixel-normal-edit": {
+      "command": "npx",
+      "args": ["-y", "@pixel-normal-edit/mcp@latest", "YOUR_SESSION_ID"],
+      "env": { "DOTENV_CONFIG_QUIET": "true" }
+    }
+  }
+}
+```
+
+### Available Tools (50+)
+
+| Category | Tools |
+|---|---|
+| Drawing | `draw_pixel`, `draw_line`, `draw_rect`, `draw_circle`, `draw_ellipse`, `draw_polygon`, `draw_fill`, `draw_gradient_rect`, `draw_pixels_bulk` |
+| Canvas | `canvas_get_size`, `canvas_resize`, `canvas_clear`, `canvas_trim` |
+| Workspace | `workspace_list_tabs`, `workspace_create_tab`, `workspace_switch_tab`, `workspace_save` |
+| Sprite | `sprite_draw`, `sprite_save_stamp`, `sprite_use_stamp`, `sprite_list_stamps` |
+| Animation | `animation_add_frame`, `animation_go_to_frame`, `animation_compare_frames`, `animation_reorder_frame` |
+| Region | `region_copy`, `region_paste`, `region_clear`, `bulk_replace_color`, `bulk_flood_fill_all` |
+| Query | `query_snapshot` (ASCII vision), `query_palette`, `query_bounding_box`, `query_pixel`, `query_export_image` |
+| Layers | `layer_add`, `layer_remove`, `layer_move`, `layer_select`, `layer_toggle_visibility` |
+| Filters | `filter_apply` (brightness, invert, grayscale, hue-rotate) |
+| History | `history_undo`, `history_redo` |
+| Modes | `mode_set_mirror`, `mode_set_onion_skin`, `mode_set_grid` |
+
+See the [MCP Bridge README](mcp-firebase-bridge/README.md) for full documentation, HTTP mode, setup wizard, and development guide.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | [React 19](https://react.dev/), [Vite 8](https://vite.dev/) |
+| Rendering | HTML5 Canvas 2D API + CSS GPU-accelerated grid |
+| Data | [`Uint32Array`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint32Array) — colors encoded as 32-bit integers |
+| i18n | [i18next](https://www.i18next.com/) + [react-i18next](https://react.i18next.com/) |
+| Backend | [Firebase](https://firebase.google.com/) (Auth + Firestore) |
+| AI Bridge | [MCP](https://modelcontextprotocol.io/) — [`@pixel-normal-edit/mcp`](https://www.npmjs.com/package/@pixel-normal-edit/mcp) |
+| Panel UI | [DockView React](https://dockview.dev/) |
+| Linting | [oxlint](https://oxc.rs/) |
+
+---
 
 ## Project Structure
 
 ```
 .
-├── public/                  # Static assets (favicon, icons)
-├── src/
-│   ├── app/                 # App entry point (main.jsx, App.jsx)
-│   ├── assets/              # Images, icons
-│   ├── features/
-│   │   ├── auth/            # Firebase Authentication
-│   │   ├── editor/          # Core pixel editor logic
-│   │   ├── settings/        # User settings
-│   │   └── storage/         # Cloud save/load
-│   ├── i18n/                # Internationalization (vi, en)
-│   ├── shared/
-│   │   ├── dom/             # DOM utilities
-│   │   ├── lib/             # Shared libraries
-│   │   ├── styles/          # Shared CSS
-│   │   └── ui/              # Reusable UI components
-│   └── styles/              # Global styles
-├── mcp-firebase-bridge/     # MCP server for AI integration
-├── index.html
-├── vite.config.js
-└── package.json
+├── mcp-firebase-bridge/     # MCP server for AI integration (published as @pixel-normal-edit/mcp)
+│   ├── index.js             # Entry point
+│   ├── core/                # Firebase, server, command bus
+│   ├── tools/               # 50+ MCP tool implementations
+│   ├── transport/           # stdio + HTTP transports
+│   └── README.md
+├── src/                     # Web app source
+├── public/                  # Static assets
+├── package.json
+└── vite.config.js
 ```
 
-## Development
-
-```bash
-# Start dev server with hot reload
-npm run dev
-
-# Lint code
-npm run lint
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
-```
-
-### AI Integration (MCP Bridge)
-
-The MCP bridge (`mcp-firebase-bridge/`) allows AI agents to read and draw on the canvas in real time. See the [MCP Bridge README](mcp-firebase-bridge/README.md) for setup instructions.
+---
 
 ## Contributing
 
@@ -162,8 +163,7 @@ Contributions are welcome. Please follow these guidelines:
 2. Create a feature branch (`git checkout -b feature/my-feature`).
 3. Make your changes.
 4. Add or update tests if applicable.
-5. Ensure lint passes (`npm run lint`).
-6. Open a Pull Request.
+5. Open a Pull Request.
 
 ### Before submitting a PR
 
@@ -172,17 +172,11 @@ Contributions are welcome. Please follow these guidelines:
 - New features should be backward-compatible where possible.
 - UI changes should respect the [design system](DESIGN.md).
 
-## Roadmap
-
-- [ ] Additional brush types (dither, pattern)
-- [ ] Tilemap export (Tiled JSON format)
-- [ ] Collaborative real-time editing
-- [ ] Plugin / extension system
-- [ ] More export formats (GIF, sprite sheet)
+---
 
 ## License
 
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+This project is licensed under the [MIT License](LICENSE).
 
 ## Author
 

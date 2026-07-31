@@ -4,6 +4,7 @@ import { auth } from '../features/auth/logic/firebase/config.js';
 import { mcpClient } from '../features/editor/api/mcp-firebase-client.js';
 
 import { initEditor } from '../features/editor/engine/main.js';
+import { initCanvasSettings } from '../features/editor/engine/core/canvas-settings.js';
 
 import { pixelMap } from '../features/editor/engine/core/state.js';
 
@@ -168,6 +169,11 @@ function App() {
 
     }, 100);
 
+  }, []);
+
+  useEffect(() => {
+    // Initialize canvas settings (checkerboard customization)
+    initCanvasSettings();
   }, []);
 
   useEffect(() => {
@@ -364,6 +370,21 @@ function App() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <img
+                src="/avatar.svg"
+                alt="Pixel Normal Edit Logo"
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  borderRadius: '7px',
+                  flexShrink: 0,
+                  transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                  cursor: 'pointer',
+                  boxShadow: '0 0 0 1px rgba(135,206,235,0.15)'
+                }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.08)'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(135,206,235,0.45)'; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 0 0 1px rgba(135,206,235,0.15)'; }}
+              />
               <h1 style={{ margin: 0, fontSize: '24px', color: 'var(--text-primary)' }}>{t('app.title') || "Pixel Normal Edit"}</h1>
               
               {aiStatus && aiStatus.type === 'connected' && (

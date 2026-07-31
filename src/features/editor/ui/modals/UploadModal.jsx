@@ -235,9 +235,9 @@ const UploadModal = () => {
                   <h3 style={{ fontSize: '16px', fontWeight: 500, color: 'var(--color-text)', margin: '0 0 4px 0' }} data-i18n="modal.clickToSelect">
                     {t('modal.clickToSelect') || 'Nhấp hoặc kéo thả file để tải lên'}
                   </h3>
-                  <p style={{ fontSize: '14px', color: 'var(--color-text-muted)', margin: '0 0 16px 0' }}>{t('modal.supportedFiles') || 'Hỗ trợ PNG, JPG, WEBP, hoặc file JSON cấu hình.'}</p>
+                  <p style={{ fontSize: '14px', color: 'var(--color-text-muted)', margin: '0 0 16px 0' }}>{t('modal.supportedFiles') || 'Hỗ trợ PNG, JPG, WEBP, GIF, Video hoặc file JSON cấu hình.'}</p>
                   <button className="btn btn-secondary" style={{ padding: '8px 20px', fontWeight: 500, pointerEvents: 'none' }}>{t('modal.browseFile') || 'Duyệt file'}</button>
-                  <input type="file" id="imageUploadModal" accept="image/*, .zip" multiple style={{ display: 'none' }} />
+                  <input type="file" id="imageUploadModal" accept="image/*, video/*, .zip" multiple style={{ display: 'none' }} />
                 </div>
 
                 <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px' }}>

@@ -6,7 +6,7 @@
 [![npm downloads](https://img.shields.io/npm/dm/@pixel-normal-edit/mcp.svg)](https://www.npmjs.com/package/@pixel-normal-edit/mcp)
 [![GitHub license](https://img.shields.io/github/license/TinhSsc/Pixel-Normal-Edit.svg)](https://github.com/TinhSsc/Pixel-Normal-Edit/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/TinhSsc/Pixel-Normal-Edit.svg)](https://github.com/TinhSsc/Pixel-Normal-Edit)
-
+[![CI](https://github.com/TinhSsc/Pixel-Normal-Edit/actions/workflows/ci.yml/badge.svg)](https://github.com/TinhSsc/Pixel-Normal-Edit/actions)
 ---
 
 ## Overview
@@ -444,7 +444,7 @@ See [CHANGELOG.md](CHANGELOG.md) for version history.
 
 ## License
 
-This project is licensed under the ISC License. See [LICENSE](LICENSE) for details.
+This project is licensed under the [MIT License](https://github.com/TinhSsc/Pixel-Normal-Edit/blob/main/LICENSE). (The parent repository Pixel Normal Edit is MIT licensed.)
 
 ---
 

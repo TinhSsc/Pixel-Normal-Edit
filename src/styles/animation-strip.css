@@ -49,6 +49,20 @@
   height: 6px;
 }
 
+.animation-strip-frames::-webkit-scrollbar-track {
+  background: var(--color-surface-hover);
+  border-radius: 4px;
+}
+
+.animation-strip-frames::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+.animation-strip-frames::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
 .animation-strip-frame {
   flex-shrink: 0;
   width: 48px;
@@ -65,6 +79,12 @@
 
 .animation-strip-frame.active {
   border-color: var(--color-primary);
+}
+
+.animation-strip-frame.multi-selected {
+  border-color: var(--color-primary-light, #60a5fa);
+  box-shadow: 0 0 0 1px var(--color-primary-light, #60a5fa);
+  opacity: 0.9;
 }
 
 .animation-strip-frame canvas {

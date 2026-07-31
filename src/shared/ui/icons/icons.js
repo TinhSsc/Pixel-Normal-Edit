@@ -64,5 +64,10 @@ export const ICONS = {
   TYPE: 'type',
   ARROW_UP: 'arrow-up',
   ARROW_DOWN: 'arrow-down',
-  TRASH_2: 'trash-2'
+  TRASH_2: 'trash-2',
+  KEYBOARD: 'keyboard',
+  ALERT_TRIANGLE: 'triangle-alert',
+  PEN_TOOL: 'pen-tool',
+  SETTINGS_2: 'settings-2',
+  PALETTE: 'palette',
 };

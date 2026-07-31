@@ -6,7 +6,7 @@ import { setSourceImage } from '../../engine/actions/set-background.js';
 import { t } from '../../../../i18n/i18n.js';
 import { parseColorToUint32 } from '../../engine/core/color-utils.js';
 import { syncGridSizeUI } from '../../engine/actions/grid-size-select.js';
-import { handleZipFile, handleSpriteSheet, handleMultipleImageFrames } from './upload-animation.js';
+import { handleZipFile, handleSpriteSheet, handleMultipleImageFrames, handleGifFile, handleVideoFile } from './upload-animation.js';
 import { createTabFromData, refreshUIAfterBatchImport, getTabs, getActiveTabId } from '../../engine/core/tab-manager.js';
 export function setupUploadModal() {
   const modal = document.getElementById('uploadModal');
@@ -63,10 +63,12 @@ export function setupUploadModal() {
     }
     
     const hasZip = filesArray.some(f => f.name.endsWith('.zip'));
-    const hasImg = filesArray.some(f => !f.name.endsWith('.zip'));
+    const hasGif = filesArray.some(f => f.type === 'image/gif' || f.name.toLowerCase().endsWith('.gif'));
+    const hasVideo = filesArray.some(f => f.type.startsWith('video/') || f.name.match(/\.(mp4|webm|mov)$/i));
+    const hasImg = filesArray.some(f => !f.name.endsWith('.zip') && !f.type.startsWith('video/') && !f.name.match(/\.(mp4|webm|mov)$/i) && !(f.type === 'image/gif' || f.name.toLowerCase().endsWith('.gif')));
     
-    if (hasZip && hasImg) {
-      alert(t('upload.mixFileError') || "Vui lòng không chọn lẫn file ZIP và file ảnh rời.");
+    if ((hasZip ? 1 : 0) + (hasGif ? 1 : 0) + (hasVideo ? 1 : 0) + (hasImg ? 1 : 0) > 1) {
+      alert(t('upload.mixFileError') || "Vui lòng không chọn lẫn lộn các loại file (ZIP, GIF, Video, Ảnh rời).");
       return;
     }
     
@@ -84,6 +86,10 @@ export function setupUploadModal() {
     
     if (hasZip) {
       handleZipFile(filesArray[0]);
+    } else if (hasGif) {
+      handleGifFile(filesArray[0]);
+    } else if (hasVideo) {
+      handleVideoFile(filesArray[0]);
     } else {
       await processImageBatch(filesArray, mode, autoSize);
     }

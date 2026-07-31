@@ -8,6 +8,7 @@ import {
   initAnimationFromCurrentState,
   insertFrameAt,
   removeFrame,
+  removeMultipleFrames,
   reorderFrame,
   frames,
   activeFrameIndex as activeFrameIndexState,
@@ -227,6 +228,19 @@ export default function CanvasPanel() {
     }, 200);
   };
 
+  const handleRemoveMultipleFrames = (indices) => {
+    if (!indices || indices.length === 0) return;
+    if (!window.confirm(t('confirm.deleteMultipleFrames') || `Bạn có chắc muốn xóa ${indices.length} frame đang chọn không?`)) return;
+
+    setTimeout(() => {
+      const removed = removeMultipleFrames(indices);
+      if (removed) {
+        setActiveIndexState(activeFrameIndexState);
+        triggerCanvasRedraw();
+      }
+    }, 50);
+  };
+
   useEffect(() => {
     window.dispatchEvent(new CustomEvent('canvas-mounted'));
   }, []);
@@ -364,6 +378,7 @@ export default function CanvasPanel() {
             onToggleOnionSkin={handleToggleOnionSkin}
             onInsertFrame={handleInsertFrame}
             onRemoveFrame={handleRemoveFrame}
+            onRemoveMultipleFrames={handleRemoveMultipleFrames}
             onReorderFrame={handleReorderFrame}
             newFrameId={newFrameId}
             removingFrameId={removingFrameId}

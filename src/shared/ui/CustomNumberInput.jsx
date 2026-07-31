@@ -40,6 +40,8 @@ export const CustomNumberInput = ({
       setInternalValue(num);
     }
     
+    setDisplayValue(num);
+    
     if (onChange) {
       onChange({ target: { value: num } });
     }

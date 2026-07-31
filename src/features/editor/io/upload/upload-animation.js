@@ -3,6 +3,7 @@ import { resizeCanvas, fitToScreen } from '../../engine/core/viewport.js';
 import { renderPixels } from '../../engine/core/render.js';
 import { resetHistory } from '../../engine/core/history.js';
 import { setAnimationState, loadFrameToCurrentState } from '../../engine/core/animation-state.js';
+import { debouncedSaveWorkspace } from '../../engine/core/tab-manager.js';
 import JSZip from 'jszip';
 
 export async function handleZipFile(file) {
@@ -162,4 +163,6 @@ function applyAnimationFrames(frames, w, h) {
   resizeCanvas();
   fitToScreen();
   renderPixels();
+
+  debouncedSaveWorkspace();
 }

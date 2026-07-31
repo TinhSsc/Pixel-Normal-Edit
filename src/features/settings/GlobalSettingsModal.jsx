@@ -9,6 +9,8 @@ import { logout } from '../auth/logic/auth-state.js';
 import { getCurrentDirectoryHandle, clearLocalDirectory, pickLocalDirectory } from '../storage/local/local-drive.js';
 import GoogleButton from '../../shared/ui/GoogleButton.jsx';
 import { loginWithGoogle } from '../auth/logic/firebase/auth-api.js';
+import KeyboardShortcutsTab from '../editor/ui/settings/KeyboardShortcutsTab.jsx';
+import { getCanvasSettings, setCanvasSettings, applyCanvasSettings } from '../editor/engine/core/canvas-settings.js';
 export default function GlobalSettingsModal() {
   const [currentUser, setCurrentUser] = useState(null);
   const [tabCounterVal, setTabCounterVal] = useState(1);
@@ -18,6 +20,9 @@ export default function GlobalSettingsModal() {
   const [aiStatus, setAiStatus] = useState(null);
   const [copiedClaude, setCopiedClaude] = useState(false);
   const [copiedCursor, setCopiedCursor] = useState(false);
+  const [canvasMode, setCanvasMode] = useState(getCanvasSettings().mode);
+  const [canvasCheckerColor, setCanvasCheckerColor] = useState(getCanvasSettings().checkerColor);
+  const [canvasCheckerSize, setCanvasCheckerSize] = useState(getCanvasSettings().checkerSize);
 
   const mcpSessionId = aiStatus ? aiStatus.sessionId : (new URLSearchParams(window.location.search).get('mcp_session') || localStorage.getItem('pixel_mcp_session') || 'unknown-session');
   
@@ -304,6 +309,12 @@ export default function GlobalSettingsModal() {
               <span>{t('modal.tabEditTools') || 'Thao tác'}</span>
             </div>
           </button>
+          <button className={`tab-btn ${activeTab === 'tab-shortcuts' ? 'active' : ''}`} data-tab="tab-shortcuts" onClick={() => setActiveTab('tab-shortcuts')}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              <Icon name={ICONS.KEYBOARD} style={{ width: '18px', height: '18px' }} />
+              <span>{t('modal.tabShortcuts') || 'Phím tắt'}</span>
+            </div>
+          </button>
         </div>
         <div className="custom-scrollbar" style={{ flex: 1, overflowY: 'auto', padding: '4px', paddingRight: '8px' }}>
           <div className={`tab-content ${activeTab === 'tab-appearance' ? 'active' : ''}`} id="tab-appearance" style={{ display: activeTab === 'tab-appearance' ? 'block' : 'none' }}>
@@ -352,6 +363,65 @@ export default function GlobalSettingsModal() {
                     <input type="color" id="customGridLineColor" defaultValue="#ffffff" style={{ width: '32px', height: '32px', padding: 0, border: 'none', borderRadius: '6px', cursor: 'pointer', background: 'transparent' }} />
                   </div>
                 </div>
+              </div>
+            </div>
+
+            <div style={{ background: 'var(--color-surface)', padding: '20px', borderRadius: '12px', border: '1px solid var(--color-border)', marginTop: '12px' }}>
+              <div style={{ marginBottom: '16px', fontSize: '15px', fontWeight: 500, color: 'var(--text-primary)' }}>{t('canvas.checkerboard') || 'Checkerboard (Nền ô vuông)'}</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <CustomDropdown
+                  id="canvasCheckerMode"
+                  value={canvasMode}
+                  onChange={(e) => {
+                    const mode = e.target.value;
+                    setCanvasMode(mode);
+                    setCanvasSettings({ mode });
+                    applyCanvasSettings();
+                  }}
+                  options={[
+                    { value: 'default', label: t('canvas.default') || 'Mặc định' },
+                    { value: 'custom', label: t('canvas.custom') || 'Tùy chỉnh' }
+                  ]}
+                />
+
+                {canvasMode === 'custom' && (
+                  <div style={{ padding: '16px', background: 'var(--color-surface-alt)', borderRadius: '8px', border: '1px dashed var(--color-border)', marginTop: '8px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                      <label style={{ fontSize: '13px', color: 'var(--text-muted)', cursor: 'pointer' }} htmlFor="canvasCheckerColor">{t('canvas.checkerColor') || 'Màu checkerboard'}</label>
+                      <input 
+                        type="color" 
+                        id="canvasCheckerColor" 
+                        value={canvasCheckerColor}
+                        onChange={(e) => {
+                          setCanvasCheckerColor(e.target.value);
+                          setCanvasSettings({ checkerColor: e.target.value });
+                          applyCanvasSettings();
+                        }}
+                        style={{ width: '32px', height: '32px', padding: 0, border: 'none', borderRadius: '6px', cursor: 'pointer', background: 'transparent' }} 
+                      />
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <label style={{ fontSize: '13px', color: 'var(--text-muted)', cursor: 'pointer' }} htmlFor="canvasCheckerSize">{t('canvas.checkerSize') || 'Kích thước checkerboard'}</label>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <input 
+                          type="number" 
+                          id="canvasCheckerSize" 
+                          min="1" 
+                          max="20" 
+                          value={canvasCheckerSize}
+                          onChange={(e) => {
+                            const size = parseInt(e.target.value, 10);
+                            setCanvasCheckerSize(size);
+                            setCanvasSettings({ checkerSize: size });
+                            applyCanvasSettings();
+                          }}
+                          style={{ width: '60px', padding: '4px 8px', border: '1px solid var(--color-border)', borderRadius: '4px', background: 'var(--color-surface)', color: 'var(--color-text)', fontSize: '13px' }}
+                        />
+                        <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>px</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -564,6 +634,10 @@ export default function GlobalSettingsModal() {
 
           <div className={`tab-content ${activeTab === 'tab-edit-tools' ? 'active' : ''}`} id="tab-edit-tools" style={{ display: activeTab === 'tab-edit-tools' ? 'block' : 'none' }}>
             <EditToolsTab />
+          </div>
+
+          <div className={`tab-content ${activeTab === 'tab-shortcuts' ? 'active' : ''}`} id="tab-shortcuts" style={{ display: activeTab === 'tab-shortcuts' ? 'block' : 'none' }}>
+            <KeyboardShortcutsTab />
           </div>
         </div>
       </div>

@@ -19,6 +19,7 @@ import { setupGridSizeSelect, setGridSize } from './actions/grid-size-select.js'
 import { setupToggleToolsPanel } from './actions/toggle-tools-panel.js';
 import { handleCopy, handleCut, handlePaste, handleDeleteSelection } from './actions/clipboard.js';
 import { loadWorkspace } from './core/storage.js';
+import { initKeyboardShortcuts } from './actions/keyboard-shortcuts.js';
 
 import { setupRotate } from './transforms/rotate.js';
 import { setupFlipH } from './transforms/flip-h.js';
@@ -83,37 +84,9 @@ export function initEditor() {
     });
   }
 
-  // Hotkeys
-  document.addEventListener('keydown', (e) => {
-    // Avoid triggering canvas hotkeys when typing in inputs
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  // Hotkeys – managed by centralized keyboard-shortcuts.js
+  initKeyboardShortcuts();
 
-    // Ctrl+S
-    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-      e.preventDefault();
-      performQuickSave();
-    }
-    // Ctrl+C
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
-      e.preventDefault();
-      handleCopy();
-    }
-    // Ctrl+X
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'x') {
-      e.preventDefault();
-      handleCut();
-    }
-    // Ctrl+V
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v') {
-      e.preventDefault();
-      handlePaste();
-    }
-    // Delete / Backspace
-    if (e.key === 'Delete' || e.key === 'Backspace') {
-      e.preventDefault();
-      handleDeleteSelection();
-    }
-  });
 
   const downloadModal = document.getElementById('downloadModal');
   const openDownloadModalBtn = document.getElementById('openDownloadModalBtn');

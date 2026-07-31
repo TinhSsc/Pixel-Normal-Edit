@@ -15,18 +15,6 @@ export function setupUndo() {
       debouncedSaveWorkspace();
     }
   }));
-
-  document.addEventListener('keydown', e => {
-    if (e.ctrlKey && !e.shiftKey && e.key.toLowerCase() === 'z') {
-      e.preventDefault();
-      if (handleSelectUndo()) return;
-      const did = undo(pixelMap, renderPixels);
-      if (did) {
-        setStatus(t('status.undo'));
-        debouncedSaveWorkspace();
-      }
-    }
-  });
 }
 
 export function setupRedo() {
@@ -37,15 +25,4 @@ export function setupRedo() {
       debouncedSaveWorkspace();
     }
   }));
-
-  document.addEventListener('keydown', e => {
-    if (e.ctrlKey && (e.key.toLowerCase() === 'y' || (e.shiftKey && e.key.toLowerCase() === 'z'))) {
-      e.preventDefault();
-      const did = redo(pixelMap, renderPixels);
-      if (did) {
-        setStatus(t('status.redo'));
-        debouncedSaveWorkspace();
-      }
-    }
-  });
 }

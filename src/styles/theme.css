@@ -38,6 +38,10 @@
   --color-grid-line: rgba(255, 255, 255, 0.05);
   --color-info: #63b3ed;
   --color-sync: #8957e5;
+  
+  /* Custom checkerboard defaults (dark theme) */
+  --custom-checker-color: #21262d;
+  --custom-checker-size: 2px;
 }
 
 :root[data-theme="light"] {
@@ -65,6 +69,10 @@
   --color-grid-line: rgba(0, 0, 0, 0.04);
   --color-info: #63b3ed;
   --color-sync: #8957e5;
+  
+  /* Custom checkerboard defaults (light theme) */
+  --custom-checker-color: #d0d7de;
+  --custom-checker-size: 2px;
 }
 
 :root .dockview-theme-dark .dv-tabs-and-actions-container,
