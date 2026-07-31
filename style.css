@@ -11,5 +11,6 @@
 @import url('./src/styles/global/modals.css');
 @import url('./src/styles/global/tool-popup.css');
 @import url('./src/styles/animation-strip.css');
+@import url('./src/styles/mini-tools.css');
 .spin { animation: spin 1.5s linear infinite; } 
 @keyframes spin { 100% { transform: rotate(360deg); } }

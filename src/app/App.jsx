@@ -13,6 +13,8 @@ import { DockviewReact } from 'dockview-react';
 import 'dockview-core/dist/styles/dockview.css';
 
 import { t } from '../i18n/i18n.js';
+import { reloadLucideIcons } from '../shared/dom/lucide-utils';
+import { initPopupBehavior } from '../shared/dom/popup-controller';
 
 
 
@@ -83,15 +85,11 @@ function App() {
 
   useEffect(() => {
     // Re-initialize icons when switching routes or rendering
-    const timer = setTimeout(() => {
-      if (window.lucide) window.lucide.createIcons();
-    }, 50);
-    
+    reloadLucideIcons(50);
+
     // Hide custom tooltip to prevent it from getting stuck when element unmounts
     const tooltip = document.getElementById('custom-tooltip');
     if (tooltip) tooltip.classList.remove('show');
-    
-    return () => clearTimeout(timer);
   }, [route, currentUser]);
 
   const navigate = (path) => {
@@ -384,6 +382,7 @@ function App() {
                 }}
                 onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.08)'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(135,206,235,0.45)'; }}
                 onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 0 0 1px rgba(135,206,235,0.15)'; }}
+                onClick={() => { window.location.href = '/?tool=home'; }}
               />
               <h1 style={{ margin: 0, fontSize: '24px', color: 'var(--text-primary)' }}>{t('app.title') || "Pixel Normal Edit"}</h1>
               

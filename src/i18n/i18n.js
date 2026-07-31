@@ -15,7 +15,16 @@ function getDefaultLang() {
 let currentLang = getDefaultLang();
 
 export function t(key, ...args) {
-  let str = (dictionary[currentLang] && dictionary[currentLang][key]) || key;
+  let str = (dictionary[currentLang] && dictionary[currentLang][key]);
+  
+  if (!str) {
+    // If the key is missing, check if the first argument is a fallback string
+    if (args.length === 1 && typeof args[0] === 'string' && !args[0].includes('{0}')) {
+      return args[0]; // Return the fallback string directly
+    }
+    str = key; // Otherwise fallback to the key itself
+  }
+
   args.forEach((arg, i) => {
     str = str.replace(`{${i}}`, arg);
   });

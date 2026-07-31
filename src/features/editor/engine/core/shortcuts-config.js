@@ -9,6 +9,7 @@ export const DEFAULT_SHORTCUTS = {
   'tool.highlightPen':  { key: 'b', ctrl: false, shift: true,  alt: false, label: 'tool.highlightPen' },
   'tool.blendBrush':    { key: 'b', ctrl: false, shift: false, alt: true,  label: 'tool.blendBrush' },
   'tool.eraser':        { key: 'e', ctrl: false, shift: false, alt: false, label: 'tool.eraser' },
+  'tool.picker':        { key: 'i', ctrl: false, shift: false, alt: false, label: 'tool.picker' },
   'tool.fill':          { key: 'g', ctrl: false, shift: false, alt: false, label: 'tool.fill' },
   'tool.magicEraser':   { key: 'e', ctrl: false, shift: true,  alt: false, label: 'tool.magicEraser' },
   'tool.select':        { key: 'm', ctrl: false, shift: false, alt: false, label: 'tool.select' },
@@ -19,6 +20,9 @@ export const DEFAULT_SHORTCUTS = {
   'tool.circle':        { key: 'c', ctrl: false, shift: false, alt: false, label: 'tool.circle' },
   'tool.text':          { key: 't', ctrl: false, shift: false, alt: false, label: 'tool.text' },
   'tool.pan':           { key: 'h', ctrl: false, shift: false, alt: false, label: 'tool.pan' },
+  'tool.ditherBrush':   { key: 'd', ctrl: false, shift: false, alt: false, label: 'tool.ditherBrush' },
+  'tool.softBrush':     { key: 's', ctrl: false, shift: false, alt: false, label: 'tool.softBrush' },
+  'tool.sprayPen':      { key: 'p', ctrl: false, shift: false, alt: false, label: 'tool.sprayPen' },
 
   // Actions
   'action.undo':        { key: 'z', ctrl: true,  shift: false, alt: false, label: 'action.undo' },

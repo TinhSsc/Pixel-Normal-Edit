@@ -78,7 +78,24 @@ const languages = {
     "btn.copied": "Copied!",
     "btn.copy": "Copy",
     "layer.title": "Layers",
-    "layer.add": "Add Layer"
+    "layer.add": "Add Layer",
+    "convert.hero.title": "Instant image conversion",
+    "convert.hero.desc": "Easily batch convert between PNG, JPG, WebP, HEIC, JXL and more. Support multiple files and ZIP export. Processing happens right in your browser.",
+    "convert.errors.unsupportedFile": "Unsupported file",
+    "convert.errors.fileTooLarge": "File too large",
+    "convert.errors.imageTooLarge": "Image too large",
+    "convert.errors.noImageToDownload": "No image to download",
+    "convert.upload.dragDrop": "Drag and drop image here",
+    "convert.upload.orClick": "or click to browse files on your device",
+    "convert.upload.button": "Choose image",
+    "convert.upload.support": "Supported: PNG, JPG, WebP, SVG, HEIC...",
+    "convert.controls.outputFormat": "Output format",
+    "convert.controls.quality": "Quality",
+    "convert.controls.download": "Download",
+    "convert.preview.title": "Image preview",
+    "convert.preview.alt": "Preview",
+    "convert.buttons.chooseOther": "Choose another image",
+    "convert.filename": "converted"
   },
   vi: {
     "group.settings": "Cài đặt",
@@ -125,7 +142,24 @@ const languages = {
     "btn.copied": "Đã copy!",
     "btn.copy": "Copy",
     "layer.title": "Lớp (Layers)",
-    "layer.add": "Thêm Lớp"
+    "layer.add": "Thêm Lớp",
+    "convert.hero.title": "Chuyển đổi hình ảnh tức thì",
+    "convert.hero.desc": "Dễ dàng chuyển đổi hàng loạt (Batch) qua lại giữa PNG, JPG, WebP, HEIC, JXL và hàng chục định dạng khác. Hỗ trợ nhiều file và xuất file ZIP. Quá trình xử lý diễn ra ngay trên trình duyệt.",
+    "convert.errors.unsupportedFile": "File không được hỗ trợ",
+    "convert.errors.fileTooLarge": "File quá lớn",
+    "convert.errors.imageTooLarge": "Ảnh quá lớn",
+    "convert.errors.noImageToDownload": "Chưa có ảnh để tải",
+    "convert.upload.dragDrop": "Kéo thả ảnh vào đây",
+    "convert.upload.orClick": "hoặc click để duyệt file trên thiết bị của bạn",
+    "convert.upload.button": "Chọn ảnh",
+    "convert.upload.support": "Hỗ trợ: PNG, JPG, WebP, SVG, HEIC...",
+    "convert.controls.outputFormat": "Định dạng đầu ra",
+    "convert.controls.quality": "Chất lượng",
+    "convert.controls.download": "Tải về",
+    "convert.preview.title": "Xem trước ảnh",
+    "convert.preview.alt": "Preview",
+    "convert.buttons.chooseOther": "Chọn ảnh khác",
+    "convert.filename": "converted"
   }
 };
 
@@ -165,11 +199,14 @@ Object.entries(languages).forEach(([langCode, langData]) => {
       console.log(`[SYNC] [${langCode}] ➕ Thêm key mới: ${key}`);
     } else {
       const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const lineRegex = new RegExp(`(^\\s*(["']?)${escapedKey}\\2\\s*:)\\s*(.*?)(\\s*(?:,|$))`, "m");
+      const lineRegex = new RegExp(`(^\\s*(["']?)${escapedKey}\\2\\s*:)(.*)$`, "m");
       const match = content.match(lineRegex);
       if (match && value !== "") {
         const newValueStr = JSON.stringify(value);
-        const currentRaw = match[3];
+        const currentRest = match[3];
+        const valMatch = currentRest.match(/^\s*(.*?)\s*(,?)\s*$/);
+        const currentRaw = valMatch ? valMatch[1] : currentRest.trim();
+        const trailingComma = valMatch ? valMatch[2] : "";
         let shouldReplace = false;
         
         try {
@@ -183,7 +220,7 @@ Object.entries(languages).forEach(([langCode, langData]) => {
         }
 
         if (shouldReplace) {
-          content = content.replace(lineRegex, `$1 ${newValueStr}$4`);
+          content = content.replace(lineRegex, `$1 ${newValueStr}${trailingComma}`);
           isModified = true;
           console.log(`[SYNC] [${langCode}] 🔄 Cập nhật key: ${key}`);
         }

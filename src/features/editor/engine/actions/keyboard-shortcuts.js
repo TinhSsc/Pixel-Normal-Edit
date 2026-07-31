@@ -91,49 +91,49 @@ function doAnimPlayPause() {
 
 const ACTION_HANDLERS = {
   // Tools – map to pixel editor tool IDs
-  'tool.pixelPen':     () => setCurrentTool('pixel-pen'),
+  'tool.pixelPen': () => setCurrentTool('pixel-pen'),
   'tool.highlightPen': () => setCurrentTool('highlight-pen'),
-  'tool.blendBrush':   () => setCurrentTool('blend-brush'),
-  'tool.ditherBrush':  () => setCurrentTool('dither-brush'),
-  'tool.softBrush':    () => setCurrentTool('soft-brush'),
-  'tool.sprayPen':     () => setCurrentTool('spray-pen'),
-  'tool.eraser':       () => setCurrentTool('eraser'),
-  'tool.picker':       () => setCurrentTool('picker'),
-  'tool.fill':         () => setCurrentTool('fill'),
-  'tool.magicEraser':  () => setCurrentTool('magic-eraser'),
-  'tool.select':       () => setCurrentTool('select'),
+  'tool.blendBrush': () => setCurrentTool('blend-brush'),
+  'tool.ditherBrush': () => setCurrentTool('dither-brush'),
+  'tool.softBrush': () => setCurrentTool('soft-brush'),
+  'tool.sprayPen': () => setCurrentTool('spray-pen'),
+  'tool.eraser': () => setCurrentTool('eraser'),
+  'tool.picker': () => setCurrentTool('picker'),
+  'tool.fill': () => setCurrentTool('fill'),
+  'tool.magicEraser': () => setCurrentTool('magic-eraser'),
+  'tool.select': () => setCurrentTool('select'),
   'tool.replaceColor': () => setCurrentTool('replace-color'),
-  'tool.outline':      () => setCurrentTool('outline'),
-  'tool.line':         () => setCurrentTool('line'),
-  'tool.rect':         () => setCurrentTool('rect'),
-  'tool.circle':       () => setCurrentTool('circle'),
-  'tool.text':         () => setCurrentTool('text'),
-  'tool.pan':          () => setCurrentTool('pan'),
+  'tool.outline': () => setCurrentTool('outline'),
+  'tool.line': () => setCurrentTool('line'),
+  'tool.rect': () => setCurrentTool('rect'),
+  'tool.circle': () => setCurrentTool('circle'),
+  'tool.text': () => setCurrentTool('text'),
+  'tool.pan': () => setCurrentTool('pan'),
 
   // Actions
-  'action.undo':       doUndo,
-  'action.redo':       doRedo,
-  'action.redoAlt':    doRedo,
-  'action.copy':       handleCopy,
-  'action.cut':        handleCut,
-  'action.paste':      handlePaste,
-  'action.delete':     handleDeleteSelection,
-  'action.selectAll':  () => { /* TODO: implement select all */ },
-  'action.deselect':   () => { /* TODO: implement deselect */ },
+  'action.undo': doUndo,
+  'action.redo': doRedo,
+  'action.redoAlt': doRedo,
+  'action.copy': handleCopy,
+  'action.cut': handleCut,
+  'action.paste': handlePaste,
+  'action.delete': handleDeleteSelection,
+  'action.selectAll': () => { /* TODO: implement select all */ },
+  'action.deselect': () => { /* TODO: implement deselect */ },
   'action.swapColors': doSwapColors,
-  'action.newCanvas':  () => document.getElementById('newCanvasBtn')?.click(),
-  'action.quickSave':  performQuickSave,
-  'action.saveAs':     () => { /* TODO: implement save as */ },
-  'action.export':     () => document.getElementById('openDownloadModalBtn')?.click(),
-  'action.settings':   () => document.getElementById('openSettingsBtn')?.click(),
+  'action.newCanvas': () => document.getElementById('newCanvasBtn')?.click(),
+  'action.quickSave': performQuickSave,
+  'action.saveAs': () => { /* TODO: implement save as */ },
+  'action.export': () => document.getElementById('openDownloadModalBtn')?.click(),
+  'action.settings': () => document.getElementById('openSettingsBtn')?.click(),
 
   // Zoom
-  'zoom.in':  zoomIn,
+  'zoom.in': zoomIn,
   'zoom.out': zoomOut,
   'zoom.fit': fitToScreen,
 
   // Modes
-  'mode.gradient':  () => {
+  'mode.gradient': () => {
     const next = !isGradientModeActive();
     setGradientModeActive(next);
     // Sync checkbox if present
@@ -157,25 +157,25 @@ const ACTION_HANDLERS = {
   'mode.onionSkin': () => toggleOnionSkin(),
 
   // Animation
-  'anim.playPause':   doAnimPlayPause,
-  'anim.prevFrame':   prevFrame,
-  'anim.nextFrame':   nextFrame,
-  'anim.firstFrame':  () => goToFrame(0),
-  'anim.lastFrame':   () => { if (frames.length > 0) goToFrame(frames.length - 1); },
-  'anim.addFrame':    addFrame,
+  'anim.playPause': doAnimPlayPause,
+  'anim.prevFrame': prevFrame,
+  'anim.nextFrame': nextFrame,
+  'anim.firstFrame': () => goToFrame(0),
+  'anim.lastFrame': () => { if (frames.length > 0) goToFrame(frames.length - 1); },
+  'anim.addFrame': addFrame,
   'anim.deleteFrame': () => { if (frames.length > 0) removeFrame(activeFrameIndex); },
 
   // Layers
-  'layer.add':      addLayer,
-  'layer.remove':   () => removeLayer(activeLayerIndex),
-  'layer.moveUp':   () => moveLayerUp(activeLayerIndex),
+  'layer.add': addLayer,
+  'layer.remove': () => removeLayer(activeLayerIndex),
+  'layer.moveUp': () => moveLayerUp(activeLayerIndex),
   'layer.moveDown': () => moveLayerDown(activeLayerIndex),
 
   // Transforms – click the existing DOM buttons to reuse their full logic
   'transform.rotate': () => document.getElementById('rotateBtn')?.click(),
-  'transform.flipH':  () => document.getElementById('flipHBtn')?.click(),
-  'transform.flipV':  () => document.getElementById('flipVBtn')?.click(),
-  'transform.trim':   () => document.getElementById('trimBtn')?.click(),
+  'transform.flipH': () => document.getElementById('flipHBtn')?.click(),
+  'transform.flipV': () => document.getElementById('flipVBtn')?.click(),
+  'transform.trim': () => document.getElementById('trimBtn')?.click(),
 };
 
 /* ------------------------------------------------------------------ */
@@ -185,34 +185,39 @@ const ACTION_HANDLERS = {
 function handleChord(e) {
   const key = e.key.toLowerCase();
   chordBuffer.push(key);
-  console.log('[shortcuts] Chord buffer:', chordBuffer);
 
   if (chordBuffer.length === 2) {
     const chord = chordBuffer.join('');
-    console.log('[shortcuts] Checking chord:', chord);
+
+    let recognized = false;
     if (chord === 'gd') {
       e.preventDefault();
       ACTION_HANDLERS['mode.gradient']();
+      recognized = true;
     } else if (chord === 'gm') {
       e.preventDefault();
       ACTION_HANDLERS['mode.mirror']();
+      recognized = true;
     } else if (chord === 'gg') {
       e.preventDefault();
       ACTION_HANDLERS['mode.grid']();
+      recognized = true;
     } else {
-      // Not a recognized chord, but we still consumed 2 keys
+      // Not a recognized chord
       console.log('[shortcuts] Not a recognized chord');
     }
     chordBuffer = [];
     if (chordTimeout) clearTimeout(chordTimeout);
-    return;
+    return recognized;
   }
 
   if (chordTimeout) clearTimeout(chordTimeout);
-  chordTimeout = setTimeout(() => { 
+  chordTimeout = setTimeout(() => {
     console.log('[shortcuts] Chord timeout - clearing buffer');
-    chordBuffer = []; 
+    chordBuffer = [];
   }, CHORD_TIMEOUT_MS);
+
+  return false;
 }
 
 /* ------------------------------------------------------------------ */
@@ -221,30 +226,25 @@ function handleChord(e) {
 
 function parseKeyboardEvent(e) {
   return {
-    key:   e.key.toLowerCase(),
-    ctrl:  e.ctrlKey || e.metaKey,
+    key: e.key.toLowerCase(),
+    ctrl: e.ctrlKey || e.metaKey,
     shift: e.shiftKey,
-    alt:   e.altKey,
+    alt: e.altKey,
   };
 }
 
 function findShortcutByConfig(config) {
-  console.log('[shortcuts] Looking for match with config:', config);
-  console.log('[shortcuts] Available shortcuts:', Object.entries(shortcuts).map(([id, s]) => ({ id, key: s.key, ctrl: s.ctrl, shift: s.shift, alt: s.alt })));
-  
+
   for (const [id, s] of Object.entries(shortcuts)) {
-    console.log('[shortcuts] Checking', id, ':', s.key, '===', config.key, '?', s.key === config.key);
     if (
       s.key === config.key &&
-      !!s.ctrl  === config.ctrl  &&
+      !!s.ctrl === config.ctrl &&
       !!s.shift === config.shift &&
-      !!s.alt   === config.alt
+      !!s.alt === config.alt
     ) {
-      console.log('[shortcuts] MATCH FOUND:', id);
       return id;
     }
   }
-  console.log('[shortcuts] NO MATCH');
   return null;
 }
 
@@ -253,17 +253,14 @@ function findShortcutByConfig(config) {
 /* ------------------------------------------------------------------ */
 
 export function handleKeyDown(e) {
-  console.log('[shortcuts] handleKeyDown called with key:', e.key, 'target:', e.target.tagName, 'target id:', e.target.id);
-  
+
   // Skip when typing
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-    console.log('[shortcuts] Skipping - in input/textarea');
     return;
   }
   // Skip when a modal is visible (except Ctrl/Meta combos)
   const modal = document.querySelector('.modal-overlay[style*="display: flex"]');
   if (modal && !e.ctrlKey && !e.metaKey) {
-    console.log('[shortcuts] Skipping - modal open:', modal.id || modal.className);
     return;
   }
 
@@ -272,21 +269,14 @@ export function handleKeyDown(e) {
     chordBuffer = [];
     if (chordTimeout) { clearTimeout(chordTimeout); chordTimeout = null; }
   } else {
-    handleChord(e);
+    if (handleChord(e)) return;
   }
 
   const keyConfig = parseKeyboardEvent(e);
-  console.log('[shortcuts] Key pressed:', keyConfig);
-  
   const shortcutId = findShortcutByConfig(keyConfig);
-  console.log('[shortcuts] Found shortcut:', shortcutId);
-
   if (shortcutId && ACTION_HANDLERS[shortcutId]) {
-    console.log('[shortcuts] Executing:', shortcutId);
     e.preventDefault();
     executeShortcut(shortcutId);
-  } else {
-    console.log('[shortcuts] No match found for key:', keyConfig.key);
   }
 }
 
@@ -299,16 +289,13 @@ export function initKeyboardShortcuts() {
   isInitialized = true;
 
   shortcuts = loadUserShortcuts();
-  
-  console.log('[shortcuts] Initialized with shortcuts:', Object.keys(shortcuts));
-  console.log('[shortcuts] tool.pixelPen config:', shortcuts['tool.pixelPen']);
+
 
   document.addEventListener('keydown', handleKeyDown);
 
   // Reload shortcuts when the Settings UI updates them
   window.addEventListener('shortcuts-updated', () => {
     shortcuts = loadUserShortcuts();
-    console.log('[shortcuts] Reloaded shortcuts:', Object.keys(shortcuts));
   });
 }
 
@@ -324,8 +311,8 @@ export function executeShortcut(shortcutId) {
 }
 
 export function updateShortcut(shortcutId, newConfig) {
-  shortcuts[shortcutId] = { 
-    ...shortcuts[shortcutId], 
+  shortcuts[shortcutId] = {
+    ...shortcuts[shortcutId],
     ...newConfig,
     key: (newConfig.key || shortcuts[shortcutId]?.key || '').toLowerCase()
   };

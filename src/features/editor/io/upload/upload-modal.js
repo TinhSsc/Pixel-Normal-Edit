@@ -8,6 +8,8 @@ import { parseColorToUint32 } from '../../engine/core/color-utils.js';
 import { syncGridSizeUI } from '../../engine/actions/grid-size-select.js';
 import { handleZipFile, handleSpriteSheet, handleMultipleImageFrames, handleGifFile, handleVideoFile } from './upload-animation.js';
 import { createTabFromData, refreshUIAfterBatchImport, getTabs, getActiveTabId } from '../../engine/core/tab-manager.js';
+import { FORMAT_REGISTRY } from '../../../mini-tools/image-converter/format-registry.js';
+import { decodeImageWithAdvancedEngine } from '../../../mini-tools/image-converter/advanced-engine.js';
 export function setupUploadModal() {
   const modal = document.getElementById('uploadModal');
   const openBtn = document.getElementById('openUploadModalBtn');
@@ -53,7 +55,7 @@ export function setupUploadModal() {
   imageDropZone?.addEventListener('dragover', e => { e.preventDefault(); imageDropZone.classList.add('dragover'); });
   imageDropZone?.addEventListener('dragleave', () => imageDropZone.classList.remove('dragover'));
   const handleImageInput = async (filesArray) => {
-    const mode = document.getElementById('importModeSelect')?.value || 'current-tab';
+    let mode = document.getElementById('importModeSelect')?.value || 'current-tab';
     const autoSize = autoSizeCheck?.checked;
     
     if (filesArray.length === 0) return;
@@ -67,14 +69,13 @@ export function setupUploadModal() {
     const hasVideo = filesArray.some(f => f.type.startsWith('video/') || f.name.match(/\.(mp4|webm|mov)$/i));
     const hasImg = filesArray.some(f => !f.name.endsWith('.zip') && !f.type.startsWith('video/') && !f.name.match(/\.(mp4|webm|mov)$/i) && !(f.type === 'image/gif' || f.name.toLowerCase().endsWith('.gif')));
     
-    if ((hasZip ? 1 : 0) + (hasGif ? 1 : 0) + (hasVideo ? 1 : 0) + (hasImg ? 1 : 0) > 1) {
-      alert(t('upload.mixFileError') || "Vui lòng không chọn lẫn lộn các loại file (ZIP, GIF, Video, Ảnh rời).");
-      return;
-    }
-    
-    if (mode === 'current-tab' && filesArray.length > 1) {
-      alert(t('upload.singleFileOverrideError') || "Chế độ 'Ghi đè Tab hiện tại' chỉ hỗ trợ tải 1 file.");
-      return;
+    if (mode === 'current-tab' && filesArray.length > 1 && !hasZip && !hasVideo) {
+      const wantMulti = window.confirm(t('upload.multiFallbackConfirm') || "Bạn đang tải lên nhiều file. Bạn có muốn mở chúng thành các Tab riêng biệt không?");
+      if (wantMulti) {
+        mode = 'multi-tab';
+      } else {
+        return;
+      }
     }
     
     const currentTab = getTabs().find(t => t.id === getActiveTabId());
@@ -83,13 +84,21 @@ export function setupUploadModal() {
     }
     
     document.getElementById('uploadModal').style.display = 'none';
-    
+
     if (hasZip) {
+      if (filesArray.length > 1) {
+        alert(t('upload.singleZipError') || "Chỉ hỗ trợ tải lên 1 file ZIP mỗi lần.");
+        return;
+      }
       handleZipFile(filesArray[0]);
-    } else if (hasGif) {
-      handleGifFile(filesArray[0]);
     } else if (hasVideo) {
+      if (filesArray.length > 1) {
+        alert(t('upload.singleVideoError') || "Chỉ hỗ trợ tải lên 1 file Video mỗi lần.");
+        return;
+      }
       handleVideoFile(filesArray[0]);
+    } else if (hasGif && filesArray.length === 1) {
+      handleGifFile(filesArray[0]);
     } else {
       await processImageBatch(filesArray, mode, autoSize);
     }
@@ -126,17 +135,30 @@ export function setupUploadModal() {
   });
 }
 
-async function processImageBatch(files, mode, autoSize) {
+export async function processImageBatch(files, mode, autoSize) {
   const imageObjects = [];
   let errorCount = 0;
 
   for (const file of files) {
-    if (!file.name.match(/\.(png|jpe?g|gif|webp)$/i)) {
+    const ext = file.name.split('.').pop().toLowerCase();
+    const formatInfo = FORMAT_REGISTRY.find(f => f.ext === ext || file.type === f.id || (f.ext === 'jpg' && ext === 'jpeg'));
+    
+    if (!formatInfo) {
       errorCount++;
       continue;
     }
     try {
-      const img = await loadImageObject(file);
+      let img;
+      if (formatInfo.advanced) {
+         if (!window.confirm(`File "${file.name}" yêu cầu bật Chế độ Nâng cao (có thể tải thêm tài nguyên). Bạn có đồng ý tải thư viện mở rộng để mở file này không?`)) {
+           errorCount++;
+           continue;
+         }
+         const decodedBlob = await decodeImageWithAdvancedEngine(file);
+         img = await loadImageObject(decodedBlob);
+      } else {
+         img = await loadImageObject(file);
+      }
       imageObjects.push({ name: file.name, img });
     } catch (e) {
       errorCount++;

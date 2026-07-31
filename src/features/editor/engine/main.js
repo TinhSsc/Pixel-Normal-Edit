@@ -1,6 +1,6 @@
 import { initMainCanvasLayout, bindMainCanvasEvents } from './core/main-canvas-manager.js';
 import { els, setStatus, setCurrentTool, initEls, pixelMap } from './core/state.js';
-import { getTabs, getActiveTabId, initTabs, performQuickSave, syncToDrive, debouncedSaveWorkspace } from './core/tab-manager.js';
+import { getTabs, getActiveTabId, initTabs, performQuickSave, syncToDrive, debouncedSaveWorkspace, createTabFromData, refreshUIAfterBatchImport } from './core/tab-manager.js';
 import { isAnimationMode } from './core/animation-state.js';
 
 import { setupGradientMode } from './modes/gradient-mode.js';
@@ -37,6 +37,7 @@ import { exportToDrive, showNotification } from '../../storage/cloud/drive-ui.js
 import { initCustomTooltip } from '../dom-adapter/tooltip.js';
 import { initMobilePopups } from '../dom-adapter/mobile-popups.js';
 import { initToolPopup } from '../ui/tool-popup/index.js';
+import { processImageBatch } from '../io/upload/upload-modal.js';
 import { updateDOM, toggleLang, t } from '../../../i18n/i18n.js';
 import { reloadLucideIcons, lucideIconHtml } from '../../../shared/dom/lucide-utils';
 import { initMobilePopupTriggers } from '../../../shared/dom/popup-controller';
@@ -453,8 +454,28 @@ window.addEventListener('toolbar-mounted', () => {
     }
   });
 
-  window.addEventListener('tool-changed', () => {
+  window.addEventListener('tool-changed', (e) => {
     saveToolbarState();
+    
+    // Sync UI button state for tools
+    const toolId = e.detail?.tool;
+    const variantId = e.detail?.variant;
+    
+    if (toolId) {
+      document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+      
+      let btnToActivate = null;
+      if (variantId) {
+        btnToActivate = document.querySelector(`.tool-btn[data-base-tool="${toolId}"][data-variant-id="${variantId}"]`);
+      }
+      if (!btnToActivate) {
+        btnToActivate = document.querySelector(`.tool-btn[data-tool="${toolId}"]`);
+      }
+      
+      if (btnToActivate) {
+        btnToActivate.classList.add('active');
+      }
+    }
   });
 
   document.body.addEventListener('input', (e) => {
@@ -491,6 +512,44 @@ window.addEventListener('canvas-mounted', async () => {
   initTabs(savedData);
   
   bindMainCanvasEvents();
+
+  const pendingImagesStr = sessionStorage.getItem('pending_edit_images');
+  if (pendingImagesStr) {
+    sessionStorage.removeItem('pending_edit_images');
+    const mode = sessionStorage.getItem('pending_edit_mode') || 'multi-tab';
+    sessionStorage.removeItem('pending_edit_mode');
+    
+    try {
+      const items = JSON.parse(pendingImagesStr);
+      const files = await Promise.all(items.map(async item => {
+        const res = await fetch(item.data);
+        const blob = await res.blob();
+        return new File([blob], item.name, { type: blob.type });
+      }));
+      await processImageBatch(files, mode, true);
+    } catch(e) {
+      console.error(e);
+    }
+  } else {
+    const pendingImage = sessionStorage.getItem('pending_edit_image');
+    if (pendingImage) {
+      sessionStorage.removeItem('pending_edit_image');
+      const img = new Image();
+      img.onload = () => {
+        const w = img.naturalWidth;
+        const h = img.naturalHeight;
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        const data32 = new Uint32Array(ctx.getImageData(0, 0, w, h).data.buffer);
+        createTabFromData("Converted Image", w, h, data32);
+        refreshUIAfterBatchImport();
+      };
+      img.src = pendingImage;
+    }
+  }
 });
 
 window.addEventListener('settings-mounted', () => {
