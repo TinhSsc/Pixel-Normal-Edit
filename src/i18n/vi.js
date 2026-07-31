@@ -785,6 +785,8 @@ export default {
   "home.benefit.uiDesc": "UI được thiết kế cho người dùng, không yêu cầu kiến thức kỹ thuật.",
   "home.benefit.batch": "Batch processing",
   "home.benefit.batchDesc": "Xử lý hàng chục ảnh cùng lúc, tiết kiệm thời gian đáng kể.",
+  "home.benefit.ai": "AI Integration (MCP)",
+  "home.benefit.aiDesc": "Kết nối AI agents (Claude, Cursor, Windsurf) qua giao thức MCP để AI vẽ trực tiếp lên canvas theo thời gian thực.",
   "home.footer.blog": "Blog",
   "home.footer.careers": "Tuyển dụng",
   "home.footer.press": "Báo chí",

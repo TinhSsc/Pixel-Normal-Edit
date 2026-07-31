@@ -95,6 +95,7 @@ export const ICONS = {
   INFO: 'info',
   SHIELD: 'shield',
   LAYERS: 'layers',
+  BOT: 'bot',
   BOLD: 'bold',
   ITALIC: 'italic',
   UNDERLINE: 'underline',

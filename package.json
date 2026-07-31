@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "npm run build && firebase deploy --only hosting",
+    "deploy:full": "npm run build && firebase deploy"
   },
   "dependencies": {
     "@imagemagick/magick-wasm": "^0.0.41",
@@ -21,6 +23,7 @@
     "i18next": "^26.3.6",
     "jszip": "^3.10.1",
     "lucide": "^1.23.0",
+    "puppeteer-core": "^25.4.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-easy-crop": "^6.2.3",

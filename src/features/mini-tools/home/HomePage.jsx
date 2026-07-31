@@ -70,6 +70,13 @@ const BENEFITS = [
     title: 'Batch processing',
     descKey: 'home.benefit.batchDesc',
     desc: 'Xử lý hàng chục ảnh cùng lúc, tiết kiệm thời gian đáng kể.'
+  },
+  {
+    icon: ICONS.BOT,
+    titleKey: 'home.benefit.ai',
+    title: 'AI Integration (MCP)',
+    descKey: 'home.benefit.aiDesc',
+    desc: 'Kết nối AI agents (Claude, Cursor, Windsurf) qua giao thức MCP để AI vẽ trực tiếp lên canvas theo thời gian thực.'
   }
 ];
 
@@ -216,7 +223,29 @@ export default function HomePage() {
           .home-hero-title { font-size: 32px !important; }
         }
       `}</style>
-      <SEOHeader title="Công cụ xử lý ảnh số 1 | Pixel Normal Edit" description="Nền tảng xử lý ảnh trực tiếp trên trình duyệt. Nhanh, riêng tư, và miễn phí." />
+      <SEOHeader
+        title={t('seo.home.title', 'Công cụ xử lý ảnh số 1 | Pixel Normal Edit')}
+        description={t('seo.home.desc', 'Nền tảng xử lý ảnh trực tiếp trên trình duyệt. Nhanh, riêng tư, và miễn phí.')}
+        schema={{
+          "@type": "WebSite",
+          "name": "Pixel Normal Edit",
+          "url": "https://pixel-normal-edit.web.app/?tool=home",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://pixel-normal-edit.web.app/?tool=home",
+            "query-input": "required name=search_term_string"
+          },
+          "mainEntity": {
+            "@type": "ItemList",
+            "itemListElement": TOOLS.filter(tool => tool.id).map((tool, i) => ({
+              "@type": "ListItem",
+              "position": i + 1,
+              "name": t(tool.titleKey, tool.title),
+              "url": `https://pixel-normal-edit.web.app/?tool=${tool.id}`
+            }))
+          }
+        }}
+      />
 
       {/* ── Header ─────────────────────────────────── */}
       <header className="home-header" style={{

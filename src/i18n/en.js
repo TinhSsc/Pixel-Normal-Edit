@@ -704,6 +704,8 @@ export default {
   "home.benefit.uiDesc": "UI designed for users, no technical knowledge required.",
   "home.benefit.batch": "Batch processing",
   "home.benefit.batchDesc": "Process dozens of images at once, saving significant time.",
+  "home.benefit.ai": "AI Integration (MCP)",
+  "home.benefit.aiDesc": "Connect AI agents (Claude, Cursor, Windsurf) via the MCP protocol to draw directly on the canvas in real time.",
   "home.footer.blog": "Blog",
   "home.footer.careers": "Careers",
   "home.footer.press": "Press",

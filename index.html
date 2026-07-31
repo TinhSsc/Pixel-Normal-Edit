@@ -5,10 +5,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Pixel Normal Edit là công cụ vẽ và chỉnh sửa Pixel Art trực tuyến chuyên nghiệp. Hỗ trợ đa dạng kích thước tùy chỉnh, nén ảnh pixel, đổ màu gradient thông minh, và nhiều chức năng nâng cao dành cho Game Developer và Artist." />
-  <meta name="keywords" content="Pixel Normal Edit, Pixel Art, Pixel Editor, Vẽ Pixel, Tạo ảnh Pixel, Nén ảnh Pixel, Game Art, Pixel Art Maker, Công cụ vẽ Pixel, 8-bit, 16-bit, Pixel Art Online" />
   <meta name="author" content="Pixel Normal Edit" />
   <meta name="robots" content="index, follow" />
   <link rel="icon" type="image/svg+xml" href="/avatar.svg" />
+  <link rel="canonical" href="https://pixel-normal-edit.web.app/" />
+  <meta property="og:image" content="https://pixel-normal-edit.web.app/og-image.png" />
+  <meta property="twitter:image" content="https://pixel-normal-edit.web.app/og-image.png" />
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website" />
@@ -21,10 +23,92 @@
   <meta property="twitter:description" content="Công cụ tạo và chỉnh sửa Pixel Art miễn phí. Tích hợp đổ màu Gradient, xóa nền thông minh và tùy chỉnh kích thước đa dạng." />
 
   <title data-i18n="app.title">Pixel Normal Edit</title>
+
+  <!-- Per-route SEO: set meta instantly from ?tool= before React loads -->
+  <script>
+    (function () {
+      var SEO = {
+        home: {
+          title: "Công cụ xử lý ảnh số 1 | Pixel Normal Edit",
+          desc: "Nền tảng xử lý ảnh trực tiếp trên trình duyệt. Nhanh, riêng tư, và miễn phí."
+        },
+        convert: {
+          title: "Đổi định dạng ảnh (Convert) - Nhanh chóng, Miễn phí | Pixel Normal Edit",
+          desc: "Chuyển đổi định dạng hình ảnh WebP, PNG, JPG, GIF miễn phí và cực kỳ nhanh chóng."
+        },
+        compress: {
+          title: "Nén ảnh (Compress) giảm dung lượng trực tuyến | Pixel Normal Edit",
+          desc: "Công cụ nén giảm dung lượng ảnh JPG, PNG, WebP tối đa bằng cách tối ưu hóa chi tiết đồ họa. Hoàn toàn miễn phí."
+        },
+        resize: {
+          title: "Đổi kích thước ảnh (Resize), thay đổi phân giải | Pixel Normal Edit",
+          desc: "Công cụ phóng to, thu nhỏ ảnh (Resize), thay đổi độ phân giải Width, Height nhanh chóng trên mọi thiết bị."
+        },
+        crop: {
+          title: "Cắt ảnh trực tuyến (Crop Image) - Chuẩn xác, dễ dùng | Pixel Normal Edit",
+          desc: "Công cụ cắt ảnh (Crop) trực tuyến miễn phí. Hỗ trợ cắt tự do, cắt theo tỷ lệ 16:9, 1:1, 4:3 nhanh chóng."
+        },
+        rotate: {
+          title: "Xoay và Lật ảnh (Rotate & Flip) trực tuyến | Pixel Normal Edit",
+          desc: "Công cụ xoay ảnh 90 độ, 180 độ, lật ngang, lật dọc (Flip) nhanh chóng trực tiếp trên trình duyệt, không làm giảm chất lượng."
+        },
+        "frames-to-media": {
+          title: "Ghép ảnh thành GIF / Video, Đổi Video sang GIF | Pixel Normal Edit",
+          desc: "Ghép ảnh PNG, JPG, WebP thành GIF động hoặc WebM. Chuyển Video sang GIF và ngược lại. Hoàn toàn xử lý cục bộ trên trình duyệt."
+        },
+        "media-to-frames": {
+          title: "Tách GIF / Video thành ảnh | Pixel Normal Edit",
+          desc: "Tách từng frame của GIF hoặc Video (MP4, WebM) thành ảnh riêng biệt. Hiển thị dần dần, tải về ZIP. Hoàn toàn xử lý cục bộ trên trình duyệt."
+        },
+        "gif-simplify": {
+          title: "Đơn giản hóa GIF / Tua nhanh video | Pixel Normal Edit",
+          desc: "Giảm một nửa số frame để GIF nhẹ hơn, hoặc tua nhanh video bằng cách bỏ xen kẽ frame. Xử lý cục bộ trên trình duyệt."
+        }
+      };
+      try {
+        var tool = new URLSearchParams(window.location.search).get('tool');
+        var data = tool && SEO[tool];
+        if (data) {
+          var url = window.location.origin + window.location.pathname + window.location.search;
+          document.title = data.title;
+          document.querySelector('meta[name="description"]').setAttribute('content', data.desc);
+          var canonical = document.querySelector('link[rel="canonical"]');
+          if (canonical) canonical.setAttribute('href', url);
+          var ogTitle = document.querySelector('meta[property="og:title"]');
+          var ogDesc = document.querySelector('meta[property="og:description"]');
+          var twTitle = document.querySelector('meta[property="twitter:title"]');
+          var twDesc = document.querySelector('meta[property="twitter:description"]');
+          if (ogTitle) ogTitle.setAttribute('content', data.title);
+          if (ogDesc) ogDesc.setAttribute('content', data.desc);
+          if (twTitle) twTitle.setAttribute('content', data.title);
+          if (twDesc) twDesc.setAttribute('content', data.desc);
+          var ogUrl = document.querySelector('meta[property="og:url"]');
+          if (!ogUrl) {
+            ogUrl = document.createElement('meta');
+            ogUrl.setAttribute('property', 'og:url');
+            document.head.appendChild(ogUrl);
+          }
+          ogUrl.setAttribute('content', url);
+        }
+      } catch (e) {}
+    })();
+  </script>
   <link rel="stylesheet" href="/style.css" />
   <script src="https://unpkg.com/lucide@latest"></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="https://apis.google.com/js/api.js" async defer></script>
+  <script type="application/ld+json" id="seo-root-structured-data">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Pixel Normal Edit",
+      "url": "https://pixel-normal-edit.web.app/",
+      "description": "Trình chỉnh sửa và vẽ Pixel Art trực tuyến chuyên nghiệp, miễn phí, chạy hoàn toàn trên trình duyệt.",
+      "applicationCategory": "GraphicsApplication",
+      "operatingSystem": "Any",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "VND" }
+    }
+  </script>
   <script>
     // Tự động xoá dữ liệu bị lỗi một lần duy nhất trong phiên duyệt web
     if (!sessionStorage.getItem('ai_cleared_local_data_v1')) {
