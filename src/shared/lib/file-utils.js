@@ -7,8 +7,7 @@ import { FORMAT_REGISTRY } from '../image/format-registry.js';
  * Điều hướng đến tool khác
  */
 export function navigate(path) {
-  if (path === '') window.location.href = '/';
-  else window.location.href = `/?tool=${path}`;
+  window.location.href = `/?tool=${path}`;
 }
 
 /**

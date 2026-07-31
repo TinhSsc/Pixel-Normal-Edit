@@ -15,9 +15,8 @@ const GifSimplifyPage = lazy(() => import('../features/mini-tools/gif-simplify/G
 export default function ToolsApp() {
   const getRoute = () => {
     const params = new URLSearchParams(window.location.search);
-    if (params.has('tool')) return params.get('tool');
-    if (params.get('page') === 'tools') return window.location.hash.replace('#', '') || 'home';
-    return '';
+    if (params.has('tool') && params.get('tool') !== '') return params.get('tool');
+    return 'home';
   };
   const [route, setRoute] = useState(getRoute());
 

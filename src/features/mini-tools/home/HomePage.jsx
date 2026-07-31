@@ -192,8 +192,7 @@ export default function HomePage() {
   };
 
   const navigate = (path) => {
-    if (path === '') window.location.href = '/';
-    else window.location.href = `/?tool=${path}`;
+    window.location.href = `/?tool=${path}`;
   };
 
   const handleContactSubmit = (e) => {

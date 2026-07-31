@@ -4,10 +4,10 @@ import App from './App.jsx'
 import ToolsApp from './ToolsApp.jsx'
 
 const searchParams = new URLSearchParams(window.location.search);
-const isTools = searchParams.has('tool') || searchParams.get('page') === 'tools';
+const isEditor = searchParams.get('tool') === 'editor' || searchParams.get('page') === 'editor';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    {isTools ? <ToolsApp /> : <App />}
+    {isEditor ? <App /> : <ToolsApp />}
   </StrictMode>,
 )

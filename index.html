@@ -67,8 +67,9 @@
         }
       };
       try {
-        var tool = new URLSearchParams(window.location.search).get('tool');
-        var data = tool && SEO[tool];
+        var toolParam = new URLSearchParams(window.location.search).get('tool');
+        var tool = (toolParam && toolParam !== '') ? toolParam : 'home';
+        var data = SEO[tool];
         if (data) {
           var url = window.location.origin + window.location.pathname + window.location.search;
           document.title = data.title;

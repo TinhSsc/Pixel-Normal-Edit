@@ -94,7 +94,7 @@ export const TOOLS = [
     color: '#a855f7'
   },
   {
-    id: '',
+    id: 'editor',
     icon: ICONS.PEN_TOOL,
     titleKey: 'home.tool.editor',
     title: 'Pixel Editor',
