@@ -51,6 +51,7 @@ ui-debug.log
 .impeccable
 DOCS/*
 debug/*
+.agents
 scratch-skills2.txt
 
 # Temp files từ AI commands
