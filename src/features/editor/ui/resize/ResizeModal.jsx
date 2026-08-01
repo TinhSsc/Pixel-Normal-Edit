@@ -28,14 +28,19 @@ export default function ResizeModal() {
     const padding = 120;
     const containerW = containerRef.current.clientWidth - padding;
     const containerH = containerRef.current.clientHeight - padding;
+    if (containerW <= 0 || containerH <= 0) return;
 
-    // Tính toán scale sao cho hiển thị trọn vẹn cả khung mới và ảnh cũ, cộng thêm khoảng an toàn
+    // Tổng kích thước nội dung cần hiển thị: khung mới + ảnh cũ tại vị trí hiện tại
     const maxW = Math.max(newSize.w, oldSize.w, Math.abs(imgPos.x) + oldSize.w, newSize.w - imgPos.x);
     const maxH = Math.max(newSize.h, oldSize.h, Math.abs(imgPos.y) + oldSize.h, newSize.h - imgPos.y);
 
-    const scaleX = containerW / Math.max(maxW, newSize.w);
-    const scaleY = containerH / Math.max(maxH, newSize.h);
-    const scale = Math.max(1, Math.min(scaleX, scaleY));
+    const scaleX = containerW / maxW;
+    const scaleY = containerH / maxH;
+
+    // Không ép scale >= 1 (gây tràn màn hình khi ảnh to).
+    // Giới hạn trên để ảnh nhỏ không phóng đại quá mức cần thiết.
+    const MAX_SCALE = 64;
+    const scale = Math.min(Math.min(scaleX, scaleY), MAX_SCALE);
 
     setDisplayScale(scale);
   };

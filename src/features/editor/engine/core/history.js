@@ -75,10 +75,36 @@ export function pushLayerState(oldLayers, oldActiveIndex, newLayers, newActiveIn
   redoStack = [];
 }
 
+var resizeRestoreHandler = null;
+
+export function setResizeRestoreHandler(fn) {
+  resizeRestoreHandler = fn;
+}
+
+export function pushResizeHistory(oldSnapshot, newSnapshot) {
+  undoStack.push({
+    type: 'RESIZE',
+    oldSnapshot,
+    newSnapshot
+  });
+  redoStack = [];
+}
+
 export function undo(pixelMap_ignored, renderFn) {
   if (undoStack.length === 0) return false;
   const stroke = undoStack.pop();
   redoStack.push(stroke);
+  
+  if (stroke.type === 'RESIZE') {
+    const uStack = undoStack;
+    const rStack = redoStack;
+    if (resizeRestoreHandler) resizeRestoreHandler(stroke.oldSnapshot);
+    else renderFn();
+    setHistoryState({ undoStack: uStack, redoStack: rStack, currentStroke });
+    debounceExtractCanvasColors();
+    window.dispatchEvent(new Event('history-undone'));
+    return true;
+  }
   
   if (stroke.type === 'LAYER_STATE') {
     resetLayers(stroke.oldLayers, stroke.oldActiveIndex);
@@ -108,6 +134,16 @@ export function redo(pixelMap_ignored, renderFn) {
   if (redoStack.length === 0) return false;
   const stroke = redoStack.pop();
   undoStack.push(stroke);
+  
+  if (stroke.type === 'RESIZE') {
+    const uStack = undoStack;
+    const rStack = redoStack;
+    if (resizeRestoreHandler) resizeRestoreHandler(stroke.newSnapshot);
+    else renderFn();
+    setHistoryState({ undoStack: uStack, redoStack: rStack, currentStroke });
+    debounceExtractCanvasColors();
+    return true;
+  }
   
   if (stroke.type === 'LAYER_STATE') {
     resetLayers(stroke.newLayers, stroke.newActiveIndex);
