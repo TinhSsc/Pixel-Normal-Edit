@@ -8,6 +8,7 @@
  */
 import { useRef } from 'react';
 import { CanvasHelper } from './CanvasHelper';
+import { t } from '../../../i18n/i18n.js';
 
 export default function FileUploader({
   onFileLoad,      // Callback khi load thành công
@@ -74,8 +75,8 @@ export default function FileUploader({
       <input ref={fileInputRef} type="file" accept={accept} multiple={multiple} hidden
              onChange={(e) => handleFiles(e.target.files)} />
       <div className="upload-icon">📁</div>
-      <p className="upload-text">Kéo thả ảnh vào đây hoặc click để chọn</p>
-      <p className="upload-hint">Hỗ trợ: PNG, JPG, WebP, GIF, BMP, SVG, HEIC</p>
+      <p className="upload-text">{t('fileUploader.drop')}</p>
+      <p className="upload-hint">{t('fileUploader.support')}</p>
     </div>
   );
 }

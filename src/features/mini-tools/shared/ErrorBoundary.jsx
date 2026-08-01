@@ -4,6 +4,7 @@
  * - Cho phép thử lại
  */
 import { Component, useState, useEffect } from 'react';
+import { t } from '../../../i18n/i18n.js';
 
 /**
  * React class ErrorBoundary wrapper
@@ -50,9 +51,9 @@ export default function ErrorBoundary({ children, fallback }) {
     ) : (
       <div className="error-container">
         <div className="error-icon">⚠️</div>
-        <h3>Có lỗi xảy ra</h3>
+        <h3>{t('errorBoundary.title')}</h3>
         <p className="error-message">{error.message}</p>
-        <button className="btn" onClick={() => setError(null)}>Thử lại</button>
+        <button className="btn" onClick={() => setError(null)}>{t('errorBoundary.retry')}</button>
       </div>
     );
   }

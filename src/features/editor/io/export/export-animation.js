@@ -41,7 +41,7 @@ function drawFrameToCanvas(frame, canvasCtx, offsetX, offsetY, options = { trans
 export function generateSpriteSheetBlob(tab, options = { transparent: true }) {
   return new Promise((resolve, reject) => {
     if (!tab || !tab.animation || !tab.animation.frames || tab.animation.frames.length === 0) {
-      reject(new Error("Không có dữ liệu ảnh động để xuất."));
+      reject(new Error(t('exportAnim.noData')));
       return;
     }
 
@@ -74,7 +74,7 @@ export function exportSpriteSheet(tab, options = { transparent: true }) {
 
 export async function generateZipBlob(tab, options = { transparent: true }) {
   if (!tab || !tab.animation || !tab.animation.frames || tab.animation.frames.length === 0) {
-    throw new Error("Không có dữ liệu ảnh động để xuất.");
+    throw new Error(t('exportAnim.noData'));
   }
 
   const zip = new JSZip();
@@ -114,7 +114,7 @@ export function exportZip(tab, options = { transparent: true }) {
 export function exportAnimation(tab, format, options = { transparent: true }) {
   return new Promise((resolve, reject) => {
     if (!tab || !tab.animation || !tab.animation.frames || tab.animation.frames.length === 0) {
-      return reject(new Error("Không có dữ liệu ảnh động để xuất."));
+      return reject(new Error(t('exportAnim.noData')));
     }
 
     if (format === 'gif') {
@@ -148,10 +148,10 @@ export function exportAnimation(tab, format, options = { transparent: true }) {
           const buffer = gif.bytes();
           resolve(new Blob([buffer], { type: 'image/gif' }));
         } catch (err) {
-          reject(new Error("Lỗi khi tạo GIF: " + err.message));
+          reject(new Error(t('exportAnim.gifError', err.message)));
         }
       }).catch(err => {
-        reject(new Error("Lỗi khi tải thư viện GIF: " + err.message));
+        reject(new Error(t('exportAnim.loadGifLibError', err.message)));
       });
       return;
     }
@@ -199,7 +199,7 @@ export function exportAnimation(tab, format, options = { transparent: true }) {
 
       drawNext();
     } else {
-      reject(new Error("Định dạng không được hỗ trợ."));
+      reject(new Error(t('exportAnim.unsupportedFormat')));
     }
   });
 }

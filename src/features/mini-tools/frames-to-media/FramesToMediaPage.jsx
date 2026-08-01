@@ -103,10 +103,10 @@ export default function FramesToMediaPage() {
           const imageData = new ImageData(new Uint8ClampedArray(f.patch), f.dims.width, f.dims.height);
           ctx.putImageData(imageData, f.dims.left, f.dims.top);
           const dataUrl = await new Promise(r => canvas.toBlob(b => r(b ? URL.createObjectURL(b) : ''), 'image/png'));
-          if (!dataUrl) throw new Error('toBlob failed');
+          if (!dataUrl) throw new Error(t('error.toBlobFailed'));
           const img = await CanvasHelper.loadImage(dataUrl);
           setFrames(prev => [...prev, { name: `${file.name} #${i + 1}`, src: dataUrl, img, width: img.naturalWidth, height: img.naturalHeight }]);
-          setLoadProgress({ current: i + 1, total: rawFrames.length, label: `Đang tách frame từ "${file.name}"...` });
+          setLoadProgress({ current: i + 1, total: rawFrames.length, label: t('framesToMedia.extractingFrame', file.name) });
         } catch(err) {
           console.warn(`Lỗi tách GIF frame ${i}:`, err);
         }
@@ -133,7 +133,7 @@ export default function FramesToMediaPage() {
 
       const seekTo = (t) => new Promise((res, rej) => {
         const onSeeked = () => { cleanup(); res(); };
-        const onError = () => { cleanup(); rej(new Error('Không thể seek video')); };
+        const onError = () => { cleanup(); rej(new Error(t('error.videoSeek'))); };
         const cleanup = () => {
           video.removeEventListener('seeked', onSeeked);
           video.removeEventListener('error', onError);
@@ -168,10 +168,10 @@ export default function FramesToMediaPage() {
               if (Math.abs(video.currentTime - time) > 0.001) await seekTo(time);
               ctx.drawImage(video, 0, 0);
               const dataUrl = await new Promise(r => canvas.toBlob(b => r(b ? URL.createObjectURL(b) : ''), 'image/png'));
-              if (!dataUrl) throw new Error('toBlob failed');
+              if (!dataUrl) throw new Error(t('error.toBlobFailed'));
               const img = await CanvasHelper.loadImage(dataUrl);
               setFrames(prev => [...prev, { name: `${file.name} @${time.toFixed(2)}s`, src: dataUrl, img, width: img.naturalWidth, height: img.naturalHeight }]);
-              setLoadProgress({ current: i + 1, total: totalFrames, label: `Đang tách frame từ "${file.name}"...` });
+              setLoadProgress({ current: i + 1, total: totalFrames, label: t('framesToMedia.extractingFrame', file.name) });
             } catch(err) {
               console.warn(`Lỗi tách Video frame ${i}:`, err);
             }
@@ -186,7 +186,7 @@ export default function FramesToMediaPage() {
       };
       video.onerror = () => {
         URL.revokeObjectURL(url);
-        reject(new Error('Không đọc được video'));
+        reject(new Error(t('error.videoRead')));
       };
     });
   };
@@ -353,8 +353,8 @@ export default function FramesToMediaPage() {
   return (
     <div style={{ background: '#0B0F16', minHeight: '100vh', display: 'block', overflowY: 'auto', color: '#F5F7FA', fontFamily: 'Inter, sans-serif' }}>
       <SEOHeader
-        title="Ghép ảnh thành GIF / Video, Đổi Video sang GIF | Pixel Normal Edit"
-        description="Ghép ảnh PNG, JPG, WebP thành GIF động hoặc WebM. Chuyển Video sang GIF và ngược lại. Hoàn toàn xử lý cục bộ trên trình duyệt."
+        title={t('framesToMedia.seo.title')}
+        description={t('framesToMedia.seo.desc')}
         schema={{ applicationCategory: 'UtilitiesApplication' }}
       />
 
@@ -364,10 +364,10 @@ export default function FramesToMediaPage() {
         </div>
         <div style={{ display: 'flex', gap: '12px' }}>
           <button onClick={() => navigate('home')} className="interact-btn" style={{ background: 'transparent', color: '#B8C0CC', border: 'none', padding: '8px 16px', borderRadius: '6px', fontWeight: 500, cursor: 'pointer', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <LucideIcon name="arrow-left" width="16" height="16" /> Trang chủ
+            <LucideIcon name="arrow-left" width="16" height="16" /> {t('home.nav.home')}
           </button>
           <button onClick={() => window.location.href = '/'} className="interact-btn" style={{ background: '#3b82f6', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '6px', fontWeight: 600, cursor: 'pointer', fontSize: '14px' }}>
-            Pixel Editor
+            {t('framesToMedia.nav.editor')}
           </button>
         </div>
       </header>
@@ -378,13 +378,13 @@ export default function FramesToMediaPage() {
         <div className="anim-fade-in" style={{ textAlign: 'center', marginBottom: '40px' }}>
           <div style={{ display: 'inline-block', padding: '6px 14px', background: `rgba(245,158,11,0.12)`, color: ACCENT, borderRadius: '20px', fontSize: '13px', fontWeight: 600, marginBottom: '16px' }}>
             <LucideIcon name="film" width="14" height="14" style={{ marginRight: '6px', verticalAlign: 'text-bottom' }} />
-            Ghép ảnh thành GIF / Video · Đổi Video ↔ GIF
+            {t('framesToMedia.heading')}
           </div>
           <h2 style={{ fontSize: '34px', fontWeight: 800, color: '#F5F7FA', margin: '0 0 14px 0', letterSpacing: '-0.02em' }}>
-            Tạo GIF hoặc WebM từ ảnh, GIF, Video
+            {t('framesToMedia.title')}
           </h2>
           <p style={{ fontSize: '16px', color: '#B8C0CC', lineHeight: 1.6, maxWidth: '560px', margin: '0 auto' }}>
-            Upload ảnh, kéo thả GIF hoặc Video — tool tự tách frame, bạn sắp xếp thứ tự, chọn FPS rồi xuất GIF hoặc WebM.
+            {t('framesToMedia.desc')}
           </p>
         </div>
 
@@ -414,15 +414,15 @@ export default function FramesToMediaPage() {
                   <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: `rgba(245,158,11,0.12)`, color: ACCENT, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <LucideIcon name="images" width="28" height="28" />
                   </div>
-                  <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#F5F7FA', margin: 0 }}>Kéo thả ảnh, GIF hoặc Video vào đây</h3>
-                  <p style={{ fontSize: '14px', color: '#8B949E', margin: 0 }}>Chọn nhiều ảnh, hoặc kéo 1 file GIF / MP4 / WebM để tự tách frame</p>
+                  <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#F5F7FA', margin: 0 }}>{t('framesToMedia.drop.title')}</h3>
+                  <p style={{ fontSize: '14px', color: '#8B949E', margin: 0 }}>{t('framesToMedia.drop.desc')}</p>
                   <button className="interact-btn" style={{ background: ACCENT, color: '#000', border: 'none', padding: '10px 22px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', fontSize: '14px' }}>
-                    Chọn file
+                    {t('framesToMedia.drop.button')}
                   </button>
                 </>
               ) : (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: ACCENT, fontWeight: 600, fontSize: '14px' }}>
-                  <LucideIcon name="plus-circle" width="18" height="18" /> Thêm ảnh / GIF / Video nữa (kéo thả hoặc click)
+                  <LucideIcon name="plus-circle" width="18" height="18" /> {t('framesToMedia.addMore')}
                 </div>
               )}
             </div>
@@ -431,7 +431,7 @@ export default function FramesToMediaPage() {
             {loadProgress && (
               <div style={{ background: '#161B22', border: '1px solid rgba(245,158,11,0.2)', borderRadius: '12px', padding: '14px 18px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '13px' }}>
-                  <span style={{ color: ACCENT, fontWeight: 600 }}>{loadProgress.label || 'Đang tải...'}</span>
+                  <span style={{ color: ACCENT, fontWeight: 600 }}>{loadProgress.label || t('framesToMedia.loading')}</span>
                   <span style={{ color: '#8B949E' }}>{loadProgress.current}/{loadProgress.total}</span>
                 </div>
                 <div style={{ background: '#0B0F16', borderRadius: '6px', height: '6px', overflow: 'hidden' }}>
@@ -444,20 +444,20 @@ export default function FramesToMediaPage() {
             {frames.length > 0 && (
               <div style={{ background: '#161B22', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '20px', overflow: 'hidden' }}>
                 <div style={{ padding: '14px 18px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontWeight: 600, color: '#F5F7FA' }}>Frames ({frames.length})</span>
+                  <span style={{ fontWeight: 600, color: '#F5F7FA' }}>{t('framesToMedia.frames')} ({frames.length})</span>
                   <div style={{ display: 'flex', gap: '8px' }}>
                     <button onClick={startPreview} className="interact-btn" style={{ background: `rgba(245,158,11,0.1)`, color: ACCENT, border: 'none', padding: '5px 12px', borderRadius: '6px', fontWeight: 600, cursor: 'pointer', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                      <LucideIcon name="play" width="12" height="12" /> Preview
+                      <LucideIcon name="play" width="12" height="12" /> {t('framesToMedia.preview')}
                     </button>
                     <button onClick={stopPreview} className="interact-btn" style={{ background: 'transparent', color: '#8B949E', border: '1px solid rgba(255,255,255,0.1)', padding: '5px 12px', borderRadius: '6px', fontWeight: 600, cursor: 'pointer', fontSize: '12px' }}>
-                      Stop
+                      {t('framesToMedia.stop')}
                     </button>
                     <button onClick={() => {
                       // Revoke all frame blob URLs
                       frames.forEach(f => { if (f.src) URL.revokeObjectURL(f.src); });
                       setFrames([]);
                     }} style={{ background: 'transparent', color: '#ef4444', border: 'none', padding: '5px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px' }}>
-                      Xóa tất cả
+                      {t('framesToMedia.clearAll')}
                     </button>
                   </div>
                 </div>
@@ -507,7 +507,7 @@ export default function FramesToMediaPage() {
               {intervalRef.current && (
                 <div className="anim-fade-in" style={{ background: '#161B22', borderRadius: '16px', overflow: 'hidden', border: `1px solid rgba(245,158,11,0.2)` }}>
                   <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.05)', fontSize: '13px', color: ACCENT, fontWeight: 600 }}>
-                    Preview ({fps} FPS)
+                    {t('framesToMedia.preview')} ({fps} FPS)
                   </div>
                   <div style={{ padding: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0B0F16', minHeight: '160px' }}>
                     <img src={frames[previewIndex]?.src} style={{ maxWidth: '100%', maxHeight: '200px', objectFit: 'contain', borderRadius: '6px' }} />
@@ -517,15 +517,15 @@ export default function FramesToMediaPage() {
 
               {/* Settings */}
               <div style={{ background: '#161B22', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '20px', padding: '22px' }}>
-                <div style={{ fontSize: '14px', fontWeight: 700, color: '#F5F7FA', marginBottom: '18px' }}>Thiết lập</div>
+                <div style={{ fontSize: '14px', fontWeight: 700, color: '#F5F7FA', marginBottom: '18px' }}>{t('framesToMedia.settings')}</div>
 
                 {/* Output type */}
                 <div style={{ marginBottom: '18px' }}>
-                  <div style={{ fontSize: '12px', color: '#8B949E', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>Định dạng đầu ra</div>
+                  <div style={{ fontSize: '12px', color: '#8B949E', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>{t('framesToMedia.outputFormat')}</div>
                   <div style={{ display: 'flex', gap: '8px', background: '#0B0F16', padding: '5px', borderRadius: '10px' }}>
                     {['gif', 'webm'].map(type => (
                       <button key={type} onClick={() => setOutputType(type)} style={{ flex: 1, padding: '9px', borderRadius: '7px', border: 'none', fontWeight: 700, fontSize: '13px', cursor: 'pointer', background: outputType === type ? ACCENT : 'transparent', color: outputType === type ? '#000' : '#8B949E', transition: 'all 0.2s' }}>
-                        {type === 'gif' ? 'GIF' : 'WebM Video'}
+                        {type === 'gif' ? 'GIF' : t('framesToMedia.webmVideo')}
                       </button>
                     ))}
                   </div>
@@ -534,18 +534,18 @@ export default function FramesToMediaPage() {
                 {/* FPS */}
                 <div style={{ marginBottom: '18px' }}>
                   <div style={{ fontSize: '12px', color: '#8B949E', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px', display: 'flex', justifyContent: 'space-between' }}>
-                    <span>FPS</span><span style={{ color: ACCENT }}>{fps}</span>
+                    <span>{t('framesToMedia.fps')}</span><span style={{ color: ACCENT }}>{fps}</span>
                   </div>
                   <input type="range" min="1" max="30" value={fps} onChange={e => setFps(Number(e.target.value))} style={{ width: '100%', accentColor: ACCENT }} />
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#4b5563', marginTop: '3px' }}>
-                    <span>1 (chậm)</span><span>30 (mượt)</span>
+                    <span>{t('framesToMedia.fpsSlow')}</span><span>{t('framesToMedia.fpsSmooth')}</span>
                   </div>
                 </div>
 
                 {/* Max dimension */}
                 <div style={{ marginBottom: '18px' }}>
                   <div style={{ fontSize: '12px', color: '#8B949E', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px', display: 'flex', justifyContent: 'space-between' }}>
-                    <span>Kích thước tối đa</span><span style={{ color: ACCENT }}>{maxDim}px</span>
+                    <span>{t('framesToMedia.maxSize')}</span><span style={{ color: ACCENT }}>{maxDim}px</span>
                   </div>
                   <input type="range" min="128" max="1920" step="64" value={maxDim} onChange={e => setMaxDim(Number(e.target.value))} style={{ width: '100%', accentColor: ACCENT }} />
                 </div>
@@ -554,10 +554,10 @@ export default function FramesToMediaPage() {
                 {lastSourceType === 'video' && (
                   <div style={{ marginBottom: '18px' }}>
                     <div style={{ fontSize: '12px', color: '#8B949E', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px', display: 'flex', justifyContent: 'space-between' }}>
-                      <span>FPS tách video</span><span style={{ color: ACCENT }}>{videoFps}</span>
+                      <span>{t('framesToMedia.videoExtractFps')}</span><span style={{ color: ACCENT }}>{videoFps}</span>
                     </div>
                     <input type="range" min="1" max="30" value={videoFps} onChange={e => setVideoFps(Number(e.target.value))} style={{ width: '100%', accentColor: ACCENT }} />
-                    <div style={{ fontSize: '11px', color: '#4b5563', marginTop: '3px' }}>Áp dụng cho video thêm vào lần sau</div>
+                    <div style={{ fontSize: '11px', color: '#4b5563', marginTop: '3px' }}>{t('framesToMedia.videoApplyToNext')}</div>
                   </div>
                 )}
 
@@ -565,10 +565,10 @@ export default function FramesToMediaPage() {
                 {outputType === 'gif' && (
                   <div style={{ marginBottom: '18px' }}>
                     <div style={{ fontSize: '12px', color: '#8B949E', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px', display: 'flex', justifyContent: 'space-between' }}>
-                      <span>Chất lượng GIF</span><span style={{ color: ACCENT }}>{gifQuality <= 5 ? 'Tốt' : gifQuality <= 15 ? 'Vừa' : 'Nhanh'}</span>
+                      <span>{t('framesToMedia.gifQuality')}</span><span style={{ color: ACCENT }}>{gifQuality <= 5 ? t('gifSimplify.good') : gifQuality <= 15 ? t('gifSimplify.medium') : t('gifSimplify.fast')}</span>
                     </div>
                     <input type="range" min="1" max="30" value={gifQuality} onChange={e => setGifQuality(Number(e.target.value))} style={{ width: '100%', accentColor: ACCENT }} />
-                    <div style={{ fontSize: '11px', color: '#4b5563', marginTop: '3px' }}>Số càng nhỏ = chất lượng cao hơn nhưng render lâu hơn</div>
+                    <div style={{ fontSize: '11px', color: '#4b5563', marginTop: '3px' }}>{t('framesToMedia.gifQualityHint')}</div>
                   </div>
                 )}
 
@@ -576,14 +576,14 @@ export default function FramesToMediaPage() {
                 <button onClick={handleRender} disabled={rendering || frames.length < 2} className="interact-btn"
                   style={{ width: '100%', background: rendering ? '#374151' : ACCENT, color: rendering ? '#9ca3af' : '#000', border: 'none', padding: '14px', borderRadius: '12px', fontWeight: 700, cursor: rendering ? 'not-allowed' : 'pointer', fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                   <LucideIcon name={rendering ? 'loader' : 'film'} width="18" height="18" className={rendering ? 'spin' : ''} />
-                  {rendering ? `Đang tạo ${outputType.toUpperCase()}...` : `Tạo ${outputType.toUpperCase()}`}
+                  {rendering ? t('framesToMedia.creating', outputType.toUpperCase()) : t('framesToMedia.createBtn', outputType.toUpperCase())}
                 </button>
 
                 {/* Render progress */}
                 {rendering && renderProgress !== null && (
                   <div style={{ marginTop: '12px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#8B949E', marginBottom: '6px' }}>
-                      <span>Đang xử lý...</span><span style={{ color: ACCENT }}>{renderProgress}%</span>
+                      <span>{t('framesToMedia.processing')}</span><span style={{ color: ACCENT }}>{renderProgress}%</span>
                     </div>
                     <div style={{ background: '#0B0F16', borderRadius: '6px', height: '6px' }}>
                       <div style={{ background: ACCENT, height: '100%', width: `${renderProgress}%`, borderRadius: '6px', transition: 'width 0.2s' }} />
@@ -597,7 +597,7 @@ export default function FramesToMediaPage() {
                 <div className="anim-fade-in" style={{ background: '#161B22', border: `1px solid rgba(245,158,11,0.3)`, borderRadius: '20px', overflow: 'hidden' }}>
                   <div style={{ padding: '14px 18px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <LucideIcon name="check-circle" width="16" height="16" style={{ color: '#10b981' }} />
-                    <span style={{ fontWeight: 600, color: '#10b981', fontSize: '14px' }}>Hoàn thành!</span>
+                    <span style={{ fontWeight: 600, color: '#10b981', fontSize: '14px' }}>{t('framesToMedia.done')}</span>
                     <span style={{ color: '#8B949E', fontSize: '12px', marginLeft: 'auto' }}>
                       {resultBlob && CanvasHelper.formatFileSize(resultBlob.size)}
                     </span>

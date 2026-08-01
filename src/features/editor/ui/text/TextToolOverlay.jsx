@@ -202,7 +202,7 @@ export default function TextToolOverlay() {
 
           <div 
             onPointerDown={(e) => handlePointerDown(e, 'move')}
-            title="Kéo để di chuyển"
+            title={t('textTool.moveHint')}
             style={{ padding: '0 8px', cursor: 'move', display: 'flex', alignItems: 'center', height: '100%' }}
             onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
             onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}

@@ -1,6 +1,8 @@
 /**
  * Helper xử lý Canvas dùng chung cho Convert, Resize, Compress
  */
+import { t } from '../../../i18n/i18n.js';
+
 export const CanvasHelper = {
   /**
    * Load ảnh từ URL
@@ -9,7 +11,7 @@ export const CanvasHelper = {
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.onload = () => resolve(img);
-      img.onerror = () => reject(new Error('Không thể đọc file ảnh'));
+      img.onerror = () => reject(new Error(t('canvasHelper.readError')));
       img.src = src;
     });
   },

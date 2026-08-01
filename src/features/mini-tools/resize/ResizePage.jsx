@@ -53,7 +53,7 @@ export default function ResizePage() {
         validateFile(file);
         const advanced = isFileAdvanced(file);
         if (advanced && !advancedMode) {
-          warns.push(`File "${file.name}" yêu cầu bật Chế độ Nâng cao để đọc.`);
+          warns.push(t('convert.error.needAdvanced', file.name));
           continue;
         }
         let src = URL.createObjectURL(file);
@@ -63,7 +63,7 @@ export default function ResizePage() {
         }
         const img = await CanvasHelper.loadImage(src);
         if (img.naturalWidth > 8192 || img.naturalHeight > 8192) {
-          warns.push(`Cảnh báo: "${file.name}" rất lớn (${img.naturalWidth}x${img.naturalHeight}), có thể gây chậm.`);
+          warns.push(t('convert.warning.largeImage', file.name, img.naturalWidth, img.naturalHeight));
         }
         newItems.push({ name: file.name, size: file.size, img, src, canvas: null, resultSrc: null, origW: img.naturalWidth, origH: img.naturalHeight });
       } catch (err) {
@@ -111,7 +111,7 @@ export default function ResizePage() {
       }));
       setFilesData(updated);
     } catch (err) {
-      setError('Lỗi khi resize: ' + err.message);
+      setError(t('resizePage.error.resize', err.message));
     }
     setIsResizing(false);
   };
@@ -170,7 +170,7 @@ export default function ResizePage() {
             <LucideIcon name={ICONS.ARROW_LEFT || "arrow-left"} width="16" height="16" /> {t('home.nav.home', 'Trang chủ')}
           </button>
           <button onClick={() => window.location.href = '/'} className="interact-btn" style={{ background: '#3b82f6', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '6px', fontWeight: 600, cursor: 'pointer', fontSize: '14px' }}>
-            Pixel Editor
+            {t('resizePage.nav.editor')}
           </button>
         </div>
       </header>
@@ -182,9 +182,9 @@ export default function ResizePage() {
             <LucideIcon name="maximize" width="14" height="14" style={{ marginRight: '6px', verticalAlign: 'text-bottom' }} />
             {t('mini_tools.resize.title', 'Resize kích thước')}
           </div>
-          <h2 style={{ fontSize: '36px', fontWeight: 800, color: '#F5F7FA', margin: '0 0 16px 0', letterSpacing: '-0.02em' }}>Đổi kích thước ảnh hàng loạt</h2>
+          <h2 style={{ fontSize: '36px', fontWeight: 800, color: '#F5F7FA', margin: '0 0 16px 0', letterSpacing: '-0.02em' }}>{t('resizePage.title')}</h2>
           <p style={{ fontSize: '16px', color: '#B8C0CC', lineHeight: 1.6, maxWidth: '600px', margin: '0 auto' }}>
-            Resize nhiều ảnh cùng lúc với cùng một kích thước. Xuất file ZIP khi chọn nhiều ảnh.
+            {t('resizePage.desc')}
           </p>
         </div>
 
@@ -198,7 +198,7 @@ export default function ResizePage() {
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
           <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', background: advancedMode ? 'rgba(236,72,153,0.1)' : '#161B22', padding: '8px 16px', borderRadius: '20px', border: advancedMode ? '1px solid rgba(236,72,153,0.3)' : '1px solid rgba(255,255,255,0.1)', transition: 'all 0.2s' }}>
             <input type="checkbox" checked={advancedMode} onChange={(e) => setAdvancedMode(e.target.checked)} style={{ width: '16px', height: '16px', accentColor: ACCENT, cursor: 'pointer' }} />
-            <span style={{ fontSize: '13px', fontWeight: 600, color: advancedMode ? ACCENT : '#8B949E' }}>Chế độ Nâng cao (TIFF, HEIC, RAW...)</span>
+            <span style={{ fontSize: '13px', fontWeight: 600, color: advancedMode ? ACCENT : '#8B949E' }}>{t('resizePage.advancedMode')}</span>
           </label>
         </div>
 
@@ -215,10 +215,10 @@ export default function ResizePage() {
             <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: `rgba(236,72,153,0.1)`, color: ACCENT, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '24px' }}>
               <LucideIcon name={ICONS.UPLOAD || "upload"} width="32" height="32" />
             </div>
-            <h3 style={{ fontSize: '20px', fontWeight: 600, color: '#F5F7FA', margin: '0 0 12px 0' }}>Kéo thả ảnh vào đây</h3>
-            <p style={{ fontSize: '15px', color: '#8B949E', margin: '0 0 24px 0' }}>Chọn nhiều ảnh cùng lúc để resize hàng loạt</p>
+            <h3 style={{ fontSize: '20px', fontWeight: 600, color: '#F5F7FA', margin: '0 0 12px 0' }}>{t('resizePage.drop.title')}</h3>
+            <p style={{ fontSize: '15px', color: '#8B949E', margin: '0 0 24px 0' }}>{t('resizePage.drop.desc')}</p>
             <button className="interact-btn" style={{ background: ACCENT, color: '#fff', border: 'none', padding: '12px 24px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', fontSize: '15px' }}>
-              Chọn ảnh
+              {t('resizePage.drop.button')}
             </button>
           </div>
         ) : (
@@ -228,11 +228,11 @@ export default function ResizePage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div style={{ background: '#161B22', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', overflow: 'hidden' }}>
                 <div style={{ padding: '16px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ fontWeight: 600, color: '#F5F7FA', fontSize: '15px' }}>Danh sách ảnh ({filesData.length})</div>
+                  <div style={{ fontWeight: 600, color: '#F5F7FA', fontSize: '15px' }}>{t('resizePage.fileList', filesData.length)}</div>
                   <div>
                     <input ref={fileInputRef} type="file" multiple accept="image/*" hidden onChange={(e) => handleFiles(e.target.files)} />
                     <button onClick={() => fileInputRef.current.click()} className="interact-btn" style={{ background: `rgba(236,72,153,0.1)`, color: ACCENT, border: 'none', padding: '6px 12px', borderRadius: '6px', fontWeight: 600, cursor: 'pointer', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <LucideIcon name="plus" width="14" height="14" /> Thêm ảnh
+                      <LucideIcon name="plus" width="14" height="14" /> {t('resizePage.addMore')}
                     </button>
                   </div>
                 </div>
@@ -255,7 +255,7 @@ export default function ResizePage() {
               </div>
 
               <button onClick={clearAll} className="interact-btn" style={{ background: 'transparent', color: '#ef4444', border: '1px solid rgba(239,68,68,0.3)', padding: '10px', borderRadius: '8px', fontWeight: 500, cursor: 'pointer', fontSize: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                <LucideIcon name="trash-2" width="16" height="16" /> Xóa toàn bộ
+                <LucideIcon name="trash-2" width="16" height="16" /> {t('resizePage.clearAll')}
               </button>
             </div>
 
@@ -265,7 +265,7 @@ export default function ResizePage() {
 
                 <div style={{ display: 'flex', gap: '16px', marginBottom: '20px' }}>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: '14px', fontWeight: 600, color: '#B8C0CC', marginBottom: '8px' }}>Chiều Rộng (W)</div>
+                    <div style={{ fontSize: '14px', fontWeight: 600, color: '#B8C0CC', marginBottom: '8px' }}>{t('resizePage.width')}</div>
                     <input type="number" min="1" value={width} onChange={(e) => handleWidthChange(Number(e.target.value))}
                       style={{ width: '100%', padding: '12px 16px', background: '#0B0F16', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: '#F5F7FA', outline: 'none', fontSize: '15px' }} />
                   </div>
@@ -275,14 +275,14 @@ export default function ResizePage() {
                     </button>
                   </div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: '14px', fontWeight: 600, color: '#B8C0CC', marginBottom: '8px' }}>Chiều Cao (H)</div>
+                    <div style={{ fontSize: '14px', fontWeight: 600, color: '#B8C0CC', marginBottom: '8px' }}>{t('resizePage.height')}</div>
                     <input type="number" min="1" value={height} onChange={(e) => handleHeightChange(Number(e.target.value))}
                       style={{ width: '100%', padding: '12px 16px', background: '#0B0F16', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: '#F5F7FA', outline: 'none', fontSize: '15px' }} />
                   </div>
                 </div>
 
                 <div style={{ marginBottom: '24px' }}>
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: '#B8C0CC', marginBottom: '12px' }}>Kích thước chuẩn</div>
+                  <div style={{ fontSize: '14px', fontWeight: 600, color: '#B8C0CC', marginBottom: '12px' }}>{t('resizePage.preset')}</div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '8px' }}>
                     {PRESETS.map(p => (
                       <button key={p.label} onClick={() => handlePreset(p)} className="interact-btn"
@@ -298,13 +298,13 @@ export default function ResizePage() {
                 <button onClick={handleResize} disabled={isResizing} className="interact-btn"
                   style={{ width: '100%', background: isResizing ? '#374151' : ACCENT, color: '#fff', border: 'none', padding: '14px', borderRadius: '12px', fontWeight: 600, cursor: isResizing ? 'not-allowed' : 'pointer', fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                   <LucideIcon name="maximize" width="18" height="18" />
-                  {isResizing ? 'Đang xử lý...' : `Resize ${filesData.length} ảnh → ${width}×${height}`}
+                  {isResizing ? t('resizePage.processing') : t('resizePage.resizeBtn', filesData.length, width, height)}
                 </button>
               </div>
 
               {hasResults && (
                 <div className="anim-fade-in" style={{ background: '#161B22', border: `1px solid rgba(236,72,153,0.3)`, borderRadius: '20px', padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: ACCENT }}>Tùy chọn tải về</div>
+                  <div style={{ fontSize: '14px', fontWeight: 600, color: ACCENT }}>{t('resizePage.downloadOptions')}</div>
                   
                   <div style={{ display: 'flex', gap: '8px', background: '#0B0F16', padding: '6px', borderRadius: '12px' }}>
                     {['image/png', 'image/jpeg', 'image/webp'].map(f => (
@@ -317,7 +317,7 @@ export default function ResizePage() {
                   {format !== 'image/png' && (
                     <div>
                       <div style={{ fontSize: '13px', color: '#B8C0CC', marginBottom: '8px', display: 'flex', justifyContent: 'space-between' }}>
-                        <span>Chất lượng</span><span style={{ color: ACCENT }}>{Math.round(quality * 100)}%</span>
+                        <span>{t('resizePage.quality')}</span><span style={{ color: ACCENT }}>{Math.round(quality * 100)}%</span>
                       </div>
                       <input type="range" min="0.1" max="1" step="0.05" value={quality} onChange={(e) => setQuality(Number(e.target.value))} style={{ width: '100%', accentColor: ACCENT }} />
                     </div>
@@ -325,7 +325,7 @@ export default function ResizePage() {
 
                   <button onClick={handleDownload} className="interact-btn anim-pulse" style={{ width: '100%', background: '#3b82f6', color: '#fff', border: 'none', padding: '12px', borderRadius: '12px', fontWeight: 600, cursor: 'pointer', fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                     <LucideIcon name="download" width="18" height="18" />
-                    {filesData.filter(f => f.canvas).length > 1 ? 'Tải file ZIP' : 'Tải về'}
+                    {filesData.filter(f => f.canvas).length > 1 ? t('convert.controls.downloadZip') : t('framesToMedia.download')}
                   </button>
                 </div>
               )}

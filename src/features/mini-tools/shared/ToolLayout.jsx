@@ -4,6 +4,8 @@
  * - Content: upload area + preview + controls
  * - Footer: actions (download, reset)
  */
+import { t } from '../../../i18n/i18n.js';
+
 export default function ToolLayout({
   title,           // Tiêu đề trang
   icon,            // Icon trang (emoji)
@@ -15,13 +17,13 @@ export default function ToolLayout({
   return (
     <div className="mini-tools-layout">
       <header className="mini-tools-header">
-        <button className="btn btn-icon" onClick={onBack} title="Về trang chủ">
+        <button className="btn btn-icon" onClick={onBack} title={t('toolLayout.backHome')}>
           ←
         </button>
         <h1>{icon} {title}</h1>
         <div className="header-spacer" />
         <button className="btn btn-outline" onClick={onNavigateEditor}>
-          🎨 Editor
+          {t('toolLayout.editor')}
         </button>
       </header>
 

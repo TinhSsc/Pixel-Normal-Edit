@@ -329,8 +329,8 @@ export default function GlobalSettingsModal() {
                     window.location.reload();
                   }}
                   options={[
-                    { value: 'vi', label: 'Tiếng Việt' },
-                    { value: 'en', label: 'English' }
+                    { value: 'vi', label: t('settings.langVietnamese') },
+                    { value: 'en', label: t('settings.langEnglish') }
                   ]}
                 />
               </div>

@@ -6,6 +6,7 @@ import { setAnimationState, loadFrameToCurrentState } from '../../engine/core/an
 import { debouncedSaveWorkspace } from '../../engine/core/tab-manager.js';
 import JSZip from 'jszip';
 import { parseGIF, decompressFrames } from 'gifuct-js';
+import { t } from '../../../../i18n/i18n.js';
 
 export async function handleZipFile(file) {
   try {
@@ -18,7 +19,7 @@ export async function handleZipFile(file) {
       .sort();
 
     if (pngFiles.length === 0) {
-      throw new Error("Không tìm thấy file .png nào trong ZIP.");
+      throw new Error(t('uploadAnim.noPngInZip'));
     }
 
     let frameWidth = 0, frameHeight = 0;
@@ -181,7 +182,7 @@ export async function handleGifFile(file) {
     const rawFrames = decompressFrames(gif, true);
 
     if (rawFrames.length > 10 || (gif.lsd.width * gif.lsd.height > 1000000)) {
-      alert("Cảnh báo: GIF lớn hoặc nhiều frame có thể làm đơ trình duyệt. Tiếp tục xử lý...");
+      alert(t('uploadAnim.gifWarning'));
     }
 
     const frames = [];
@@ -244,11 +245,11 @@ export async function handleGifFile(file) {
 
 export async function handleVideoFile(file) {
   try {
-    const fpsStr = prompt("Nhập số khung hình trên giây (FPS) muốn tách:", "10");
+    const fpsStr = prompt(t('uploadAnim.promptFps'), "10");
     if (fpsStr === null) return;
     const fps = parseFloat(fpsStr);
     if (isNaN(fps) || fps <= 0) {
-      alert("FPS không hợp lệ.");
+      alert(t('uploadAnim.invalidFps'));
       return;
     }
 
@@ -276,7 +277,7 @@ export async function handleVideoFile(file) {
     const totalFrames = Math.floor(duration * fps);
 
     if (totalFrames > 10 || (videoWidth * videoHeight > 1000000)) {
-      alert("Cảnh báo: Video lớn hoặc nhiều frame có thể làm đơ trình duyệt. Tiếp tục xử lý...");
+      alert(t('uploadAnim.videoWarning'));
     }
 
     const frames = [];

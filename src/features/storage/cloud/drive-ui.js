@@ -469,7 +469,7 @@ export async function exportToDrive(tab, format) {
     blob = generateWorkspaceJsonBlob(tab);
     ext = 'json';
   } else {
-    throw new Error('Unsupported format');
+    throw new Error(t('driveUi.unsupportedFormat'));
   }
 
   const fileName = `${tab.name || 'pixel-art'}.${ext}`;

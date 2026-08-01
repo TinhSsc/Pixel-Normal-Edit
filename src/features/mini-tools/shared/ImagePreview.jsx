@@ -4,6 +4,7 @@
  */
 import { useState } from 'react';
 import { CanvasHelper } from './CanvasHelper';
+import { t } from '../../../i18n/i18n.js';
 
 export default function ImagePreview({
   imageSrc,          // URL ảnh gốc
@@ -17,12 +18,12 @@ export default function ImagePreview({
 
   return (
     <div className={`preview-container ${className}`}>
-      {loading && <div className="preview-loading">Đang tải ảnh...</div>}
+      {loading && <div className="preview-loading">{t('imagePreview.loading')}</div>}
 
       <div className="preview-image-wrapper">
         <img
           src={processedSrc || imageSrc}
-          alt="Preview"
+          alt={t('imagePreview.alt')}
           className="preview-image"
           onLoad={() => { setLoading(false); if (onImageLoad) onImageLoad(); }}
           onError={() => setLoading(false)}

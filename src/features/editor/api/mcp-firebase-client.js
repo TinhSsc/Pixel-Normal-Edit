@@ -1,5 +1,6 @@
 import { collection, query, where, onSnapshot, updateDoc, deleteDoc, doc, getDocs, setDoc } from 'firebase/firestore';
 import { db } from '../../auth/logic/firebase/config';
+import { t } from '../../../i18n/i18n.js';
 
 // ── Security: whitelist of allowed actions ─────────────────────────────────
 const ALLOWED_ACTIONS = new Set([
@@ -117,14 +118,14 @@ class MCPFirebaseClient {
 
           if (commandData.data && Array.isArray(commandData.data)) {
             if (commandData.data.length > 256 || (commandData.data[0] || '').length > 256)
-              throw new Error('Sprite/data too large (max 256×256)');
+              throw new Error(t('mcpFirebase.spriteTooLarge'));
           }
 
           // ── Execute ───────────────────────────────────────────────
           let result = null;
           if (this.commandBus && typeof this.commandBus.execute === 'function') {
             window.dispatchEvent(new CustomEvent('ai-connection-status', {
-              detail: { type: 'connected', text: 'Trạng thái: đã kết nối mcp', sessionId: this.sessionId }
+              detail: { type: 'connected', text: t('mcpFirebase.connected'), sessionId: this.sessionId }
             }));
             result = await this.commandBus.execute(commandData);
           } else {

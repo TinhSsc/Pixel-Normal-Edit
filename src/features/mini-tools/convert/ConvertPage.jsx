@@ -39,12 +39,12 @@ export default function ConvertPage() {
       for (const file of Array.from(files)) {
         try {
           if (!file.type.startsWith('image/')) {
-            throw new Error(`File không được hỗ trợ: ${file.name}`);
+            throw new Error(t('convert.error.unsupportedFile', file.name));
           }
 
           const advanced = isFileAdvanced(file);
           if (advanced && !advancedMode) {
-             throw new Error(`File "${file.name}" yêu cầu bật Chế độ Nâng cao.`);
+             throw new Error(t('convert.error.needAdvanced', file.name));
           }
           let img;
           if (advanced) {
@@ -54,7 +54,7 @@ export default function ConvertPage() {
              img = await CanvasHelper.loadImage(URL.createObjectURL(file));
           }
           if (img.naturalWidth > 8192 || img.naturalHeight > 8192) {
-             errMsgs.push(`Cảnh báo: Ảnh "${file.name}" có kích thước rất lớn (${img.naturalWidth}x${img.naturalHeight}), có thể gây chậm trình duyệt.`);
+             errMsgs.push(t('convert.warning.largeImage', file.name, img.naturalWidth, img.naturalHeight));
           }
           const canvas = CanvasHelper.drawImageToCanvas(img);
           newFilesData.push({
@@ -95,18 +95,18 @@ export default function ConvertPage() {
       
       if (filesData.length === 1) {
          const blob = await encodeImage(filesData[0].canvas, format, quality, advancedMode);
-         let outName = filesData[0].name.split('.')[0] + '_converted.' + ext;
+         let outName = filesData[0].name.split('.')[0] + t('convert.filenameSuffix') + ext;
          CanvasHelper.downloadBlob(blob, outName);
       } else {
          const zip = new JSZip();
          for (let i = 0; i < filesData.length; i++) {
             const fd = filesData[i];
             const blob = await encodeImage(fd.canvas, format, quality, advancedMode);
-            let outName = fd.name.split('.')[0] + '_converted.' + ext;
+            let outName = fd.name.split('.')[0] + t('convert.filenameSuffix') + ext;
             zip.file(outName, blob);
          }
          const zipBlob = await zip.generateAsync({ type: 'blob' });
-         saveAs(zipBlob, 'converted_images.zip');
+         saveAs(zipBlob, t('convert.zipName'));
       }
     } catch (err) {
       setError(err.message);
@@ -159,7 +159,7 @@ export default function ConvertPage() {
             <LucideIcon name={ICONS.ARROW_LEFT} width="16" height="16" /> {t('home.nav.home', 'Trang chủ')}
           </button>
           <button onClick={() => window.location.href = '/'} className="interact-btn" style={{ background: '#3b82f6', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '6px', fontWeight: 600, cursor: 'pointer', fontSize: '14px' }}>
-            Pixel Editor
+            {t('convert.nav.editor', 'Pixel Editor')}
           </button>
         </div>
       </header>
@@ -189,7 +189,7 @@ export default function ConvertPage() {
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
           <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', background: advancedMode ? 'rgba(59, 130, 246, 0.1)' : '#161B22', padding: '8px 16px', borderRadius: '20px', border: advancedMode ? '1px solid rgba(59, 130, 246, 0.3)' : '1px solid rgba(255,255,255,0.1)', transition: 'all 0.2s' }}>
             <input type="checkbox" checked={advancedMode} onChange={(e) => setAdvancedMode(e.target.checked)} style={{ width: '16px', height: '16px', accentColor: '#3b82f6', cursor: 'pointer' }} />
-            <span style={{ fontSize: '13px', fontWeight: 600, color: advancedMode ? '#3b82f6' : '#8B949E' }}>Chế độ Nâng cao (TIFF, HEIC, AVIF, RAW...)</span>
+            <span style={{ fontSize: '13px', fontWeight: 600, color: advancedMode ? '#3b82f6' : '#8B949E' }}>{t('convert.advancedMode')}</span>
           </label>
         </div>
 
@@ -254,14 +254,14 @@ export default function ConvertPage() {
               <div style={{ flex: '1 1 auto', display: 'flex', flexDirection: 'column', gap: '12px', minWidth: '180px' }}>
                 <button onClick={handleDownload} disabled={isExporting} className="interact-btn anim-pulse" style={{ background: '#3b82f6', color: '#fff', border: 'none', padding: '12px 24px', borderRadius: '12px', fontWeight: 600, cursor: isExporting ? 'not-allowed' : 'pointer', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center', opacity: isExporting ? 0.7 : 1 }}>
                   <LucideIcon name={ICONS.DOWNLOAD} width="18" height="18" />
-                  {isExporting ? 'Đang xử lý...' : (filesData.length > 1 ? t('convert.controls.downloadZip', 'Tải file ZIP') : t('convert.controls.download', 'Tải về'))}
+                  {isExporting ? t('convert.processing') : (filesData.length > 1 ? t('convert.controls.downloadZip', 'Tải file ZIP') : t('convert.controls.download', 'Tải về'))}
                 </button>
                 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', background: 'rgba(255,255,255,0.02)', padding: '8px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
                    {filesData.length > 1 && (
                       <select value={editMode} onChange={e => setEditMode(e.target.value)} style={{ padding: '6px', borderRadius: '6px', background: '#0B0F16', color: '#F5F7FA', border: '1px solid rgba(255,255,255,0.1)', fontSize: '12px', marginBottom: '4px', cursor: 'pointer' }}>
-                        <option value="multi-tab">Mở thành nhiều Tabs</option>
-                        <option value="animation">Mở gộp thành Ảnh động (Animation)</option>
+                        <option value="multi-tab">{t('convert.multiTab')}</option>
+                        <option value="animation">{t('convert.animationMode')}</option>
                       </select>
                    )}
                    <button 
@@ -271,7 +271,7 @@ export default function ConvertPage() {
                      style={{ background: '#161B22', color: '#B8C0CC', border: '1px solid rgba(255,255,255,0.1)', padding: '10px 16px', borderRadius: '8px', fontWeight: 600, cursor: isExporting ? 'not-allowed' : 'pointer', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center', opacity: isExporting ? 0.7 : 1 }}
                    >
                      <LucideIcon name={ICONS.EDIT_3 || "edit-3"} width="16" height="16" />
-                     {isExporting ? 'Đang gửi...' : t('convert.controls.openEditor', 'Mở trong Editor')}
+                     {isExporting ? t('convert.sending') : t('convert.controls.openEditor', 'Mở trong Editor')}
                    </button>
                 </div>
               </div>
@@ -287,7 +287,7 @@ export default function ConvertPage() {
                 <div>
                    <input ref={fileInputRef} type="file" multiple accept="image/*" hidden onChange={(e) => handleFiles(e.target.files)} />
                    <button onClick={() => fileInputRef.current.click()} className="interact-btn" style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', border: 'none', padding: '6px 12px', borderRadius: '6px', fontWeight: 600, cursor: 'pointer', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                     <LucideIcon name="plus" width="14" height="14" /> Thêm ảnh
+                     <LucideIcon name="plus" width="14" height="14" /> {t('convert.addMore')}
                    </button>
                 </div>
               </div>
@@ -315,7 +315,7 @@ export default function ConvertPage() {
 
             <div style={{ textAlign: 'center', marginTop: '16px' }}>
               <button onClick={() => setFilesData([])} className="interact-btn" style={{ background: 'transparent', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)', padding: '10px 20px', borderRadius: '8px', fontWeight: 500, cursor: 'pointer', fontSize: '14px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-                <LucideIcon name="trash-2" width="16" height="16" /> Xóa toàn bộ
+                <LucideIcon name="trash-2" width="16" height="16" /> {t('convert.clearAll')}
               </button>
             </div>
           </div>

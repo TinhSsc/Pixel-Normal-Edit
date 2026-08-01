@@ -154,7 +154,7 @@ export default function CropPage() {
             <LucideIcon name={ICONS.ARROW_LEFT || "arrow-left"} width="16" height="16" /> {t('home.nav.home', 'Trang chủ')}
           </button>
           <button onClick={() => window.location.href = '/'} className="interact-btn" style={{ background: '#3b82f6', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '6px', fontWeight: 600, cursor: 'pointer', fontSize: '14px' }}>
-            Pixel Editor
+            {t('cropPage.nav.editor')}
           </button>
         </div>
       </header>
@@ -167,10 +167,10 @@ export default function CropPage() {
             {t('mini_tools.crop.title', 'Cắt ảnh')}
           </div>
           <h2 style={{ fontSize: '36px', fontWeight: 800, color: '#F5F7FA', margin: '0 0 16px 0', letterSpacing: '-0.02em' }}>
-            Cắt ảnh chuẩn xác theo tỷ lệ
+            {t('cropPage.title')}
           </h2>
           <p style={{ fontSize: '16px', color: '#B8C0CC', lineHeight: 1.6, maxWidth: '600px', margin: '0 auto' }}>
-            Cắt xén các phần thừa, tập trung vào đối tượng chính với công cụ crop trực quan. Hỗ trợ đa tỷ lệ khung hình.
+            {t('cropPage.desc')}
           </p>
         </div>
 
@@ -184,7 +184,7 @@ export default function CropPage() {
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '16px' }}>
           <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', background: advancedMode ? 'rgba(139,92,246,0.1)' : '#161B22', padding: '8px 16px', borderRadius: '20px', border: advancedMode ? '1px solid rgba(139,92,246,0.3)' : '1px solid rgba(255,255,255,0.1)', transition: 'all 0.2s' }}>
             <input type="checkbox" checked={advancedMode} onChange={(e) => setAdvancedMode(e.target.checked)} style={{ width: '16px', height: '16px', accentColor: '#8b5cf6', cursor: 'pointer' }} />
-            <span style={{ fontSize: '13px', fontWeight: 600, color: advancedMode ? '#8b5cf6' : '#8B949E' }}>Chế độ Nâng cao (TIFF, HEIC, RAW...)</span>
+            <span style={{ fontSize: '13px', fontWeight: 600, color: advancedMode ? '#8b5cf6' : '#8B949E' }}>{t('cropPage.advancedMode')}</span>
           </label>
         </div>
 
@@ -206,10 +206,10 @@ export default function CropPage() {
             <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(139, 92, 246, 0.1)', color: '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '24px' }}>
               <LucideIcon name={ICONS.UPLOAD || "upload"} width="32" height="32" />
             </div>
-            <h3 style={{ fontSize: '20px', fontWeight: 600, color: '#F5F7FA', margin: '0 0 12px 0' }}>Kéo thả ảnh vào đây</h3>
-            <p style={{ fontSize: '15px', color: '#8B949E', margin: '0 0 24px 0' }}>hoặc click để duyệt file trên thiết bị của bạn</p>
+            <h3 style={{ fontSize: '20px', fontWeight: 600, color: '#F5F7FA', margin: '0 0 12px 0' }}>{t('cropPage.drop.title')}</h3>
+            <p style={{ fontSize: '15px', color: '#8B949E', margin: '0 0 24px 0' }}>{t('cropPage.drop.desc')}</p>
             <button className="interact-btn" style={{ background: '#8b5cf6', color: '#fff', border: 'none', padding: '12px 24px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', fontSize: '15px' }}>
-              Chọn ảnh
+              {t('cropPage.drop.button')}
             </button>
           </div>
         ) : (
@@ -246,10 +246,10 @@ export default function CropPage() {
                 
                 {/* Tỷ lệ */}
                 <div style={{ marginBottom: '24px' }}>
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: '#B8C0CC', marginBottom: '12px' }}>Tỷ lệ (Aspect Ratio)</div>
+                  <div style={{ fontSize: '14px', fontWeight: 600, color: '#B8C0CC', marginBottom: '12px' }}>{t('cropPage.ratio')}</div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
                     {[
-                      { label: 'Tự do', value: NaN },
+                      { label: t('cropPage.ratioFree'), value: NaN },
                       { label: '1:1', value: 1 / 1 },
                       { label: '4:3', value: 4 / 3 },
                       { label: '16:9', value: 16 / 9 },
@@ -275,7 +275,7 @@ export default function CropPage() {
 
                 {/* Xoay ảnh */}
                 <div style={{ marginBottom: '24px' }}>
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: '#B8C0CC', marginBottom: '12px' }}>Xoay ảnh</div>
+                  <div style={{ fontSize: '14px', fontWeight: 600, color: '#B8C0CC', marginBottom: '12px' }}>{t('rotatePage.rotate')}</div>
                   <div style={{ display: 'flex', gap: '8px' }}>
                     <button onClick={() => setRotation(r => r - 90)} className="interact-btn" style={{ flex: 1, background: '#0B0F16', color: '#B8C0CC', border: '1px solid rgba(255,255,255,0.05)', padding: '10px', borderRadius: '8px', cursor: 'pointer', display: 'flex', justifyContent: 'center' }}>
                       <LucideIcon name="rotate-ccw" width="16" height="16" />
@@ -284,7 +284,7 @@ export default function CropPage() {
                       <LucideIcon name="rotate-cw" width="16" height="16" />
                     </button>
                     <button onClick={() => setRotation(0)} className="interact-btn" style={{ flex: 1, background: '#0B0F16', color: '#B8C0CC', border: '1px solid rgba(255,255,255,0.05)', padding: '10px', borderRadius: '8px', cursor: 'pointer', display: 'flex', justifyContent: 'center', fontSize: '13px', fontWeight: 600 }}>
-                      Reset
+                      {t('cropPage.reset')}
                     </button>
                   </div>
                 </div>
@@ -295,7 +295,7 @@ export default function CropPage() {
                   style={{ width: '100%', background: isCropping ? '#374151' : '#8b5cf6', color: '#fff', border: 'none', padding: '12px', borderRadius: '12px', fontWeight: 600, cursor: isCropping ? 'not-allowed' : 'pointer', fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
                 >
                   <LucideIcon name="crop" width="18" height="18" className={isCropping ? "spin" : ""} /> 
-                  {isCropping ? 'Đang xử lý...' : 'Áp dụng Cắt'}
+                  {isCropping ? t('rotatePage.processing') : t('cropPage.cropBtn')}
                 </button>
               </div>
 
@@ -303,19 +303,19 @@ export default function CropPage() {
               {croppedSrc && (
                 <div className="anim-fade-in" style={{ background: '#161B22', border: '1px solid rgba(139, 92, 246, 0.3)', borderRadius: '20px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                   <div style={{ fontSize: '14px', fontWeight: 600, color: '#8b5cf6', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <LucideIcon name="check-circle" width="16" height="16" /> Đã cắt thành công
+                    <LucideIcon name="check-circle" width="16" height="16" /> {t('cropPage.done')}
                   </div>
                   <div style={{ background: 'url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wNSkiLz48L3N2Zz4=") repeat', borderRadius: '8px', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '120px' }}>
-                    <img src={croppedSrc} alt="Cropped preview" style={{ maxWidth: '100%', maxHeight: '200px', objectFit: 'contain' }} />
+                    <img src={croppedSrc} alt={t('cropPage.previewAlt')} style={{ maxWidth: '100%', maxHeight: '200px', objectFit: 'contain' }} />
                   </div>
                   <button onClick={handleDownload} className="interact-btn anim-pulse" style={{ width: '100%', background: '#3b82f6', color: '#fff', border: 'none', padding: '12px', borderRadius: '12px', fontWeight: 600, cursor: 'pointer', fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                    <LucideIcon name={ICONS.DOWNLOAD || "download"} width="18" height="18" /> Tải ảnh về
+                    <LucideIcon name={ICONS.DOWNLOAD || "download"} width="18" height="18" /> {t('cropPage.download')}
                   </button>
                 </div>
               )}
 
               <button onClick={handleReset} className="interact-btn" style={{ width: '100%', background: 'transparent', color: '#B8C0CC', border: '1px solid rgba(255,255,255,0.1)', padding: '12px', borderRadius: '12px', fontWeight: 500, cursor: 'pointer', fontSize: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-                <LucideIcon name="refresh-cw" width="16" height="16" /> Chọn ảnh khác
+                <LucideIcon name="refresh-cw" width="16" height="16" /> {t('cropPage.changeImage')}
               </button>
 
             </div>

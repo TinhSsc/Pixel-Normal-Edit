@@ -204,7 +204,7 @@ export default function HomePage() {
   const handleContactSubmit = (e) => {
     e.preventDefault();
     if (!contactName.trim() || !contactEmail.trim() || !contactMessage.trim()) {
-      alert('Vui lòng điền đầy đủ thông tin.');
+      alert(t('home.contact.alertFill'));
       return;
     }
     // Simulate sending (client-side only, actually this is a static site)
@@ -378,11 +378,11 @@ export default function HomePage() {
         <section id="products" className="anim-fade-in" style={{ marginBottom: '120px' }}>
           <SectionTitle
             labelKey="home.products.label"
-            label="Sản phẩm"
+            label={t('home.products.label')}
             titleKey="home.products.title"
-            title="Bộ công cụ toàn diện"
+            title={t('home.products.title')}
             subtitleKey="home.products.subtitle"
-            subtitle="Từ chuyển đổi định dạng đến chỉnh sửa nâng cao — tất cả trong một nền tảng duy nhất."
+            subtitle={t('home.products.subtitle')}
           />
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '24px' }}>
             {TOOLS.map(tool => (
@@ -407,11 +407,11 @@ export default function HomePage() {
         <section id="features" className="anim-fade-in" style={{ marginBottom: '120px' }}>
           <SectionTitle
             labelKey="home.benefits.label"
-            label="Lợi ích"
+            label={t('home.benefits.label')}
             titleKey="home.benefits.title"
-            title="Tại sao chọn ImgTools?"
+            title={t('home.benefits.title')}
             subtitleKey="home.benefits.subtitle"
-            subtitle="Không chỉ là một công cụ xử lý ảnh — đây là trải nghiệm được thiết kế cho người dùng hiện đại."
+            subtitle={t('home.benefits.subtitle')}
           />
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '32px' }}>
             {BENEFITS.map(b => (
@@ -475,7 +475,7 @@ export default function HomePage() {
           <div style={{ width: '100%', maxWidth: '420px', minHeight: '80px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <a href="https://ko-fi.com/de7ad9ff-aedc-4e88-800f-87f5c8c92e70" target="_blank" rel="noreferrer" style={{ background: '#3b82f6', color: '#fff', padding: '16px 32px', borderRadius: '12px', textDecoration: 'none', fontSize: '18px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '12px', boxShadow: '0 8px 24px rgba(59,130,246,0.3)', transition: 'transform 0.2s' }} onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-4px)'} onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
               <img src="https://storage.ko-fi.com/cdn/cup-border.png" alt="Ko-fi" width="24" height="24" />
-              <span>Support me on Ko-fi</span>
+              <span>{t('home.koFiSupport')}</span>
             </a>
           </div>
         </section>

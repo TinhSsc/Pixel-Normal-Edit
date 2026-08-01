@@ -49,7 +49,7 @@ export default function LayerControl() {
           </div>
         </div>
         
-        <button className="btn" style={{ height: '38px', padding: '0 12px' }} onClick={() => setShowModal(true)} title="Layer Settings">
+        <button className="btn" style={{ height: '38px', padding: '0 12px' }} onClick={() => setShowModal(true)} title={t('layerControl.settings')}>
           <Icon name={ICONS.SETTINGS} style={{ width: '18px', height: '18px' }} />
         </button>
       </div>

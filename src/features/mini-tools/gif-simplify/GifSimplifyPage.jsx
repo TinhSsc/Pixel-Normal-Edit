@@ -6,6 +6,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { CanvasHelper } from '../shared/CanvasHelper';
 import SEOHeader from '../shared/SEOHeader';
+import { t } from '../../../i18n/i18n.js';
 import RelatedTools from '../shared/RelatedTools';
 import { LucideIcon, reloadLucideIcons } from '../../../shared/dom/lucide-utils';
 import GIF from 'gif.js';
@@ -52,7 +53,7 @@ export default function GifSimplifyPage() {
     const gif = parseGIF(buffer);
     const rawFrames = decompressFrames(gif, true);
 
-    setProgress({ current: 0, total: rawFrames.length, label: 'Đang giải mã GIF...' });
+    setProgress({ current: 0, total: rawFrames.length, label: t('mediaToFrames.status.decodingGif') });
 
     const w = gif.lsd.width;
     const h = gif.lsd.height;
@@ -67,7 +68,7 @@ export default function GifSimplifyPage() {
         const imageData = new ImageData(new Uint8ClampedArray(f.patch), f.dims.width, f.dims.height);
         ctx.putImageData(imageData, f.dims.left, f.dims.top);
         const src = await new Promise(r => canvas.toBlob(b => r(b ? URL.createObjectURL(b) : ''), 'image/png'));
-        if (!src) throw new Error('toBlob failed');
+        if (!src) throw new Error(t('error.toBlobFailed'));
         setFrames(prev => [...prev, { src, label: `Frame ${i + 1}` }]);
         setProgress({ current: i + 1, total: rawFrames.length, label: `Frame ${i + 1}/${rawFrames.length}` });
       } catch(err) {
@@ -92,7 +93,7 @@ export default function GifSimplifyPage() {
 
       const seekTo = (t) => new Promise((res, rej) => {
         const onSeeked = () => { cleanup(); res(); };
-        const onError = () => { cleanup(); rej(new Error('Không thể seek video')); };
+        const onError = () => { cleanup(); rej(new Error(t('error.videoSeek'))); };
         const cleanup = () => {
           video.removeEventListener('seeked', onSeeked);
           video.removeEventListener('error', onError);
@@ -127,7 +128,7 @@ export default function GifSimplifyPage() {
               if (Math.abs(video.currentTime - time) > 0.001) await seekTo(time);
               ctx.drawImage(video, 0, 0);
               const src = await new Promise(r => canvas.toBlob(b => r(b ? URL.createObjectURL(b) : ''), 'image/png'));
-              if (!src) throw new Error('toBlob failed');
+              if (!src) throw new Error(t('error.toBlobFailed'));
               setFrames(prev => [...prev, { src, label: `t=${time.toFixed(2)}s` }]);
               setProgress({ current: i + 1, total: totalFrames, label: `${i + 1}/${totalFrames}` });
             } catch(err) {
@@ -144,7 +145,7 @@ export default function GifSimplifyPage() {
       };
       video.onerror = () => {
         URL.revokeObjectURL(url);
-        reject(new Error('Không đọc được video'));
+        reject(new Error(t('error.videoRead')));
       };
     });
   };
@@ -154,7 +155,7 @@ export default function GifSimplifyPage() {
     const isGif = file.type === 'image/gif' || file.name.toLowerCase().endsWith('.gif');
     const isVideo = file.type.startsWith('video/') || file.name.match(/\.(mp4|webm|mov|m4v)$/i);
     if (!isGif && !isVideo) {
-      setError('Chỉ hỗ trợ file GIF hoặc Video (MP4, WebM, MOV).');
+      setError(t('mediaToFrames.error.onlyGifVideo'));
       return;
     }
 
@@ -172,7 +173,7 @@ export default function GifSimplifyPage() {
       if (isGif) await extractGifFrames(file);
       else await extractVideoFrames(file);
     } catch (e) {
-      setError('Lỗi tách frame: ' + (e.message || String(e)));
+      setError(t('mediaToFrames.error.extract', e.message || String(e)));
     }
 
     setExtracting(false);
@@ -261,9 +262,9 @@ export default function GifSimplifyPage() {
   };
 
   const handleRender = async () => {
-    if (frames.length < 2) { setError('Cần ít nhất 2 frame.'); return; }
+    if (frames.length < 2) { setError(t('gifSimplify.error.minFrames')); return; }
     const keep = frames.filter((_, i) => i % step === 0);
-    if (keep.length === 0) { setError('Không còn frame nào sau khi giảm.'); return; }
+    if (keep.length === 0) { setError(t('gifSimplify.error.noFramesLeft')); return; }
 
     setRendering(true);
     setRenderProgress(0);
@@ -275,7 +276,7 @@ export default function GifSimplifyPage() {
       setResultBlob(blob);
       setResultSrc(URL.createObjectURL(blob));
     } catch (e) {
-      setError('Lỗi render: ' + e.message);
+      setError(t('gifSimplify.error.render', e.message));
     }
     setRendering(false);
     setRenderProgress(null);
@@ -292,8 +293,8 @@ export default function GifSimplifyPage() {
   return (
     <div style={{ background: '#0B0F16', minHeight: '100vh', display: 'block', overflowY: 'auto', color: '#F5F7FA', fontFamily: 'Inter, sans-serif' }}>
       <SEOHeader
-        title="Đơn giản hóa GIF / Tua nhanh video | Pixel Normal Edit"
-        description="Giảm một nửa số frame để GIF nhẹ hơn, hoặc tua nhanh video bằng cách bỏ xen kẽ frame. Xử lý cục bộ trên trình duyệt."
+        title={t('gifSimplify.seo.title')}
+        description={t('gifSimplify.seo.desc')}
         schema={{ applicationCategory: 'UtilitiesApplication' }}
       />
 
@@ -303,10 +304,10 @@ export default function GifSimplifyPage() {
         </div>
         <div style={{ display: 'flex', gap: '12px' }}>
           <button onClick={() => navigate('home')} className="interact-btn" style={{ background: 'transparent', color: '#B8C0CC', border: 'none', padding: '8px 16px', borderRadius: '6px', fontWeight: 500, cursor: 'pointer', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <LucideIcon name="arrow-left" width="16" height="16" /> Trang chủ
+            <LucideIcon name="arrow-left" width="16" height="16" /> {t('gifSimplify.nav.home')}
           </button>
           <button onClick={() => window.location.href = '/'} className="interact-btn" style={{ background: '#3b82f6', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '6px', fontWeight: 600, cursor: 'pointer', fontSize: '14px' }}>
-            Pixel Editor
+            {t('gifSimplify.nav.editor')}
           </button>
         </div>
       </header>
@@ -317,13 +318,13 @@ export default function GifSimplifyPage() {
         <div className="anim-fade-in" style={{ textAlign: 'center', marginBottom: '40px' }}>
           <div style={{ display: 'inline-block', padding: '6px 14px', background: `rgba(168,85,247,0.12)`, color: ACCENT, borderRadius: '20px', fontSize: '13px', fontWeight: 600, marginBottom: '16px' }}>
             <LucideIcon name="timer" width="14" height="14" style={{ marginRight: '6px', verticalAlign: 'text-bottom' }} />
-            Đơn giản GIF / Tua nhanh video
+            {t('gifSimplify.title')}
           </div>
           <h2 style={{ fontSize: '34px', fontWeight: 800, color: '#F5F7FA', margin: '0 0 14px 0', letterSpacing: '-0.02em' }}>
-            Bỏ xen kẽ frame, nhẹ hơn & nhanh hơn
+            {t('gifSimplify.heading')}
           </h2>
           <p style={{ fontSize: '16px', color: '#B8C0CC', lineHeight: 1.6, maxWidth: '560px', margin: '0 auto' }}>
-            Tải GIF hoặc video, chọn mức giảm, tool sẽ giữ 1 trong mỗi N frame rồi xuất GIF nhẹ hơn hoặc WebM chạy nhanh hơn.
+            {t('gifSimplify.desc')}
           </p>
         </div>
 
@@ -351,10 +352,10 @@ export default function GifSimplifyPage() {
                 <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: `rgba(168,85,247,0.12)`, color: ACCENT, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <LucideIcon name="timer" width="28" height="28" />
                 </div>
-                <h3 style={{ fontSize: '20px', fontWeight: 600, color: '#F5F7FA', margin: 0 }}>Kéo thả GIF hoặc Video vào đây</h3>
-                <p style={{ fontSize: '14px', color: '#8B949E', margin: 0 }}>Hỗ trợ: GIF · MP4 · WebM · MOV</p>
+                <h3 style={{ fontSize: '20px', fontWeight: 600, color: '#F5F7FA', margin: 0 }}>{t('gifSimplify.drop.title')}</h3>
+                <p style={{ fontSize: '14px', color: '#8B949E', margin: 0 }}>{t('gifSimplify.drop.support')}</p>
                 <button className="interact-btn" style={{ background: ACCENT, color: '#000', border: 'none', padding: '10px 24px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', fontSize: '14px' }}>
-                  Chọn file
+                  {t('gifSimplify.drop.button')}
                 </button>
               </div>
             )}
@@ -368,7 +369,7 @@ export default function GifSimplifyPage() {
                   </div>
                 </div>
                 <button onClick={() => { setFrames([]); setSourceInfo(null); setResultSrc(null); setResultBlob(null); fileInputRef.current.click(); }} style={{ background: 'rgba(168,85,247,0.1)', color: ACCENT, border: 'none', padding: '7px 14px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', fontSize: '12px' }}>
-                  Đổi file
+                  {t('gifSimplify.changeFile')}
                 </button>
                 <input ref={fileInputRef} type="file" accept="image/gif,video/*" hidden onChange={(e) => handleFile(e.target.files[0])} />
               </div>
@@ -378,7 +379,7 @@ export default function GifSimplifyPage() {
               <div style={{ background: '#161B22', border: '1px solid rgba(168,85,247,0.2)', borderRadius: '12px', padding: '16px 18px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '13px' }}>
                   <span style={{ color: ACCENT, fontWeight: 600 }}>
-                    {extracting ? 'Đang tách frame...' : 'Đang xử lý...'}
+                    {extracting ? t('mediaToFrames.extracting') : t('mediaToFrames.processing')}
                   </span>
                   <span style={{ color: '#8B949E' }}>{progress?.label}</span>
                 </div>
@@ -396,7 +397,7 @@ export default function GifSimplifyPage() {
                 <div style={{ padding: '14px 18px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
                   <span style={{ fontWeight: 600, color: '#F5F7FA' }}>
                     {frames.length} frames
-                    <span style={{ color: ACCENT, marginLeft: '10px', fontSize: '13px' }}>→ giữ {keptCount} (bỏ {frames.length - keptCount})</span>
+                    <span style={{ color: ACCENT, marginLeft: '10px', fontSize: '13px' }}>{t('gifSimplify.keepCount', keptCount, frames.length - keptCount)}</span>
                   </span>
                 </div>
                 <div 
@@ -435,26 +436,26 @@ export default function GifSimplifyPage() {
           {frames.length > 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div style={{ background: '#161B22', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '20px', padding: '22px' }}>
-                <div style={{ fontSize: '14px', fontWeight: 700, color: '#F5F7FA', marginBottom: '18px' }}>Thiết lập giảm frame</div>
+                <div style={{ fontSize: '14px', fontWeight: 700, color: '#F5F7FA', marginBottom: '18px' }}>{t('gifSimplify.frameSettings')}</div>
 
                 {/* Step */}
                 <div style={{ marginBottom: '18px' }}>
                   <div style={{ fontSize: '12px', color: '#8B949E', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px', display: 'flex', justifyContent: 'space-between' }}>
-                    <span>Giữ 1 trong mỗi</span><span style={{ color: ACCENT }}>{step} frame</span>
+                    <span>{t('gifSimplify.keepEvery')}</span><span style={{ color: ACCENT }}>{step} {t('gifSimplify.frames')}</span>
                   </div>
                   <input type="range" min="2" max="10" step="1" value={step} onChange={e => setStep(Number(e.target.value))} style={{ width: '100%', accentColor: ACCENT }} />
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', color: '#4b5563', marginTop: '3px' }}>
-                    <span>x2 (nhẹ)</span><span>x10 (rất nhanh)</span>
+                    <span>{t('gifSimplify.x2Light')}</span><span>{t('gifSimplify.x10Fast')}</span>
                   </div>
                 </div>
 
                 {/* Output type */}
                 <div style={{ marginBottom: '18px' }}>
-                  <div style={{ fontSize: '12px', color: '#8B949E', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>Định dạng đầu ra</div>
+                  <div style={{ fontSize: '12px', color: '#8B949E', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>{t('framesToMedia.outputFormat')}</div>
                   <div style={{ display: 'flex', gap: '8px', background: '#0B0F16', padding: '5px', borderRadius: '10px' }}>
                     {['gif', 'webm'].map(type => (
                       <button key={type} onClick={() => setOutputType(type)} style={{ flex: 1, padding: '9px', borderRadius: '7px', border: 'none', fontWeight: 700, fontSize: '13px', cursor: 'pointer', background: outputType === type ? ACCENT : 'transparent', color: outputType === type ? '#000' : '#8B949E', transition: 'all 0.2s' }}>
-                        {type === 'gif' ? 'GIF' : 'WebM Video'}
+                        {type === 'gif' ? 'GIF' : t('gifSimplify.webmVideo')}
                       </button>
                     ))}
                   </div>
@@ -463,7 +464,7 @@ export default function GifSimplifyPage() {
                 {/* FPS */}
                 <div style={{ marginBottom: '18px' }}>
                   <div style={{ fontSize: '12px', color: '#8B949E', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px', display: 'flex', justifyContent: 'space-between' }}>
-                    <span>FPS đầu ra</span><span style={{ color: ACCENT }}>{fps}</span>
+                    <span>{t('gifSimplify.outputFps')}</span><span style={{ color: ACCENT }}>{fps}</span>
                   </div>
                   <input type="range" min="1" max="30" value={fps} onChange={e => setFps(Number(e.target.value))} style={{ width: '100%', accentColor: ACCENT }} />
                 </div>
@@ -471,7 +472,7 @@ export default function GifSimplifyPage() {
                 {/* Max dimension */}
                 <div style={{ marginBottom: '18px' }}>
                   <div style={{ fontSize: '12px', color: '#8B949E', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px', display: 'flex', justifyContent: 'space-between' }}>
-                    <span>Kích thước tối đa</span><span style={{ color: ACCENT }}>{maxDim}px</span>
+                    <span>{t('gifSimplify.maxDim')}</span><span style={{ color: ACCENT }}>{maxDim}px</span>
                   </div>
                   <input type="range" min="128" max="1920" step="64" value={maxDim} onChange={e => setMaxDim(Number(e.target.value))} style={{ width: '100%', accentColor: ACCENT }} />
                 </div>
@@ -480,7 +481,7 @@ export default function GifSimplifyPage() {
                 {outputType === 'gif' && (
                   <div style={{ marginBottom: '18px' }}>
                     <div style={{ fontSize: '12px', color: '#8B949E', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px', display: 'flex', justifyContent: 'space-between' }}>
-                      <span>Chất lượng GIF</span><span style={{ color: ACCENT }}>{gifQuality <= 5 ? 'Tốt' : gifQuality <= 15 ? 'Vừa' : 'Nhanh'}</span>
+                      <span>{t('gifSimplify.gifQuality')}</span><span style={{ color: ACCENT }}>{gifQuality <= 5 ? t('gifSimplify.good') : gifQuality <= 15 ? t('gifSimplify.medium') : t('gifSimplify.fast')}</span>
                     </div>
                     <input type="range" min="1" max="30" value={gifQuality} onChange={e => setGifQuality(Number(e.target.value))} style={{ width: '100%', accentColor: ACCENT }} />
                   </div>
@@ -490,7 +491,7 @@ export default function GifSimplifyPage() {
                 {sourceInfo?.type === 'Video' && (
                   <div style={{ marginBottom: '18px' }}>
                     <div style={{ fontSize: '12px', color: '#8B949E', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px', display: 'flex', justifyContent: 'space-between' }}>
-                      <span>FPS tách video</span><span style={{ color: ACCENT }}>{videoFps}</span>
+                      <span>{t('gifSimplify.videoExtractFps')}</span><span style={{ color: ACCENT }}>{videoFps}</span>
                     </div>
                     <input type="range" min="1" max="30" value={videoFps} onChange={e => setVideoFps(Number(e.target.value))} style={{ width: '100%', accentColor: ACCENT }} />
                   </div>
@@ -500,14 +501,14 @@ export default function GifSimplifyPage() {
                 <button onClick={handleRender} disabled={rendering || frames.length < 2} className="interact-btn"
                   style={{ width: '100%', background: rendering ? '#374151' : ACCENT, color: rendering ? '#9ca3af' : '#000', border: 'none', padding: '14px', borderRadius: '12px', fontWeight: 700, cursor: rendering ? 'not-allowed' : 'pointer', fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                   <LucideIcon name={rendering ? 'loader' : 'zap'} width="18" height="18" className={rendering ? 'spin' : ''} />
-                  {rendering ? `Đang tạo ${outputType.toUpperCase()}...` : `Giảm ${frames.length} → ${keptCount} frame`}
+                  {rendering ? t('gifSimplify.creating', outputType.toUpperCase()) : t('gifSimplify.reduceFrames', frames.length, keptCount)}
                 </button>
 
                 {/* Render progress */}
                 {rendering && renderProgress !== null && (
                   <div style={{ marginTop: '12px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#8B949E', marginBottom: '6px' }}>
-                      <span>Đang xử lý...</span><span style={{ color: ACCENT }}>{renderProgress}%</span>
+                      <span>{t('gifSimplify.processing')}</span><span style={{ color: ACCENT }}>{renderProgress}%</span>
                     </div>
                     <div style={{ background: '#0B0F16', borderRadius: '6px', height: '6px' }}>
                       <div style={{ background: ACCENT, height: '100%', width: `${renderProgress}%`, borderRadius: '6px', transition: 'width 0.2s' }} />
@@ -521,7 +522,7 @@ export default function GifSimplifyPage() {
                 <div className="anim-fade-in" style={{ background: '#161B22', border: `1px solid rgba(168,85,247,0.3)`, borderRadius: '20px', overflow: 'hidden' }}>
                   <div style={{ padding: '14px 18px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <LucideIcon name="check-circle" width="16" height="16" style={{ color: '#10b981' }} />
-                    <span style={{ fontWeight: 600, color: '#10b981', fontSize: '14px' }}>Hoàn thành!</span>
+                    <span style={{ fontWeight: 600, color: '#10b981', fontSize: '14px' }}>{t('gifSimplify.completed')}</span>
                     <span style={{ color: '#8B949E', fontSize: '12px', marginLeft: 'auto' }}>
                       {resultBlob && CanvasHelper.formatFileSize(resultBlob.size)}
                     </span>
@@ -534,7 +535,7 @@ export default function GifSimplifyPage() {
                   <div style={{ padding: '14px 18px' }}>
                     <button onClick={handleDownload} className="interact-btn anim-pulse" style={{ width: '100%', background: '#3b82f6', color: '#fff', border: 'none', padding: '12px', borderRadius: '10px', fontWeight: 700, cursor: 'pointer', fontSize: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                       <LucideIcon name="download" width="18" height="18" />
-                      Tải về {outputType.toUpperCase()}
+                      {t('gifSimplify.download', outputType.toUpperCase())}
                     </button>
                   </div>
                 </div>

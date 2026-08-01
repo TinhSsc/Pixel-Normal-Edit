@@ -224,7 +224,7 @@ function loadImageObject(file) {
     const src = URL.createObjectURL(file);
     const img = new Image();
     img.onload = () => resolve(img);
-    img.onerror = () => reject(new Error("Lỗi đọc file ảnh"));
+    img.onerror = () => reject(new Error(t('uploadModal.readImageError')));
     img.src = src;
   });
 }

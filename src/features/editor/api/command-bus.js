@@ -3,6 +3,7 @@ import { circlePoints } from '../engine/algorithms/circle-algo.js';
 import { renderPixels } from '../engine/core/render.js';
 import { parseUint32ToHex, parseColorToUint32 } from '../engine/core/color-utils.js';
 import { pixelMap, GRID_WIDTH, GRID_HEIGHT } from '../engine/core/state.js';
+import { t } from '../../../i18n/i18n.js';
 
 // ── Module-level state ─────────────────────────────────────────────────────
 let _anchors   = new Map();   // name → { x, y }
@@ -59,7 +60,7 @@ window.__evidenceStore = window.__evidenceStore || new ObjectEvidenceStore();
 
 function setPixelTracked(x, y, color, objectId) {
   const a = window.__lastApiInstance;
-  if (!a) throw new Error("api is not defined");
+  if (!a) throw new Error(t('commandBus.apiNotDefined'));
   a.activeDocument.draw.setPixel(x, y, color);
   
   if (objectId !== undefined) {
@@ -176,7 +177,7 @@ function setDirect(px_, py_, color, api) {
 // MAIN COMMAND DISPATCHER
 // ═══════════════════════════════════════════════════════════════════════════
 export async function executeCommand(api, cmd) {
-  if (!cmd || typeof cmd !== 'object') throw new Error('Invalid command format');
+  if (!cmd || typeof cmd !== 'object') throw new Error(t('commandBus.invalidFormat'));
   window.__lastApiInstance = api;
   const { action, ...args } = cmd;
 
@@ -305,7 +306,7 @@ export async function executeCommand(api, cmd) {
 
     case 'editValidateDiff': {
       if (!window.__editBeforeState) {
-        throw new Error("editValidateDiff: No before state captured. Call editCaptureBefore first.");
+        throw new Error(t('commandBus.noBeforeState'));
       }
       const { region, pixels } = window.__editBeforeState;
       const size = api.activeDocument.canvas.getSize();
@@ -673,7 +674,7 @@ export async function executeCommand(api, cmd) {
     }
 
     case 'pasteRegion': {
-      if (!_clipboard) throw new Error('No region copied. Use copyRegion first.');
+      if (!_clipboard) throw new Error(t('commandBus.noRegionCopied'));
       const { x=_clipboard.x, y=_clipboard.y } = args;
       const { w,h,data } = _clipboard;
       api.activeDocument.history.beginTransaction();
@@ -721,7 +722,7 @@ export async function executeCommand(api, cmd) {
     // QUERY
     // ─────────────────────────────────────────────────────────────────────
     case 'query': {
-      if (!args.type) throw new Error('query: missing type');
+      if (!args.type) throw new Error(t('commandBus.queryMissingType'));
       let result;
       switch (args.type) {
         case 'isEmpty':        result=api.activeDocument.query.isEmpty(); break;
@@ -893,7 +894,7 @@ export async function executeCommand(api, cmd) {
 
 // ── Batch: wrap N commands in 1 history transaction ────────────────────────
 export async function executeCommandBatch(api, commands) {
-  if (!Array.isArray(commands)) throw new Error('Commands must be an array');
+  if (!Array.isArray(commands)) throw new Error(t('commandBus.mustBeArray'));
   api.activeDocument.history.beginTransaction();
   const results=[];
   try {

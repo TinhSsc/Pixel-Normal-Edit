@@ -200,7 +200,7 @@ export default function KeyboardShortcutsTab() {
       {/* Shortcuts list */}
       <div className="shortcuts-list-wrapper">
         {(groupedShortcuts[activeCategory] || []).length === 0 && (
-          <div className="shortcuts-empty">Không có phím tắt trong danh mục này.</div>
+          <div className="shortcuts-empty">{t('keyboardShortcuts.emptyCategory')}</div>
         )}
         {(groupedShortcuts[activeCategory] || []).map(({ id, label, key, ctrl, shift, alt }) => {
           const isEditing = editingId === id;

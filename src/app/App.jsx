@@ -123,7 +123,7 @@ function App() {
         if (mcpClient.commandBus) {
           mcpClient.initialize(mcpClient.commandBus, user.uid);
           window.dispatchEvent(new CustomEvent('ai-connection-status', {
-            detail: { type: 'waiting', text: 'Đang chờ kết nối...', sessionId: user.uid }
+            detail: { type: 'waiting', text: t('mcpFirebase.waiting'), sessionId: user.uid }
           }));
         }
       } else {
@@ -401,7 +401,7 @@ function App() {
                     whiteSpace: 'nowrap',
                     fontFamily: 'monospace'
                   }} 
-                  title="Trạng thái MCP"
+                  title={t('mcpFirebase.statusTitle')}
                 >
                   <span style={{ 
                     width: '6px', 

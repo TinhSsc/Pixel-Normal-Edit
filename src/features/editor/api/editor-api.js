@@ -20,6 +20,7 @@ import { exportAnimation } from '../io/export/export-animation.js';
 import { executeCommand, executeCommandBatch } from './command-bus.js';
 import { getElementValue, setElementValue } from '../../../shared/lib/dom-utils.js';
 import { mcpClient } from './mcp-firebase-client.js';
+import { t } from '../../../i18n/i18n.js';
 
 export const EditorAPI = {
   capabilities: {
@@ -135,12 +136,12 @@ export const EditorAPI = {
           if (!state || !state.frames) return [];
           const frames = state.frames;
           if (frameIndex1 < 0 || frameIndex1 >= frames.length || frameIndex2 < 0 || frameIndex2 >= frames.length) {
-            throw new Error("Invalid frame index");
+            throw new Error(t('editorApi.invalidFrameIndex'));
           }
           const f1 = frames[frameIndex1];
           const f2 = frames[frameIndex2];
           if (f1.width !== f2.width || f1.height !== f2.height) {
-            throw new Error("Frames have different dimensions");
+            throw new Error(t('editorApi.framesDifferentDims'));
           }
           const w = f1.width;
           const h = f1.height;
@@ -196,20 +197,20 @@ export const EditorAPI = {
       export: async (format, options = { transparent: true }) => {
         const tabs = getTabs();
         const activeTab = tabs.find(t => t.id === getActiveTabId());
-        if (!activeTab) throw new Error("No active tab to export");
+        if (!activeTab) throw new Error(t('editorApi.noActiveTab'));
 
         switch (format) {
           case 'png': return await generateWorkspacePngBlob(activeTab, options);
           case 'webp': return await generateWorkspaceWebpBlob(activeTab, options);
           case 'jpeg': return await generateWorkspaceJpegBlob(activeTab, options);
           case 'json': return generateWorkspaceJsonBlob(activeTab);
-          default: throw new Error(`Unsupported format: ${format}`);
+          default: throw new Error(t('editorApi.unsupportedFormat', format));
         }
       },
       exportAnimation: async (format, options = {}) => {
         const tabs = getTabs();
         const activeTab = tabs.find(t => t.id === getActiveTabId());
-        if (!activeTab) throw new Error("No active tab to export");
+        if (!activeTab) throw new Error(t('editorApi.noActiveTab'));
         return await exportAnimation(activeTab, format, options);
       }
     },

@@ -219,7 +219,7 @@ export function setupSetBackground() {
         img.src = bgImage;
         await new Promise((resolve, reject) => {
           img.onload = resolve;
-          img.onerror = () => reject(new Error("Failed to load background image"));
+          img.onerror = () => reject(new Error(t('status.bgLoadError')));
         });
 
         // Draw background image scaled to grid dimensions

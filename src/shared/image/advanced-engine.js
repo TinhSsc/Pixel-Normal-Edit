@@ -1,5 +1,6 @@
 import { initializeImageMagick, ImageMagick, MagickFormat, MagickReadSettings } from '@imagemagick/magick-wasm';
 import wasmUrl from '@imagemagick/magick-wasm/magick.wasm?url';
+import { t } from '../../i18n/i18n.js';
 
 let isInitialized = false;
 
@@ -11,7 +12,7 @@ export const initAdvancedEngine = async () => {
     isInitialized = true;
   } catch (err) {
     console.error("Lỗi khởi tạo ImageMagick:", err);
-    throw new Error("Không thể khởi tạo Chế độ Nâng cao (ImageMagick).");
+    throw new Error(t('advancedEngine.initError'));
   }
 };
 
@@ -61,7 +62,7 @@ export const encodeImageWithAdvancedEngine = async (canvas, ext, quality) => {
     try {
       ImageMagick.read(new Uint8Array(imgData.data.buffer), settings, (image) => {
         const mFormat = EXT_TO_MAGICK_FORMAT[ext.toLowerCase()];
-        if (!mFormat) throw new Error("Định dạng không được hỗ trợ bởi Advanced Engine: " + ext);
+        if (!mFormat) throw new Error(t('advancedEngine.unsupportedFormat', ext));
         
         image.format = mFormat;
         if (quality) image.quality = quality * 100;

@@ -79,19 +79,19 @@ const UserInputModal = () => {
         <div className="modal-header">
           <h3 className="modal-title">
             <Icon name={ICONS.HELP} style={{ width: 20, height: 20, marginRight: 8 }} />
-            AI Needs Input ({request.type})
+            {t('userInput.title', request.type)}
           </h3>
         </div>
         
         <div className="modal-body user-input-body">
           <p className="user-input-description">
-            The AI assistant is waiting for your input to proceed.
+            {t('userInput.desc')}
           </p>
 
           {request.type === 'CANVAS_SIZE' && (
             <div className="user-input-size-row">
               <div className="user-input-field-group">
-                <label className="user-input-label">Width</label>
+                <label className="user-input-label">{t('userInput.width')}</label>
                 <input 
                   type="number" 
                   value={formData.width || ''} 
@@ -101,7 +101,7 @@ const UserInputModal = () => {
                 />
               </div>
               <div className="user-input-field-group">
-                <label className="user-input-label">Height</label>
+                <label className="user-input-label">{t('userInput.height')}</label>
                 <input 
                   type="number" 
                   value={formData.height || ''} 
@@ -120,14 +120,14 @@ const UserInputModal = () => {
                 className={`user-input-approve-btn ${formData.approval === 'APPROVE' ? 'active' : ''}`}
               >
                 <Icon name={ICONS.CLOUD_CHECK} style={{ width: 16, height: 16 }} />
-                Approve
+                {t('userInput.approve')}
               </button>
               <button 
                 onClick={() => setFormData({...formData, approval: 'REJECT'})}
                 className={`user-input-reject-btn ${formData.approval === 'REJECT' ? 'active' : ''}`}
               >
                 <Icon name={ICONS.X} style={{ width: 16, height: 16 }} />
-                Reject
+                {t('userInput.reject')}
               </button>
             </div>
           )}
@@ -135,7 +135,7 @@ const UserInputModal = () => {
           {/* Progress Bar for Timeout */}
           <div className="user-input-timer">
             <div className="user-input-timer-header">
-              <span>Auto-submitting in:</span>
+              <span>{t('userInput.autoSubmitIn')}</span>
               <span className="user-input-timer-count">{timeLeft}s</span>
             </div>
             <div className="user-input-progress-track">
@@ -148,8 +148,8 @@ const UserInputModal = () => {
         </div>
 
         <div className="modal-footer user-input-footer">
-          <button className="btn" onClick={handleCancel}>Cancel</button>
-          <button className="btn btn-primary" onClick={() => handleSubmit(false)}>Submit</button>
+          <button className="btn" onClick={handleCancel}>{t('userInput.cancel')}</button>
+          <button className="btn btn-primary" onClick={() => handleSubmit(false)}>{t('userInput.submit')}</button>
         </div>
       </div>
     </div>

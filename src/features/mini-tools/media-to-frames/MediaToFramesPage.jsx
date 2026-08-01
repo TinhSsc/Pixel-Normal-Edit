@@ -11,6 +11,7 @@ import RelatedTools from '../shared/RelatedTools';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import { decompressFrames, parseGIF } from 'gifuct-js';
+import { t } from '../../../i18n/i18n.js';
 
 const ACCENT = '#06b6d4';
 
@@ -88,7 +89,7 @@ export default function MediaToFramesPage() {
     const gif = parseGIF(buffer);
     const rawFrames = decompressFrames(gif, true);
 
-    setProgress({ current: 0, total: rawFrames.length, label: 'Đang giải mã GIF...' });
+    setProgress({ current: 0, total: rawFrames.length, label: t('mediaToFrames.status.decodingGif') });
 
     const w = gif.lsd.width;
     const h = gif.lsd.height;
@@ -109,7 +110,7 @@ export default function MediaToFramesPage() {
 
         // Snapshot this frame async
         const src = await new Promise(resolve => canvas.toBlob(b => resolve(b ? URL.createObjectURL(b) : ''), 'image/png'));
-        if (!src) throw new Error('toBlob failed');
+        if (!src) throw new Error(t('error.toBlobFailed'));
         
         const newFrame = { src, label: `Frame ${i + 1}`, selected: true };
         extracted.push(newFrame);
@@ -170,7 +171,7 @@ export default function MediaToFramesPage() {
 
             ctx.drawImage(video, 0, 0);
             const src = await new Promise(resolve => canvas.toBlob(b => resolve(b ? URL.createObjectURL(b) : ''), 'image/png'));
-            if (!src) throw new Error('toBlob failed');
+            if (!src) throw new Error(t('error.toBlobFailed'));
 
             const newFrame = { src, label: `t=${time.toFixed(2)}s`, selected: true };
             extracted.push(newFrame);
@@ -189,7 +190,7 @@ export default function MediaToFramesPage() {
       };
       video.onerror = () => {
         URL.revokeObjectURL(url);
-        reject(new Error('Không thể đọc video'));
+        reject(new Error(t('mediaToFrames.error.readVideo')));
       };
     });
   };
@@ -200,7 +201,7 @@ export default function MediaToFramesPage() {
     const isVideo = file.type.startsWith('video/') || file.name.match(/\.(mp4|webm|mov|avi)$/i);
 
     if (!isGif && !isVideo) {
-      setError('Chỉ hỗ trợ file GIF hoặc Video (MP4, WebM, MOV).');
+      setError(t('mediaToFrames.error.onlyGifVideo'));
       return;
     }
 
@@ -217,7 +218,7 @@ export default function MediaToFramesPage() {
         await extractVideoFrames(file);
       }
     } catch (e) {
-      setError('Lỗi tách frame: ' + (e.message || String(e)));
+      setError(t('mediaToFrames.error.extract', e.message || String(e)));
     }
 
     setExtracting(false);
@@ -246,7 +247,7 @@ export default function MediaToFramesPage() {
       CanvasHelper.downloadBlob(blob, `frame_1.${ext}`);
     } else {
       // Multiple: ZIP with progress
-      setProgress({ current: 0, total: selectedFrames.length, label: 'Đang tạo ZIP...' });
+      setProgress({ current: 0, total: selectedFrames.length, label: t('mediaToFrames.status.creatingZip') });
       const zip = new JSZip();
       for (let i = 0; i < selectedFrames.length; i++) {
         const f = selectedFrames[i];
@@ -266,7 +267,7 @@ export default function MediaToFramesPage() {
         setProgress({ current: i + 1, total: selectedFrames.length, label: `${i + 1}/${selectedFrames.length}` });
         if (i % 5 === 0) await yieldToMain();
       }
-      setProgress({ current: selectedFrames.length, total: selectedFrames.length, label: 'Đang nén ZIP...' });
+      setProgress({ current: selectedFrames.length, total: selectedFrames.length, label: t('mediaToFrames.status.compressingZip') });
       const zipBlob = await zip.generateAsync({ type: 'blob' });
       saveAs(zipBlob, 'frames.zip');
       setProgress(null);
@@ -276,8 +277,8 @@ export default function MediaToFramesPage() {
   return (
     <div style={{ background: '#0B0F16', minHeight: '100vh', display: 'block', overflowY: 'auto', color: '#F5F7FA', fontFamily: 'Inter, sans-serif' }}>
       <SEOHeader
-        title="Tách GIF / Video thành ảnh | Pixel Normal Edit"
-        description="Tách từng frame của GIF hoặc Video (MP4, WebM) thành ảnh riêng biệt. Hiển thị dần dần, tải về ZIP. Hoàn toàn xử lý cục bộ trên trình duyệt."
+        title={t('mediaToFrames.seo.title')}
+        description={t('mediaToFrames.seo.desc')}
         schema={{ applicationCategory: 'UtilitiesApplication' }}
       />
 
@@ -287,10 +288,10 @@ export default function MediaToFramesPage() {
         </div>
         <div style={{ display: 'flex', gap: '12px' }}>
           <button onClick={() => navigate('home')} className="interact-btn" style={{ background: 'transparent', color: '#B8C0CC', border: 'none', padding: '8px 16px', borderRadius: '6px', fontWeight: 500, cursor: 'pointer', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <LucideIcon name="arrow-left" width="16" height="16" /> Trang chủ
+            <LucideIcon name="arrow-left" width="16" height="16" /> {t('mediaToFrames.nav.home')}
           </button>
           <button onClick={() => window.location.href = '/'} className="interact-btn" style={{ background: '#3b82f6', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: '6px', fontWeight: 600, cursor: 'pointer', fontSize: '14px' }}>
-            Pixel Editor
+            {t('mediaToFrames.nav.editor')}
           </button>
         </div>
       </header>
@@ -301,13 +302,13 @@ export default function MediaToFramesPage() {
         <div className="anim-fade-in" style={{ textAlign: 'center', marginBottom: '40px' }}>
           <div style={{ display: 'inline-block', padding: '6px 14px', background: `rgba(6,182,212,0.12)`, color: ACCENT, borderRadius: '20px', fontSize: '13px', fontWeight: 600, marginBottom: '16px' }}>
             <LucideIcon name="scissors" width="14" height="14" style={{ marginRight: '6px', verticalAlign: 'text-bottom' }} />
-            Tách GIF / Video thành ảnh
+            {t('mediaToFrames.badge')}
           </div>
           <h2 style={{ fontSize: '34px', fontWeight: 800, color: '#F5F7FA', margin: '0 0 14px 0', letterSpacing: '-0.02em' }}>
-            Extract từng frame của GIF & Video
+            {t('mediaToFrames.title')}
           </h2>
           <p style={{ fontSize: '16px', color: '#B8C0CC', lineHeight: 1.6, maxWidth: '580px', margin: '0 auto' }}>
-            Upload file GIF hoặc Video. Các frame được hiển thị dần ngay khi tách xong — không cần đợi. Tải về từng ảnh hoặc cả ZIP.
+            {t('mediaToFrames.desc')}
           </p>
         </div>
 
@@ -336,10 +337,10 @@ export default function MediaToFramesPage() {
                 <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: `rgba(6,182,212,0.12)`, color: ACCENT, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <LucideIcon name="scissors" width="28" height="28" />
                 </div>
-                <h3 style={{ fontSize: '20px', fontWeight: 600, color: '#F5F7FA', margin: 0 }}>Kéo thả GIF hoặc Video vào đây</h3>
-                <p style={{ fontSize: '14px', color: '#8B949E', margin: 0 }}>Hỗ trợ: GIF · MP4 · WebM · MOV</p>
+                <h3 style={{ fontSize: '20px', fontWeight: 600, color: '#F5F7FA', margin: 0 }}>{t('mediaToFrames.drop.title')}</h3>
+                <p style={{ fontSize: '14px', color: '#8B949E', margin: 0 }}>{t('mediaToFrames.drop.support')}</p>
                 <button className="interact-btn" style={{ background: ACCENT, color: '#000', border: 'none', padding: '10px 24px', borderRadius: '8px', fontWeight: 700, cursor: 'pointer', fontSize: '14px' }}>
-                  Chọn file
+                  {t('mediaToFrames.drop.button')}
                 </button>
               </div>
             )}
@@ -354,7 +355,7 @@ export default function MediaToFramesPage() {
                   </div>
                 </div>
                 <button onClick={() => { reset(); fileInputRef.current.click(); }} style={{ background: 'rgba(6,182,212,0.1)', color: ACCENT, border: 'none', padding: '7px 14px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', fontSize: '12px' }}>
-                  Đổi file
+                  {t('mediaToFrames.changeFile')}
                 </button>
                 <input ref={fileInputRef} type="file" accept="image/gif,video/*" hidden onChange={(e) => handleFile(e.target.files[0])} />
               </div>
@@ -365,7 +366,7 @@ export default function MediaToFramesPage() {
               <div style={{ background: '#161B22', border: '1px solid rgba(6,182,212,0.2)', borderRadius: '12px', padding: '16px 18px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '13px' }}>
                   <span style={{ color: ACCENT, fontWeight: 600 }}>
-                    {extracting ? 'Đang tách frame...' : 'Đang xử lý...'}
+                    {extracting ? t('mediaToFrames.extracting') : t('mediaToFrames.processing')}
                   </span>
                   <span style={{ color: '#8B949E' }}>{progress?.label}</span>
                 </div>
@@ -382,11 +383,11 @@ export default function MediaToFramesPage() {
               <div style={{ background: '#161B22', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '20px', overflow: 'hidden' }}>
                 <div style={{ padding: '14px 18px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
                   <span style={{ fontWeight: 600, color: '#F5F7FA' }}>
-                    {frames.length} frames {extracting && <span style={{ color: '#8B949E', fontSize: '13px' }}>(đang tách...)</span>}
+                    {frames.length} frames {extracting && <span style={{ color: '#8B949E', fontSize: '13px' }}>{t('mediaToFrames.extractingHint')}</span>}
                   </span>
                   <div style={{ display: 'flex', gap: '8px' }}>
-                    <button onClick={selectAll} style={{ background: 'transparent', color: ACCENT, border: `1px solid rgba(6,182,212,0.3)`, padding: '4px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '11px', fontWeight: 600 }}>Chọn tất cả</button>
-                    <button onClick={selectNone} style={{ background: 'transparent', color: '#8B949E', border: '1px solid rgba(255,255,255,0.1)', padding: '4px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '11px', fontWeight: 600 }}>Bỏ chọn</button>
+                    <button onClick={selectAll} style={{ background: 'transparent', color: ACCENT, border: `1px solid rgba(6,182,212,0.3)`, padding: '4px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '11px', fontWeight: 600 }}>{t('mediaToFrames.selectAll')}</button>
+                    <button onClick={selectNone} style={{ background: 'transparent', color: '#8B949E', border: '1px solid rgba(255,255,255,0.1)', padding: '4px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '11px', fontWeight: 600 }}>{t('mediaToFrames.selectNone')}</button>
                   </div>
                 </div>
                 <div onScroll={(e) => {
@@ -424,11 +425,11 @@ export default function MediaToFramesPage() {
           {frames.length > 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div style={{ background: '#161B22', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '20px', padding: '22px' }}>
-                <div style={{ fontSize: '14px', fontWeight: 700, color: '#F5F7FA', marginBottom: '18px' }}>Tùy chọn xuất</div>
+                <div style={{ fontSize: '14px', fontWeight: 700, color: '#F5F7FA', marginBottom: '18px' }}>{t('mediaToFrames.exportOptions')}</div>
 
                 {/* Format */}
                 <div style={{ marginBottom: '18px' }}>
-                  <div style={{ fontSize: '12px', color: '#8B949E', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>Định dạng ảnh</div>
+                  <div style={{ fontSize: '12px', color: '#8B949E', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>{t('mediaToFrames.imageFormat')}</div>
                   <div style={{ display: 'flex', gap: '6px', background: '#0B0F16', padding: '5px', borderRadius: '10px' }}>
                     {['image/png', 'image/jpeg', 'image/webp'].map(f => (
                       <button key={f} onClick={() => setFormat(f)} style={{ flex: 1, padding: '8px 4px', borderRadius: '7px', border: 'none', fontWeight: 700, fontSize: '12px', cursor: 'pointer', background: format === f ? ACCENT : 'transparent', color: format === f ? '#000' : '#8B949E', transition: 'all 0.2s' }}>
@@ -441,7 +442,7 @@ export default function MediaToFramesPage() {
                 {format !== 'image/png' && (
                   <div style={{ marginBottom: '18px' }}>
                     <div style={{ fontSize: '12px', color: '#8B949E', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px', display: 'flex', justifyContent: 'space-between' }}>
-                      <span>Chất lượng</span><span style={{ color: ACCENT }}>{Math.round(quality * 100)}%</span>
+                      <span>{t('mediaToFrames.quality')}</span><span style={{ color: ACCENT }}>{Math.round(quality * 100)}%</span>
                     </div>
                     <input type="range" min="0.5" max="1" step="0.05" value={quality} onChange={e => setQuality(Number(e.target.value))} style={{ width: '100%', accentColor: ACCENT }} />
                   </div>
@@ -449,26 +450,26 @@ export default function MediaToFramesPage() {
 
                 {/* Selected count */}
                 <div style={{ background: '#0B0F16', borderRadius: '10px', padding: '12px 14px', marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '13px', color: '#8B949E' }}>Đã chọn</span>
+                  <span style={{ fontSize: '13px', color: '#8B949E' }}>{t('mediaToFrames.selected')}</span>
                   <span style={{ fontSize: '15px', fontWeight: 700, color: ACCENT }}>{selectedFrames.length}/{frames.length} frames</span>
                 </div>
 
                 <button onClick={handleDownload} disabled={!selectedFrames.length || extracting} className="interact-btn"
                   style={{ width: '100%', background: !selectedFrames.length || extracting ? '#374151' : ACCENT, color: !selectedFrames.length || extracting ? '#6b7280' : '#000', border: 'none', padding: '14px', borderRadius: '12px', fontWeight: 700, cursor: !selectedFrames.length || extracting ? 'not-allowed' : 'pointer', fontSize: '15px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
                   <LucideIcon name="download" width="18" height="18" />
-                  {selectedFrames.length > 1 ? `Tải ZIP (${selectedFrames.length} ảnh)` : 'Tải ảnh'}
+                  {selectedFrames.length > 1 ? t('mediaToFrames.downloadZip', selectedFrames.length) : t('mediaToFrames.downloadImage')}
                 </button>
               </div>
 
               {/* Video FPS hint */}
               <div style={{ background: '#161B22', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px', padding: '18px' }}>
-                <div style={{ fontSize: '13px', color: '#8B949E', fontWeight: 600, marginBottom: '10px' }}>Video: Số frame/giây cần tách</div>
+                <div style={{ fontSize: '13px', color: '#8B949E', fontWeight: 600, marginBottom: '10px' }}>{t('mediaToFrames.videoFps')}</div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#8B949E', marginBottom: '6px' }}>
-                  <span>FPS extract</span><span style={{ color: ACCENT }}>{videoFps} fps</span>
+                  <span>{t('mediaToFrames.fpsExtract')}</span><span style={{ color: ACCENT }}>{videoFps} fps</span>
                 </div>
                 <input type="range" min="1" max="30" value={videoFps} onChange={e => setVideoFps(Number(e.target.value))} disabled={!!sourceInfo} style={{ width: '100%', accentColor: ACCENT, opacity: sourceInfo ? 0.5 : 1, cursor: sourceInfo ? 'not-allowed' : 'pointer' }} />
                 <div style={{ fontSize: '11px', color: '#4b5563', marginTop: '5px' }}>
-                  {sourceInfo ? "⚠️ Hãy tải lại file video để áp dụng FPS mới." : `Video 30s × ${videoFps}fps ≈ ${30 * videoFps} ảnh`}
+                  {sourceInfo ? t('mediaToFrames.reloadForFps') : t('mediaToFrames.videoEstimate', videoFps, 30 * videoFps)}
                 </div>
               </div>
             </div>

@@ -6,6 +6,7 @@
  */
 import { useState, useEffect } from 'react';
 import { CanvasHelper } from './CanvasHelper';
+import { t } from '../../../i18n/i18n.js';
 
 /**
  * Ước tính dung lượng file đầu ra
@@ -36,7 +37,7 @@ export default function DownloadButton({
 
   const handleDownload = async () => {
     try {
-      if (!canvas) throw new Error('Chưa có ảnh để tải');
+      if (!canvas) throw new Error(t('downloadButton.noImage'));
 
       const blob = await CanvasHelper.toBlob(canvas, format, quality);
       const ext = format.split('/')[1].replace('jpeg', 'jpg');
