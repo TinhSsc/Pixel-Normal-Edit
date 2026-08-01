@@ -37,8 +37,21 @@ export function reloadLucideIcons(delay = 0) {
     const doReload = () => {
       if (window.lucide && typeof window.lucide.createIcons === 'function') {
         window.lucide.createIcons();
+        resolve();
+        return;
       }
-      resolve();
+      // Script lucide chưa load xong (CDN chậm) -> chờ rồi tạo icons
+      const start = Date.now();
+      const timer = setInterval(() => {
+        if (window.lucide && typeof window.lucide.createIcons === 'function') {
+          clearInterval(timer);
+          window.lucide.createIcons();
+          resolve();
+        } else if (Date.now() - start > 10000) {
+          clearInterval(timer);
+          resolve();
+        }
+      }, 100);
     };
 
     if (delay > 0) {

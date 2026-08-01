@@ -132,6 +132,7 @@ export default function CanvasSettingsModal({ isOpen, onClose }) {
               <label style={{ display: 'block', fontSize: '10px', fontWeight: 'bold', color: 'var(--color-text-muted)', marginBottom: '6px', textTransform: 'uppercase' }} data-i18n="label.width">{t('label.width') || 'Width'}</label>
               <CustomNumberInput 
                 value={width} 
+                max={9999}
                 onChange={handleWidthChange} 
               />
             </div>
@@ -139,6 +140,7 @@ export default function CanvasSettingsModal({ isOpen, onClose }) {
               <label style={{ display: 'block', fontSize: '10px', fontWeight: 'bold', color: 'var(--color-text-muted)', marginBottom: '6px', textTransform: 'uppercase' }} data-i18n="label.height">{t('label.height') || 'Height'}</label>
               <CustomNumberInput 
                 value={height} 
+                max={9999}
                 onChange={handleHeightChange} 
               />
             </div>

@@ -168,6 +168,12 @@ export default function HomePage() {
     };
   }, []);
 
+  // Chạy sau MỖI lần render: React re-render sẽ thay <i data-lucide> bằng <svg>,
+  // nên cần tạo lại icons để tránh icon biến mất sau khi auth state cập nhật.
+  useEffect(() => {
+    reloadLucideIcons();
+  });
+
 
   const cycleTheme = () => {
     const next = THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length];
@@ -305,7 +311,7 @@ export default function HomePage() {
               {t('home.hero.desc', 'Nền tảng xử lý ảnh trực tiếp trên trình duyệt — không cần tài khoản, không upload lên server, dữ liệu của bạn chỉ thuộc về bạn.')}
             </p>
             <div style={{ display: 'flex', gap: '16px' }}>
-              <button onClick={() => navigate('')} className="interact-btn" style={{ background: 'var(--home-surface)', color: 'var(--home-text)', border: '1px solid var(--home-border)', padding: '16px 32px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', fontSize: '16px' }}>
+              <button onClick={() => navigate('editor')} className="interact-btn" style={{ background: 'var(--home-surface)', color: 'var(--home-text)', border: '1px solid var(--home-border)', padding: '16px 32px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer', fontSize: '16px' }}>
                 {t('home.hero.cta.editor', 'Pixel Editor')}
               </button>
             </div>
