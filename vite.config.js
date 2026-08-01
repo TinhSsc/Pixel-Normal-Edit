@@ -39,7 +39,7 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,wasm}'],
-        maximumFileSizeToCacheInBytes: 5000000 // 5MB for WebAssembly or large files
+        maximumFileSizeToCacheInBytes: 20000000 // 20MB for WebAssembly or large files
       },
       devOptions: {
         enabled: true,
