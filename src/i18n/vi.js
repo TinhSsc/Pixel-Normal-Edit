@@ -1129,4 +1129,6 @@ export default {
   "framesToMedia.loading": "Đang tải...",
   "framesToMedia.seo.desc": "Ghép ảnh PNG, JPG, WebP thành GIF động hoặc WebM. Chuyển Video sang GIF và ngược lại. Hoàn toàn xử lý cục bộ trên trình duyệt.",
   "framesToMedia.webmVideo": "WebM Video",
+  "format.jpeg": "JPG",
+  "format.jpegDesc": "File nhỏ hơn, không nền trong suốt",
 }

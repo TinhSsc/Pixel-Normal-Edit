@@ -1127,4 +1127,6 @@ export default {
   "framesToMedia.loading": "Loading...",
   "framesToMedia.seo.desc": "Combine PNG, JPG, WebP images into animated GIF or WebM. Convert Video to GIF and back. Fully processed locally in your browser.",
   "framesToMedia.webmVideo": "WebM Video",
+  "format.jpeg": "JPG",
+  "format.jpegDesc": "Smaller file, no transparency",
 };

@@ -412,6 +412,8 @@ const MASTER = {
   "format.gifDesc": { en: "Animated GIF format", vi: "Định dạng ảnh động GIF" },
   "format.jpg": { en: "JPG", vi: "JPG" },
   "format.jpgDesc": { en: "Smaller file, no transparency", vi: "File nhỏ hơn, không nền trong suốt" },
+  "format.jpeg": { en: "JPG", vi: "JPG" },
+  "format.jpegDesc": { en: "Smaller file, no transparency", vi: "File nhỏ hơn, không nền trong suốt" },
   "format.json": { en: "JSON", vi: "JSON" },
   "format.jsonDesc": { en: "Project file (editable)", vi: "File dự án (có thể sửa lại)" },
   "format.png": { en: "PNG", vi: "PNG" },
