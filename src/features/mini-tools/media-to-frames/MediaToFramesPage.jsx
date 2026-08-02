@@ -35,10 +35,12 @@ const waitForSeek = (video, timeout = 500) => {
       if (!resolved) {
         resolved = true;
         video.removeEventListener('seeked', onSeeked);
+        let retries = 0;
         const check = () => {
-          if (video.readyState >= 2) {
+          if (video.readyState >= 2 || retries > 60) {
             resolve();
           } else {
+            retries++;
             requestAnimationFrame(check);
           }
         };
@@ -138,6 +140,16 @@ export default function MediaToFramesPage() {
     return new Promise((resolve, reject) => {
       const url = URL.createObjectURL(file);
       const video = document.createElement('video');
+      video.style.position = 'fixed';
+      video.style.top = '0';
+      video.style.left = '0';
+      video.style.opacity = '0.01';
+      video.style.pointerEvents = 'none';
+      video.style.width = '10px';
+      video.style.height = '10px';
+      video.style.zIndex = '-9999';
+      document.body.appendChild(video);
+      
       video.src = url;
       video.preload = 'auto';
       video.muted = true;
@@ -177,9 +189,16 @@ export default function MediaToFramesPage() {
             const time = i * interval;
             const seekPromise = waitForSeek(video);
             video.currentTime = Math.min(time, duration - 0.01);
+            
+            // On mobile, seeking while paused might not fetch data. Force fetch:
+            let playAttempt = video.play();
+            if (playAttempt !== undefined) playAttempt.catch(() => {});
+
             await seekPromise;
 
+            // Important: draw before pause!
             ctx.drawImage(video, 0, 0);
+            video.pause();
             const src = await new Promise(resolve => canvas.toBlob(b => resolve(b ? URL.createObjectURL(b) : ''), 'image/png'));
             if (!src) throw new Error(t('error.toBlobFailed'));
 
@@ -195,10 +214,12 @@ export default function MediaToFramesPage() {
           // Yield every 2 frames so browser paints
           if (i % 2 === 0) await yieldToMain();
         }
+        if (video.parentNode) video.parentNode.removeChild(video);
         URL.revokeObjectURL(url);
         resolve(extracted);
       };
       video.onerror = () => {
+        if (video.parentNode) video.parentNode.removeChild(video);
         URL.revokeObjectURL(url);
         reject(new Error(t('mediaToFrames.error.readVideo')));
       };

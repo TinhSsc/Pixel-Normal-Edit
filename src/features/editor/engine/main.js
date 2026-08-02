@@ -30,7 +30,7 @@ import { exportJpeg, generateWorkspaceJpegBlob } from '../io/export/export-jpeg.
 import { exportJson, generateWorkspaceJsonBlob } from '../io/export/export-json.js';
 import { exportPng, generateWorkspacePngBlob } from '../io/export/export-png.js';
 import { exportWebp, generateWorkspaceWebpBlob } from '../io/export/export-webp.js';
-import { generateSpriteSheetBlob, generateZipBlob, exportSpriteSheet, exportZip } from '../io/export/export-animation.js';
+import { generateSpriteSheetBlob, generateZipBlob, exportSpriteSheet, exportZip, exportAnimation } from '../io/export/export-animation.js';
 import { getCurrentDirectoryHandle, saveFileToLocalDrive, initLocalDrive } from '../../storage/local/local-drive.js';
 import { exportToDrive, showNotification } from '../../storage/cloud/drive-ui.js';
 
@@ -315,8 +315,7 @@ export function initEditor() {
                if (format === 'spritesheet') return generateSpriteSheetBlob(tab, exportOptions);
                if (format === 'zip') return generateZipBlob(tab, exportOptions);
                if (format === 'webm' || format === 'gif') {
-                  const animExport = await import('../io/export/export-animation.js');
-                  return animExport.exportAnimation(tab, format, exportOptions);
+                  return exportAnimation(tab, format, exportOptions);
                }
             };
             

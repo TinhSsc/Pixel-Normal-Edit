@@ -86,6 +86,16 @@ export default function GifSimplifyPage() {
     return new Promise((resolve, reject) => {
       const url = URL.createObjectURL(file);
       const video = document.createElement('video');
+      video.style.position = 'fixed';
+      video.style.top = '0';
+      video.style.left = '0';
+      video.style.opacity = '0.01';
+      video.style.pointerEvents = 'none';
+      video.style.width = '10px';
+      video.style.height = '10px';
+      video.style.zIndex = '-9999';
+      document.body.appendChild(video);
+      
       video.src = url;
       video.preload = 'auto';
       video.muted = true;
@@ -93,14 +103,27 @@ export default function GifSimplifyPage() {
       video.setAttribute('playsinline', '');
 
       const seekTo = (t) => new Promise((res, rej) => {
-        const onSeeked = () => { cleanup(); res(); };
-        const onError = () => { cleanup(); rej(new Error(t('error.videoSeek'))); };
+        let isDone = false;
         const cleanup = () => {
+          if (isDone) return;
+          isDone = true;
           video.removeEventListener('seeked', onSeeked);
           video.removeEventListener('error', onError);
         };
+        const onSeeked = () => { cleanup(); res(); };
+        const onError = () => { cleanup(); rej(new Error(t('error.videoSeek'))); };
+        
         video.addEventListener('seeked', onSeeked);
         video.addEventListener('error', onError);
+        
+        // Timeout fallback
+        setTimeout(() => {
+          if (!isDone) {
+            cleanup();
+            res(); // Resolve anyway to avoid hanging
+          }
+        }, 1000);
+
         video.currentTime = t;
       });
 
@@ -130,8 +153,16 @@ export default function GifSimplifyPage() {
             try {
               const time = Math.min(i * interval, duration - 0.01);
               // Bỏ qua seek nếu đang đứng đúng vị trí (tránh treo khi currentTime == 0)
-              if (Math.abs(video.currentTime - time) > 0.001) await seekTo(time);
+              if (Math.abs(video.currentTime - time) > 0.001) {
+                let playAttempt = video.play();
+                if (playAttempt !== undefined) playAttempt.catch(() => {});
+                await seekTo(time);
+              }
+              // Draw before pause
               ctx.drawImage(video, 0, 0);
+              if (Math.abs(video.currentTime - time) > 0.001) {
+                video.pause();
+              }
               const src = await new Promise(r => canvas.toBlob(b => r(b ? URL.createObjectURL(b) : ''), 'image/png'));
               if (!src) throw new Error(t('error.toBlobFailed'));
               setFrames(prev => [...prev, { src, label: `t=${time.toFixed(2)}s` }]);
@@ -141,16 +172,19 @@ export default function GifSimplifyPage() {
             }
             if (i % 2 === 0) await yieldToMain();
           }
+          if (video.parentNode) video.parentNode.removeChild(video);
           URL.revokeObjectURL(url);
           resolve();
-        } catch (e) {
+        } catch(err) {
+          if (video.parentNode) video.parentNode.removeChild(video);
           URL.revokeObjectURL(url);
-          reject(e);
+          reject(err);
         }
       };
       video.onerror = () => {
+        if (video.parentNode) video.parentNode.removeChild(video);
         URL.revokeObjectURL(url);
-        reject(new Error(t('error.videoRead')));
+        reject(new Error(t('error.videoLoad')));
       };
     });
   };
