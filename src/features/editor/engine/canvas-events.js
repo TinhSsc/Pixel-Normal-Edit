@@ -26,6 +26,8 @@ import { useHandTool } from './tools/hand.js';
 import { useReplaceColor } from './tools/replace-color.js';
 import { useSelectTool } from './tools/select.js';
 import { useTextTool } from './tools/text.js';
+import { toolbarConfig } from './tool-registry/toolbar-manager.js';
+import { navigationConfig } from '../ui/edit-panel/navigation-manager.js';
 let isDrawing = false;
 let lastCell = null;
 let panStart = null;
@@ -33,6 +35,13 @@ let rulerAnchor = null;
 let rulerDir = null;
 let measureStartCell = null;
 let measureHideTimer = null;
+
+// Tập hợp các tool hợp lệ có thể dùng trên canvas (không phụ thuộc DOM, không bị ảnh hưởng bởi việc ẩn nút)
+const VALID_TOOLS = new Set([
+  ...Object.keys(toolbarConfig.tools),
+  ...Object.keys(navigationConfig.tools),
+  'pan'
+]);
 
 function getColor(btn) {
   if (btn === 2) return els.colorPicker2?.value || '#ffffff';
@@ -291,9 +300,8 @@ function onPointerDown(e) {
     return;
   }
 
-  // Verify that the current tool is actually selected and visible in the UI
-  const activeBtn = document.querySelector(`.tool-btn[data-tool="${currentTool}"]`);
-  if (!activeBtn || !activeBtn.classList.contains('active')) {
+  // Verify that the current tool is valid and can be used (engine state, not DOM)
+  if (!currentTool || !VALID_TOOLS.has(currentTool)) {
     setStatus(t('status.toolHidden') || 'Vui lòng chọn một công cụ để sử dụng.');
     return;
   }

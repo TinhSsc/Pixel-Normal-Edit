@@ -630,25 +630,38 @@
 .home-nav-link {
   transition: color 0.2s ease;
 }
-.home-nav-link:hover {
-  color: #F5F7FA !important;
+@media (hover: hover) {
+  .home-nav-link:hover {
+    color: #F5F7FA !important;
+  }
 }
 
 /* Tool cards */
 .home-tool-card {
   transition: all 0.2s ease;
 }
-.home-tool-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(255,255,255,0.15) !important;
-  background: rgba(255,255,255,0.02) !important;
+@media (hover: hover) {
+  .home-tool-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(255,255,255,0.15) !important;
+    background: rgba(255,255,255,0.02) !important;
+  }
 }
 
 /* CTA buttons */
 .home-cta-btn {
   transition: all 0.2s ease;
 }
-.home-cta-btn:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
+@media (hover: hover) {
+  .home-cta-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+}
+
+/* Fix mobile layout for mini-tools grids */
+@media (max-width: 900px) {
+  div[style*="grid-template-columns: 1fr 3"] {
+    grid-template-columns: 1fr !important;
+  }
 }

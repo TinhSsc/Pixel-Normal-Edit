@@ -127,8 +127,8 @@ function PinnedVariantBtn({ baseTool, variant }) {
 
   const handleClick = (e) => {
     e.stopPropagation();
-    // Xóa active khỏi tất cả .tool-btn (vanilla JS style đang dùng)
-    document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+    // Xóa active khỏi tất cả .tool-btn tool thật (không đụng toggle mode ở panel edit)
+    document.querySelectorAll('.tool-btn[data-tool]').forEach(b => b.classList.remove('active'));
     // Dispatch để vanilla JS (events.js bindQuickPinBarEvents) xử lý activation
     window.dispatchEvent(new CustomEvent('pinned-variant-click', {
       detail: { baseTool, variantId: variant.id, label: variant.label }

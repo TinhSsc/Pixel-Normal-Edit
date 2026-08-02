@@ -5,7 +5,7 @@ import { els } from './state.js';
  * Lấy các giá trị hiện tại của UI và lưu vào localStorage.
  */
 export function saveToolbarState() {
-  let activeTool = document.querySelector('.tool-btn.active')?.dataset?.tool || '';
+  let activeTool = document.querySelector('.tool-btn[data-tool].active')?.dataset?.tool || '';
   
   // Bạn có thể thêm logic loại trừ lưu trữ ở đây, nhưng theo yêu cầu
   // việc quyết định reset cái gì sẽ do file toolbar-reset.js đảm nhận.

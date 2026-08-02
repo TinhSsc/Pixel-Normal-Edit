@@ -81,7 +81,7 @@ export function bindQuickPinBarEvents() {
   window.addEventListener('pinned-variant-click', (e) => {
     const { baseTool, variantId, label } = e.detail;
     // Xóa active khỏi mọi tool-btn (bao gồm cả .pinned-tool-btn)
-    document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tool-btn[data-tool]').forEach(b => b.classList.remove('active'));
     setCurrentTool(baseTool, variantId);
     setStatus(`${t('status.toolSelected') || 'Selected'} ${label}`);
     // Cập nhật icon trên tool-btn gốc
@@ -100,7 +100,7 @@ export function bindQuickPinBarEvents() {
       const { baseTool, variantId } = btn.dataset;
       
       // Remove active from ALL tool buttons
-      document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tool-btn[data-tool]').forEach(b => b.classList.remove('active'));
       
       // Set THIS pinned button as active
       btn.classList.add('active');
@@ -115,6 +115,10 @@ export function bindQuickPinBarEvents() {
     // If they clicked a normal tool button
     const normalToolBtn = e.target.closest('.tool-btn');
     if (normalToolBtn && !normalToolBtn.classList.contains('pinned-tool-btn')) {
+      // Action buttons (cut/copy/paste...) are momentary — never treated as tools
+      const baseTool = normalToolBtn.dataset.tool;
+      if (baseTool && ['cut', 'copy', 'paste'].includes(baseTool)) return;
+
       // It's a main tool button. Remove active from all pinned tools
       document.querySelectorAll('.pinned-tool-btn').forEach(el => el.classList.remove('active'));
       
@@ -122,7 +126,6 @@ export function bindQuickPinBarEvents() {
       // Because main.js only sets the base tool (setCurrentTool(btn.dataset.tool)).
       // It doesn't pass the variant.
       // So we can intercept it here and update the variant!
-      const baseTool = normalToolBtn.dataset.tool;
       if (baseTool) {
         const variantId = getActiveVariant(baseTool, null);
         // We let main.js handle adding .active to the normal tool button

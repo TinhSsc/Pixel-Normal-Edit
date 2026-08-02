@@ -141,8 +141,18 @@ export default function MediaToFramesPage() {
       video.src = url;
       video.preload = 'auto';
       video.muted = true;
+      video.playsInline = true;
+      video.setAttribute('playsinline', '');
 
       video.onloadedmetadata = async () => {
+        // Force mobile browsers to fetch video data
+        try {
+          await video.play();
+          video.pause();
+        } catch (err) {
+          console.warn("Autoplay warning: ", err);
+        }
+
         // Fix for Infinity/NaN duration bug in some Chromium/Firefox versions for WebM/MP4
         if (!isFinite(video.duration) || isNaN(video.duration)) {
           video.currentTime = 1e101;

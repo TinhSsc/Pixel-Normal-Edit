@@ -130,6 +130,7 @@ export default function FramesToMediaPage() {
       video.preload = 'auto';
       video.muted = true;
       video.playsInline = true;
+      video.setAttribute('playsinline', '');
 
       const seekTo = (t) => new Promise((res, rej) => {
         const onSeeked = () => { cleanup(); res(); };
@@ -145,6 +146,10 @@ export default function FramesToMediaPage() {
 
       video.onloadedmetadata = async () => {
         try {
+          try {
+            await video.play();
+            video.pause();
+          } catch (err) {}
           if (!isFinite(video.duration) || isNaN(video.duration)) {
             video.currentTime = 1e101;
             await seekTo(1e101).catch(() => {});

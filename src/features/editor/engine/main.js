@@ -462,7 +462,7 @@ window.addEventListener('toolbar-mounted', () => {
     const variantId = e.detail?.variant;
     
     if (toolId) {
-      document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tool-btn[data-tool]').forEach(b => b.classList.remove('active'));
       
       let btnToActivate = null;
       if (variantId) {

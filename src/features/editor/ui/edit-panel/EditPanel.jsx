@@ -150,6 +150,12 @@ export default function EditPanel() {
                       <Icon name={tool.icon} />
                     </button>
                   );
+                } else if (tool.type === 'action') {
+                  btnContent = (
+                    <button data-tool={tool.id} className="tool-btn" data-i18n={tool.tooltipKey} title={tool.defaultTitle}>
+                      <Icon name={tool.icon} />
+                    </button>
+                  );
                 } else if (tool.type === 'tool') {
                   btnContent = <ToolButton toolConfig={tool} />;
                 }

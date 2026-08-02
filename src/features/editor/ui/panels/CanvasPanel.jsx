@@ -29,6 +29,7 @@ import TextToolOverlay from '../text/TextToolOverlay.jsx';
 import { renderPixels, setForceFullRender } from '../../engine/core/render.js';
 import { getZoom, getPan, setPan, applyTransform } from '../../engine/core/viewport.js';
 import { t } from '../../../../i18n/i18n.js';
+import { blendUint32 } from '../../engine/core/color-utils.js';
 
 function OnionSkinLayer({ frame }) {
   const ref = React.useRef(null);
@@ -41,7 +42,21 @@ function OnionSkinLayer({ frame }) {
     const ctx2d = ref.current.getContext('2d');
     const imageData = ctx2d.createImageData(width, height);
     const data32 = new Uint32Array(imageData.data.buffer);
-    data32.set(pixelMap);
+    
+    if (frame.layers && frame.layers.length > 0) {
+      const mergedMap = new Uint32Array(width * height);
+      for (const layer of frame.layers) {
+        if (!layer.visible) continue;
+        for (let i = 0; i < mergedMap.length; i++) {
+          if (layer.pixelMap[i] !== 0) {
+            mergedMap[i] = blendUint32(mergedMap[i], layer.pixelMap[i]);
+          }
+        }
+      }
+      data32.set(mergedMap);
+    } else if (pixelMap) {
+      data32.set(pixelMap);
+    }
     ctx2d.putImageData(imageData, 0, 0);
 
     const mainCanvas = document.getElementById('pixelCanvas');
