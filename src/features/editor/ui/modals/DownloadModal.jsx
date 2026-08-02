@@ -97,9 +97,16 @@ const DownloadModal = () => {
               <div style={{ flexShrink: 0 }}>
                 <h3 style={{ fontSize: '12px', fontWeight: 600, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '12px' }} data-i18n="download.destination">{t('download.destination') || 'Destination'}</h3>
                 <div style={{ display: 'flex', gap: '12px' }}>
-                  <button className="dl-dest-btn select-btn active interact-btn" data-dest="local" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', padding: '14px', borderRadius: '12px', transition: 'all 0.2s' }} data-i18n="tooltip.localDest">
-                    <Icon name={ICONS.MONITOR_DOWN} style={{ width: '18px', height: '18px' }} />
-                    <span style={{ fontSize: '14px', fontWeight: 500 }} data-i18n="download.local">{t('download.local') || 'Local Device'}</span>
+                  <button className="dl-dest-btn select-btn interact-btn" data-dest="download" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', padding: '14px', borderRadius: '12px', transition: 'all 0.2s' }} data-i18n="tooltip.downloadDest">
+                    <Icon name={ICONS.DOWNLOAD} style={{ width: '18px', height: '18px' }} />
+                    <span style={{ fontSize: '14px', fontWeight: 500 }} data-i18n="download.download">{t('download.download') || 'Download to device'}</span>
+                    <div className="active-checkmark" style={{ top: '50%', transform: 'translateY(-50%)', right: '12px' }}>
+                      <Icon name={ICONS.CHECK} style={{ width: '16px', height: '16px' }} />
+                    </div>
+                  </button>
+                  <button className="dl-dest-btn select-btn interact-btn" data-dest="local" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', padding: '14px', borderRadius: '12px', transition: 'all 0.2s' }} data-i18n="tooltip.localDest">
+                    <Icon name={ICONS.HARD_DRIVE} style={{ width: '18px', height: '18px' }} />
+                    <span style={{ fontSize: '14px', fontWeight: 500 }} data-i18n="download.folder">{t('download.folder') || 'Save to folder'}</span>
                     <div className="active-checkmark" style={{ top: '50%', transform: 'translateY(-50%)', right: '12px' }}>
                       <Icon name={ICONS.CHECK} style={{ width: '16px', height: '16px' }} />
                     </div>
@@ -110,6 +117,28 @@ const DownloadModal = () => {
                     <div className="active-checkmark" style={{ top: '50%', transform: 'translateY(-50%)', right: '12px' }}>
                       <Icon name={ICONS.CHECK} style={{ width: '16px', height: '16px' }} />
                     </div>
+                  </button>
+                </div>
+
+                {/* Local Folder Status */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginTop: '10px', padding: '10px 14px', borderRadius: '10px', backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flex: 1 }}>
+                    <Icon name={ICONS.HARD_DRIVE} style={{ width: '15px', height: '15px', color: 'var(--color-text-muted)', flexShrink: 0 }} />
+                    <span id="dlFolderStatusText" style={{ fontSize: '12.5px', color: 'var(--color-text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}></span>
+                  </div>
+                  <button id="chooseFolderBtn" className="btn interact-btn" style={{ padding: '5px 12px', fontSize: '12px', fontWeight: 500, borderRadius: '8px', backgroundColor: 'var(--color-surface-alt)', color: 'var(--color-text-bright)', flexShrink: 0 }} data-i18n="download.chooseFolder">
+                    {t('download.chooseFolder') || 'Choose folder'}
+                  </button>
+                </div>
+
+                {/* Drive Status */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginTop: '10px', padding: '10px 14px', borderRadius: '10px', backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flex: 1 }}>
+                    <Icon name={ICONS.CLOUD} style={{ width: '15px', height: '15px', color: 'var(--color-text-muted)', flexShrink: 0 }} />
+                    <span id="dlDriveStatusText" style={{ fontSize: '12.5px', color: 'var(--color-text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}></span>
+                  </div>
+                  <button id="driveLoginBtn" className="btn interact-btn" style={{ padding: '5px 12px', fontSize: '12px', fontWeight: 500, borderRadius: '8px', backgroundColor: 'var(--color-surface-alt)', color: 'var(--color-text-bright)', flexShrink: 0 }} data-i18n="download.chooseDriveLogin">
+                    {t('download.chooseDriveLogin') || 'Sign in to Drive'}
                   </button>
                 </div>
               </div>
