@@ -1,6 +1,6 @@
 import { initMainCanvasLayout, bindMainCanvasEvents } from './core/main-canvas-manager.js';
 import { els, setStatus, setCurrentTool, initEls, pixelMap } from './core/state.js';
-import { getTabs, getActiveTabId, initTabs, performQuickSave, debouncedSaveWorkspace, createTabFromData, refreshUIAfterBatchImport } from './core/tab-manager.js';
+import { getTabs, getActiveTabId, initTabs, performQuickSave, syncToDrive, debouncedSaveWorkspace, createTabFromData, refreshUIAfterBatchImport } from './core/tab-manager.js';
 import { isAnimationMode } from './core/animation-state.js';
 
 import { setupGradientMode } from './modes/gradient-mode.js';
@@ -31,9 +31,8 @@ import { exportJson, generateWorkspaceJsonBlob } from '../io/export/export-json.
 import { exportPng, generateWorkspacePngBlob } from '../io/export/export-png.js';
 import { exportWebp, generateWorkspaceWebpBlob } from '../io/export/export-webp.js';
 import { generateSpriteSheetBlob, generateZipBlob, exportSpriteSheet, exportZip, exportAnimation } from '../io/export/export-animation.js';
-import { getCurrentDirectoryHandle, saveFileToLocalDrive, initLocalDrive, pickLocalDirectory } from '../../storage/local/local-drive.js';
+import { getCurrentDirectoryHandle, saveFileToLocalDrive, initLocalDrive } from '../../storage/local/local-drive.js';
 import { exportToDrive, showNotification } from '../../storage/cloud/drive-ui.js';
-import { uploadToDrive, getDriveToken, loginToDrive } from '../../storage/cloud/drive-api.js';
 
 import { initCustomTooltip } from '../dom-adapter/tooltip.js';
 import { initMobilePopups } from '../dom-adapter/mobile-popups.js';
@@ -99,10 +98,7 @@ export function initEditor() {
     openDownloadModalBtn.addEventListener('click', () => {
       document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none');
       downloadModal.style.display = 'flex';
-
-      setActiveDest(getCurrentDirectoryHandle() ? 'local' : 'download');
-      updateDownloadDestStatus();
-
+      
       const canvasList = document.getElementById('downloadCanvasList');
       if (canvasList) {
         canvasList.innerHTML = '';
@@ -218,27 +214,6 @@ export function initEditor() {
     if (downloadModal) downloadModal.style.display = 'none';
   };
 
-  const updateDownloadDestStatus = () => {
-    const folderStatusText = document.getElementById('dlFolderStatusText');
-    const folderHandle = getCurrentDirectoryHandle();
-    if (folderStatusText) {
-      folderStatusText.textContent = folderHandle
-        ? `${t('download.folderSelected') || 'Folder: '}${folderHandle.name}`
-        : (t('download.folderNotSet') || 'Chưa chọn thư mục cục bộ');
-    }
-    const driveStatusText = document.getElementById('dlDriveStatusText');
-    if (driveStatusText) {
-      driveStatusText.textContent = getDriveToken()
-        ? (t('download.driveLoggedIn') || 'Đã đăng nhập Google Drive')
-        : (t('download.driveNotLoggedIn') || 'Chưa đăng nhập Google Drive');
-    }
-  };
-
-  const setActiveDest = (dest) => {
-    document.querySelectorAll('.dl-dest-btn').forEach(b => b.classList.remove('active'));
-    document.querySelector(`.dl-dest-btn[data-dest="${dest}"]`)?.classList.add('active');
-  };
-
   if (closeDownloadModalBtn) closeDownloadModalBtn.addEventListener('click', closeDownloadModal);
   if (cancelDownloadBtn) cancelDownloadBtn.addEventListener('click', closeDownloadModal);
 
@@ -293,27 +268,6 @@ export function initEditor() {
     });
   });
 
-  const chooseFolderBtn = document.getElementById('chooseFolderBtn');
-  if (chooseFolderBtn) {
-    chooseFolderBtn.addEventListener('click', async () => {
-      const handle = await pickLocalDirectory();
-      updateDownloadDestStatus();
-      if (handle) setActiveDest('local');
-    });
-  }
-
-  const driveLoginBtn = document.getElementById('driveLoginBtn');
-  if (driveLoginBtn) {
-    driveLoginBtn.addEventListener('click', () => loginToDrive());
-  }
-
-  window.addEventListener('local-dir-changed', () => updateDownloadDestStatus());
-  window.addEventListener('drive-connected', () => {
-    updateDownloadDestStatus();
-    setActiveDest('drive');
-  });
-  window.addEventListener('drive-disconnected', updateDownloadDestStatus);
-
   // Handle Execute Download Button
   const executeDownloadBtn = document.getElementById('executeDownloadBtn');
   if (executeDownloadBtn) {
@@ -345,70 +299,74 @@ export function initEditor() {
       reloadLucideIcons();
 
       try {
-        const runExport = async () => {
-           if (format === 'png') return generateWorkspacePngBlob(tab, exportOptions);
-           if (format === 'jpeg') return generateWorkspaceJpegBlob(tab, exportOptions);
-           if (format === 'webp') return generateWorkspaceWebpBlob(tab, exportOptions);
-           if (format === 'json') return generateWorkspaceJsonBlob(tab);
-           if (format === 'spritesheet') return generateSpriteSheetBlob(tab, exportOptions);
-           if (format === 'zip') return generateZipBlob(tab, exportOptions);
-           if (format === 'webm' || format === 'gif') {
-              return exportAnimation(tab, format, exportOptions);
-           }
-        };
-
-        const resolveExt = (fmt) => {
-          if (fmt === 'jpeg') return 'jpg';
-          if (fmt === 'spritesheet') return 'png';
-          return fmt;
-        };
-
-        const getFileName = (tab) => `${tab.name.replace(/\s+/g, '-')}.${resolveExt(format)}`;
-
-        const downloadToDevice = (blob, fileName) => {
-          const a = document.createElement('a');
-          a.href = URL.createObjectURL(blob);
-          a.download = fileName;
-          a.click();
-        };
-
-        if (dest === 'local' && !getCurrentDirectoryHandle()) {
-          const handle = await pickLocalDirectory();
-          if (!handle) {
-            throw new Error(t('download.folderNotSet') || 'Chưa chọn thư mục cục bộ');
-          }
-          updateDownloadDestStatus();
-        }
-
         for (const cb of selectedCheckboxes) {
           const tab = tabs.find(t => t.id === cb.value);
           if (!tab) continue;
 
-          if (dest === 'download') {
-            const blob = await runExport();
-            downloadToDevice(blob, getFileName(tab));
-          } else if (dest === 'local') {
-            const fileName = getFileName(tab);
-            const blob = await runExport();
-            await saveFileToLocalDrive(fileName, blob);
-            tab.storage = { type: 'local', id: null, handle: null, name: fileName };
-            tab.format = format;
-          } else if (dest === 'drive') {
-            if (!getDriveToken()) {
-              throw new Error(`${t('download.driveNotLoggedIn') || 'Chưa đăng nhập Google Drive'}. ${t('download.chooseDriveLogin') || 'Vui lòng đăng nhập để tải lên Drive.'}`);
+          if (dest === 'local') {
+            const handle = getCurrentDirectoryHandle();
+            const namePrefix = tab.name.replace(/\s+/g, '-');
+            
+            const runExport = async () => {
+               if (format === 'png') return generateWorkspacePngBlob(tab, exportOptions);
+               if (format === 'jpeg') return generateWorkspaceJpegBlob(tab, exportOptions);
+               if (format === 'webp') return generateWorkspaceWebpBlob(tab, exportOptions);
+               if (format === 'json') return generateWorkspaceJsonBlob(tab);
+               if (format === 'spritesheet') return generateSpriteSheetBlob(tab, exportOptions);
+               if (format === 'zip') return generateZipBlob(tab, exportOptions);
+               if (format === 'webm' || format === 'gif') {
+                  return exportAnimation(tab, format, exportOptions);
+               }
+            };
+            
+            if (handle) {
+              try {
+                const blob = await runExport();
+                let ext = format;
+                if (format === 'jpeg') ext = 'jpg';
+                if (format === 'spritesheet') ext = 'png';
+                await saveFileToLocalDrive(`${namePrefix}.${ext}`, blob);
+                
+                tab.storage = { type: 'local', id: null, handle: null, name: `${namePrefix}.${ext}` };
+                tab.format = format;
+              } catch (saveErr) {
+                console.warn('Local drive save failed, falling back to download', saveErr);
+                const blob = await runExport();
+                let ext = format;
+                if (format === 'jpeg') ext = 'jpg';
+                if (format === 'spritesheet') ext = 'png';
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = `${namePrefix}.${ext}`;
+                a.click();
+              }
+            } else {
+               const blob = await runExport();
+               let ext = format;
+               if (format === 'jpeg') ext = 'jpg';
+               if (format === 'spritesheet') ext = 'png';
+               const a = document.createElement('a');
+               a.href = URL.createObjectURL(blob);
+               a.download = `${namePrefix}.${ext}`;
+               a.click();
             }
-            const blob = await runExport();
-            await uploadToDrive(getFileName(tab), blob);
+            successCount++;
+          } else if (dest === 'drive') {
+            tab.format = format; 
+            await syncToDrive(tab);
+            successCount++;
           }
-          successCount++;
         }
-
+        
         if (dest === 'drive') {
-          showNotification(t('download.driveUploaded') || 'Đã tải lên Google Drive');
-        } else if (dest === 'local') {
-          showNotification(t('status.savedToLocal') || 'Đã lưu vào Thư mục cục bộ');
+          showNotification(t('status.savedToDrive') || 'Đã lưu vào Google Drive');
         } else {
-          showNotification(t('download.success', successCount));
+          const handle = getCurrentDirectoryHandle();
+          if (handle) {
+            showNotification(t('status.savedToLocal') || 'Đã lưu vào Thư mục cục bộ');
+          } else {
+            showNotification(t('download.success', successCount));
+          }
         }
         closeDownloadModal();
       } catch (err) {
