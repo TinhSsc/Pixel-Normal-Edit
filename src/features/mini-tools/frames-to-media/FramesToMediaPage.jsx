@@ -47,7 +47,7 @@ export default function FramesToMediaPage() {
   useEffect(() => { reloadLucideIcons(); }, []);
 
   const navigate = (path) => {
-    window.location.href = path === '' ? '/' : `/?tool=${path}`;
+    window.location.href = path === '' ? '/' : `/${path}`;
   };
 
   // — Progressive file loader (ảnh, GIF hoặc Video) —

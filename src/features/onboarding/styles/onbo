@@ -1,0 +1,252 @@
+/* onboarding.css — Style cho hệ thống hướng dẫn onboarding */
+
+/* ===== Welcome Dialog (Hộp thoại chào hỏi) ===== */
+.onboarding-welcome-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  animation: onboarding-fade-in 0.2s ease;
+}
+
+.onboarding-welcome-card {
+  background: var(--bg-primary, #1e1e2e);
+  border: 1px solid var(--border-color, #333);
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 480px;
+  width: calc(100% - 32px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  animation: onboarding-slide-up 0.3s ease;
+}
+
+.onboarding-welcome-logo {
+  margin-bottom: 16px;
+}
+
+.onboarding-welcome-logo img {
+  border-radius: 12px;
+  box-shadow: 0 0 0 2px rgba(135, 206, 235, 0.3);
+}
+
+.onboarding-welcome-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary, #fff);
+  margin: 0 0 12px;
+}
+
+.onboarding-welcome-desc {
+  font-size: 14px;
+  color: var(--text-muted, #aaa);
+  line-height: 1.6;
+  margin: 0 0 16px;
+}
+
+.onboarding-welcome-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px;
+  text-align: left;
+}
+
+.onboarding-welcome-features li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: var(--text-primary, #fff);
+}
+
+.onboarding-welcome-features li svg {
+  color: var(--accent, #4a9eff);
+  flex-shrink: 0;
+}
+
+.onboarding-welcome-question {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary, #fff);
+  margin: 0 0 16px;
+}
+
+.onboarding-welcome-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.onboarding-welcome-btn-guide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.onboarding-welcome-btn-skip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px;
+  font-size: 14px;
+}
+
+.onboarding-welcome-sub {
+  font-size: 12px;
+  color: var(--text-muted, #888);
+  margin: 0;
+}
+
+/* ===== Onboarding Overlay (Step cards) ===== */
+.onboarding-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  animation: onboarding-fade-in 0.15s ease;
+}
+
+/* ===== Step Card (Ô vuông hướng dẫn) ===== */
+.onboarding-stepcard {
+  background: var(--bg-primary, #1e1e2e);
+  border: 1px solid var(--border-color, #333);
+  border-radius: 14px;
+  padding: 24px;
+  max-width: 420px;
+  width: calc(100% - 32px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  animation: onboarding-slide-up 0.3s ease;
+}
+
+.onboarding-stepcard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.onboarding-stepcard-badge {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent, #4a9eff);
+  background: rgba(74, 158, 255, 0.12);
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.onboarding-stepcard-phase {
+  font-size: 12px;
+  color: var(--text-muted, #888);
+}
+
+.onboarding-stepcard-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary, #fff);
+  margin: 0 0 10px;
+}
+
+.onboarding-stepcard-body {
+  font-size: 14px;
+  color: var(--text-muted, #aaa);
+  line-height: 1.6;
+  margin: 0 0 16px;
+}
+
+.onboarding-stepcard-progress {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.onboarding-stepcard-progress-bar {
+  height: 100%;
+  background: var(--accent, #4a9eff);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.onboarding-stepcard-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.onboarding-stepcard-btn-back,
+.onboarding-stepcard-btn-skip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+.onboarding-stepcard-btn-next {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* ===== Animations ===== */
+@keyframes onboarding-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes onboarding-slide-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .onboarding-welcome-card,
+  .onboarding-stepcard {
+    padding: 20px;
+    max-width: 100%;
+  }
+
+  .onboarding-welcome-title {
+    font-size: 19px;
+  }
+
+  .onboarding-stepcard-title {
+    font-size: 16px;
+  }
+
+  .onboarding-stepcard-actions {
+    flex-wrap: wrap;
+  }
+
+  .onboarding-stepcard-btn-back,
+  .onboarding-stepcard-btn-skip,
+  .onboarding-stepcard-btn-next {
+    min-height: 44px;
+  }
+}

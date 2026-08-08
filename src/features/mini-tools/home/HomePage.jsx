@@ -198,7 +198,7 @@ export default function HomePage() {
   };
 
   const navigate = (path) => {
-    window.location.href = `/?tool=${path}`;
+    window.location.href = `/${path}`;
   };
 
   const handleContactSubmit = (e) => {
@@ -234,10 +234,10 @@ export default function HomePage() {
         schema={{
           "@type": "WebSite",
           "name": "Pixel Normal Edit",
-          "url": "https://pixel-normal-edit.web.app/?tool=home",
+          "url": "https://pixel-normal-edit.web.app/",
           "potentialAction": {
             "@type": "SearchAction",
-            "target": "https://pixel-normal-edit.web.app/?tool=home",
+            "target": "https://pixel-normal-edit.web.app/",
             "query-input": "required name=search_term_string"
           },
           "mainEntity": {
@@ -246,7 +246,7 @@ export default function HomePage() {
               "@type": "ListItem",
               "position": i + 1,
               "name": t(tool.titleKey, tool.title),
-              "url": `https://pixel-normal-edit.web.app/?tool=${tool.id}`
+              "url": `https://pixel-normal-edit.web.app/${tool.id}`
             }))
           }
         }}

@@ -1,0 +1,18 @@
+import WelcomeDialog from './WelcomeDialog.jsx';
+import OnboardingOverlay from './OnboardingOverlay.jsx';
+import { useOnboarding } from './hooks/useOnboarding.js';
+import './styles/onboarding.css';
+
+/**
+ * Component gốc của onboarding — tự quyết định hiển thị gì dựa trên state.
+ * - state === 'welcome' → hiện WelcomeDialog
+ * - state === 'active' → hiện OnboardingOverlay (step cards)
+ * Đặt component này một lần trong App/ToolsApp.
+ */
+export default function OnboardingRoot() {
+  const { state } = useOnboarding();
+
+  if (state === 'welcome') return <WelcomeDialog />;
+  if (state === 'active') return <OnboardingOverlay />;
+  return null;
+}

@@ -4,7 +4,8 @@ import App from './App.jsx'
 import ToolsApp from './ToolsApp.jsx'
 
 const searchParams = new URLSearchParams(window.location.search);
-let tool = searchParams.get('tool');
+let pathTool = window.location.pathname.split('/').filter(Boolean)[0];
+let tool = pathTool || searchParams.get('tool');
 
 if (tool) {
   localStorage.setItem('last_visited_tool', tool);

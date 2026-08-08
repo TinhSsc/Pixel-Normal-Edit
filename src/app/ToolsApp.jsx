@@ -13,7 +13,12 @@ const MediaToFramesPage = lazy(() => import('../features/mini-tools/media-to-fra
 const GifSimplifyPage = lazy(() => import('../features/mini-tools/gif-simplify/GifSimplifyPage.jsx'));
 
 export default function ToolsApp() {
+  const MINI_TOOLS_ROUTES = ['home', 'convert', 'compress', 'resize', 'crop', 'rotate', 'frames-to-media', 'media-to-frames', 'gif-simplify'];
+
   const getRoute = () => {
+    const path = window.location.pathname.split('/').filter(Boolean)[0];
+    if (path && MINI_TOOLS_ROUTES.includes(path)) return path;
+
     const params = new URLSearchParams(window.location.search);
     if (params.has('tool') && params.get('tool') !== '') return params.get('tool');
     const lastTool = localStorage.getItem('last_visited_tool');
@@ -22,7 +27,6 @@ export default function ToolsApp() {
   };
   const [route, setRoute] = useState(getRoute());
 
-  const MINI_TOOLS_ROUTES = ['home', 'convert', 'compress', 'resize', 'crop', 'rotate', 'frames-to-media', 'media-to-frames', 'gif-simplify'];
 
   if (!MINI_TOOLS_ROUTES.includes(route)) {
     window.location.href = '/';

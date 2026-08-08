@@ -382,7 +382,7 @@ function App() {
                 }}
                 onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.08)'; e.currentTarget.style.boxShadow = '0 0 0 2px rgba(135,206,235,0.45)'; }}
                 onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 0 0 1px rgba(135,206,235,0.15)'; }}
-                onClick={() => { window.location.href = '/?tool=home'; }}
+                onClick={() => { window.location.href = '/'; }}
               />
               <h1 style={{ margin: 0, fontSize: '24px', color: 'var(--text-primary)' }}>{t('app.title') || "Pixel Normal Edit"}</h1>
               

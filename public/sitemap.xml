@@ -5,48 +5,44 @@
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
+
   <url>
-    <loc>https://pixel-normal-edit.web.app/?tool=home</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://pixel-normal-edit.web.app/?tool=convert</loc>
+    <loc>https://pixel-normal-edit.web.app/convert</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://pixel-normal-edit.web.app/?tool=compress</loc>
+    <loc>https://pixel-normal-edit.web.app/compress</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://pixel-normal-edit.web.app/?tool=resize</loc>
+    <loc>https://pixel-normal-edit.web.app/resize</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://pixel-normal-edit.web.app/?tool=crop</loc>
+    <loc>https://pixel-normal-edit.web.app/crop</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://pixel-normal-edit.web.app/?tool=rotate</loc>
+    <loc>https://pixel-normal-edit.web.app/rotate</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://pixel-normal-edit.web.app/?tool=frames-to-media</loc>
+    <loc>https://pixel-normal-edit.web.app/frames-to-media</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://pixel-normal-edit.web.app/?tool=media-to-frames</loc>
+    <loc>https://pixel-normal-edit.web.app/media-to-frames</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://pixel-normal-edit.web.app/?tool=gif-simplify</loc>
+    <loc>https://pixel-normal-edit.web.app/gif-simplify</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>

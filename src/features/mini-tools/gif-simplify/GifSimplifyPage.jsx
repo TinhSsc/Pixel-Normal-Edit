@@ -40,7 +40,7 @@ export default function GifSimplifyPage() {
   const fileInputRef = useRef(null);
 
   const navigate = (path) => {
-    window.location.href = path === '' ? '/' : `/?tool=${path}`;
+    window.location.href = path === '' ? '/' : `/${path}`;
   };
 
   useEffect(() => {

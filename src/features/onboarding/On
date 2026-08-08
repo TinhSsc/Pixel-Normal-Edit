@@ -1,0 +1,47 @@
+import StepCard from './StepCard.jsx';
+import { useOnboarding } from './hooks/useOnboarding.js';
+
+/**
+ * Overlay hiển thị các step onboarding.
+ * Phase 0 dùng modal trung tâm (highlightType 'none').
+ * Sau này mở rộng thêm Spotlight khi thêm Phase 1+.
+ */
+export default function OnboardingOverlay() {
+  const {
+    isActive,
+    currentStep,
+    currentStepData,
+    totalSteps,
+    nextStep,
+    prevStep,
+    skipOnboarding,
+    pauseOnboarding,
+  } = useOnboarding();
+
+  if (!isActive || !currentStepData) return null;
+
+  const step = currentStepData;
+  const showBack = step.showBack !== false && currentStep > 0;
+  const showSkip = step.showSkip !== false;
+
+  return (
+    <div
+      className="onboarding-overlay"
+      onClick={(e) => {
+        // Bấm nền (ngoài stepcard) → tạm dừng
+        if (e.target === e.currentTarget) pauseOnboarding();
+      }}
+    >
+      <StepCard
+        step={step}
+        index={currentStep}
+        total={totalSteps}
+        showBack={showBack}
+        showSkip={showSkip}
+        onNext={nextStep}
+        onBack={prevStep}
+        onSkip={skipOnboarding}
+      />
+    </div>
+  );
+}

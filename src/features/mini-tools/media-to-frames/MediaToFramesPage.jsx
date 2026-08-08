@@ -72,7 +72,7 @@ export default function MediaToFramesPage() {
   useEffect(() => { reloadLucideIcons(); }, []);
 
   const navigate = (path) => {
-    window.location.href = path === '' ? '/' : `/?tool=${path}`;
+    window.location.href = path === '' ? '/' : `/${path}`;
   };
 
   const reset = () => {

@@ -33,7 +33,7 @@ export default function RelatedTools({ currentTool }) {
         {tools.map(tool => (
           <a
             key={tool.id}
-            href={`/?tool=${tool.id}`}
+            href={`/${tool.id}`}
             className="home-tool-card"
             style={{
               position: 'relative',
