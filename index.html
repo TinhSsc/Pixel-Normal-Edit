@@ -9,6 +9,7 @@
   <meta name="author" content="Pixel Normal Edit" />
   <meta name="robots" content="index, follow" />
   <meta name="google-site-verification" content="YNHZX0lv5yot2KyYpbA_kSz3dzruBp5FLHiZwoNbDkQ" />
+  <meta name="keywords" content="pixel art editor, vẽ pixel art online, công cụ pixel art, pixel normal edit, tạo pixel art, chỉnh sửa pixel, đổi định dạng ảnh, nén ảnh, resize ảnh, crop ảnh, xoay ảnh, gif, video" />
   <link rel="icon" type="image/svg+xml" href="/avatar.svg" />
   <link rel="canonical" href="https://pixel-normal-edit.web.app/" />
   <meta property="og:image" content="https://pixel-normal-edit.web.app/og-image.png" />
@@ -18,13 +19,14 @@
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Pixel Normal Edit - Trình chỉnh sửa Pixel Art Thông Minh" />
   <meta property="og:description" content="Công cụ tạo và chỉnh sửa Pixel Art miễn phí. Tích hợp đổ màu Gradient, xóa nền thông minh và tùy chỉnh kích thước đa dạng." />
+  <meta property="og:url" content="https://pixel-normal-edit.web.app/" />
 
   <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image" />
   <meta property="twitter:title" content="Pixel Normal Edit - Trình chỉnh sửa Pixel Art Thông Minh" />
   <meta property="twitter:description" content="Công cụ tạo và chỉnh sửa Pixel Art miễn phí. Tích hợp đổ màu Gradient, xóa nền thông minh và tùy chỉnh kích thước đa dạng." />
 
-  <title data-i18n="app.title">Pixel Normal Edit</title>
+  <title data-i18n="app.title">Pixel Normal Edit - Trình chỉnh sửa Pixel Art trực tuyến miễn phí</title>
 
   <!-- Per-route SEO: set meta instantly from ?tool= before React loads -->
   <script>
@@ -113,6 +115,19 @@
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "VND" }
     }
   </script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Trang chủ", "item": "https://pixel-normal-edit.web.app/" },
+        { "@type": "ListItem", "position": 2, "name": "Đổi định dạng ảnh", "item": "https://pixel-normal-edit.web.app/convert" },
+        { "@type": "ListItem", "position": 3, "name": "Nén ảnh", "item": "https://pixel-normal-edit.web.app/compress" },
+        { "@type": "ListItem", "position": 4, "name": "Đổi kích thước ảnh", "item": "https://pixel-normal-edit.web.app/resize" },
+        { "@type": "ListItem", "position": 5, "name": "Cắt ảnh", "item": "https://pixel-normal-edit.web.app/crop" }
+      ]
+    }
+  </script>
   <script>
     // Tự động xoá dữ liệu bị lỗi một lần duy nhất trong phiên duyệt web
     if (!sessionStorage.getItem('ai_cleared_local_data_v1')) {
@@ -145,8 +160,71 @@
 </head>
 
 <body>
-  <div id="root"></div>
-    <script type="module" src="/src/app/main.jsx"></script>
+  <noscript>
+    <h1>Pixel Normal Edit - Trình chỉnh sửa Pixel Art trực tuyến miễn phí</h1>
+    <p>Pixel Normal Edit là công cụ vẽ và chỉnh sửa Pixel Art trực tuyến chuyên nghiệp, miễn phí, chạy hoàn toàn trên trình duyệt. Hỗ trợ đa dạng kích thước tùy chỉnh, nén ảnh pixel, đổ màu gradient thông minh, và nhiều chức năng nâng cao dành cho Game Developer và Artist.</p>
+    <h2>Các công cụ</h2>
+    <ul>
+      <li><a href="/convert">Đổi định dạng ảnh (Convert)</a> - Chuyển đổi WebP, PNG, JPG, GIF</li>
+      <li><a href="/compress">Nén ảnh (Compress)</a> - Giảm dung lượng ảnh JPG, PNG, WebP</li>
+      <li><a href="/resize">Đổi kích thước ảnh (Resize)</a> - Thay đổi phân giải</li>
+      <li><a href="/crop">Cắt ảnh (Crop)</a> - Cắt theo tỷ lệ hoặc tự do</li>
+      <li><a href="/rotate">Xoay và Lật ảnh (Rotate & Flip)</a></li>
+      <li><a href="/frames-to-media">Ghép ảnh thành GIF / Video</a></li>
+      <li><a href="/media-to-frames">Tách GIF / Video thành ảnh</a></li>
+      <li><a href="/gif-simplify">Đơn giản hóa GIF / Tua nhanh video</a></li>
+    </ul>
+    <p>Trình duyệt của bạn cần bật JavaScript để sử dụng đầy đủ tính năng. Vui lòng bật JavaScript và tải lại trang.</p>
+  </noscript>
+  <div id="root">
+    <!-- Nội dung tĩnh SEO: sẽ được React thay thế khi JavaScript chạy -->
+    <main style="max-width: 960px; margin: 0 auto; padding: 2rem 1rem; font-family: system-ui, -apple-system, sans-serif; color: #1e1e24; line-height: 1.6;">
+      <header>
+        <h1>Pixel Normal Edit - Trình chỉnh sửa Pixel Art trực tuyến miễn phí</h1>
+        <p>Ứng dụng vẽ và chỉnh sửa Pixel Art chuyên nghiệp, chạy hoàn toàn trên trình duyệt, không cần cài đặt. Miễn phí và riêng tư — ảnh của bạn không bao giờ rời khỏi thiết bị.</p>
+      </header>
+      <section>
+        <h2>Tính năng nổi bật</h2>
+        <ul>
+          <li>Vẽ Pixel Art với kích thước canvas tùy chỉnh từ 1×1 đến 256×256</li>
+          <li>Đổ màu gradient thông minh, xóa nền tự động</li>
+          <li>Chuyển đổi định dạng ảnh: WebP, PNG, JPG, GIF</li>
+          <li>Nén ảnh giảm dung lượng không giảm chất lượng rõ rệt</li>
+          <li>Đổi kích thước, cắt, xoay, lật ảnh nhanh chóng</li>
+          <li>Tạo GIF động từ nhiều ảnh, tách frame từ video</li>
+          <li>Hỗ trợ 12+ ngôn ngữ, tùy chỉnh giao diện tối/sáng</li>
+        </ul>
+      </section>
+      <section>
+        <h2>Các công cụ xử lý ảnh phổ biến</h2>
+        <ul>
+          <li><a href="/">Trang chủ</a> — Vẽ và chỉnh sửa Pixel Art</li>
+          <li><a href="/convert">Đổi định dạng ảnh trực tuyến</a> — Chuyển đổi WebP, PNG, JPG, GIF miễn phí</li>
+          <li><a href="/compress">Nén ảnh trực tuyến</a> — Giảm dung lượng JPG, PNG, WebP</li>
+          <li><a href="/resize">Đổi kích thước ảnh</a> — Resize ảnh nhanh chóng trên mọi thiết bị</li>
+          <li><a href="/crop">Cắt ảnh online</a> — Cắt theo tỷ lệ 16:9, 1:1, 4:3 hoặc tự do</li>
+          <li><a href="/rotate">Xoay và lật ảnh</a> — Xoay 90°, 180°, lật ngang, lật dọc</li>
+          <li><a href="/frames-to-media">Ghép ảnh thành GIF / Video</a> — Tạo GIF động, WebM</li>
+          <li><a href="/media-to-frames">Tách GIF / Video thành ảnh</a> — Xuất từng frame ra ZIP</li>
+          <li><a href="/gif-simplify">Đơn giản hóa GIF</a> — Giảm frame, tua nhanh video</li>
+        </ul>
+      </section>
+      <section>
+        <h2>Vì sao chọn Pixel Normal Edit?</h2>
+        <ul>
+          <li><strong>100% miễn phí</strong> — Không giới hạn, không watermark, không cần đăng ký</li>
+          <li><strong>Riêng tư tuyệt đối</strong> — Toàn bộ xử lý diễn ra cục bộ trên trình duyệt của bạn</li>
+          <li><strong>Nhanh và nhẹ</strong> — Không cần tải lên máy chủ, kết quả tức thì</li>
+          <li><strong>Chuyên cho Game Developer & Artist</strong> — Công cụ pixel art chuyên sâu</li>
+          <li><strong>Đa ngôn ngữ</strong> — Hỗ trợ Tiếng Việt, English và nhiều ngôn ngữ khác</li>
+        </ul>
+      </section>
+      <footer>
+        <p>&copy; 2026 Pixel Normal Edit. Trình chỉnh sửa Pixel Art trực tuyến miễn phí.</p>
+      </footer>
+    </main>
+  </div>
+  <script type="module" src="/src/app/main.jsx"></script>
 </body>
 
 </html>
