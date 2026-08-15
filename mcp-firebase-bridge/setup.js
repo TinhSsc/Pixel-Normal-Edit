@@ -139,11 +139,11 @@ async function main() {
     console.log(`  1. Start HTTP server:`);
     console.log(`     node mcp-firebase-bridge/index.js --http\n`);
     console.log(`  2. Open editor:`);
-    console.log(`     http://localhost:5173?mcp_session=${sessionId}\n`);
+    console.log(`     https://pixel-normal-edit.vercel.app/?mcp_session=${sessionId}\n`);
     console.log(`  3. Restart Antigravity — it will connect automatically`);
   } else {
     console.log(`  1. Open editor:`);
-    console.log(`     http://localhost:5173?mcp_session=${sessionId}\n`);
+    console.log(`     https://pixel-normal-edit.vercel.app/?mcp_session=${sessionId}\n`);
     console.log(`  2. Restart Antigravity — it will connect automatically`);
   }
   console.log('\n' + '═'.repeat(52) + '\n');

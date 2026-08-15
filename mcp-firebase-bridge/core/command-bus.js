@@ -8,6 +8,7 @@
 const crypto = require('crypto');
 const { doc, setDoc, onSnapshot, getDoc } = require('firebase/firestore');
 const { db } = require('./firebase');
+const { openBrowser, buildEditorUrl } = require('./open-browser');
 
 const SESSION = process.argv[2] || process.env.MCP_SESSION || 'default-session';
 const TIMEOUT = parseInt(process.env.MCP_TIMEOUT || '20000');
@@ -28,8 +29,8 @@ async function sendCommand(payload, timeoutOverride = null) {
   return new Promise((resolve) => {
     const timer = setTimeout(async () => {
       unsub();
-      
-      let fallbackUrl = `http://localhost:5173/?mcp_session=${SESSION}`;
+
+      let fallbackUrl = buildEditorUrl(SESSION);
       try {
         const sessionSnap = await getDoc(doc(db, 'mcp_sessions', SESSION));
         if (sessionSnap.exists() && sessionSnap.data().currentUrl) {
@@ -37,9 +38,12 @@ async function sendCommand(payload, timeoutOverride = null) {
         }
       } catch (e) {}
 
+      // Automatically open the browser tab so the editor can respond
+      const opened = await openBrowser(fallbackUrl);
+
       resolve({
         isError: true,
-        content: [{ type: 'text', text: `⏱ Timeout (${actualTimeout}ms). The browser tab is not open or not responding. You MUST tell the user to open or F5 this URL in their browser: ${fallbackUrl}` }]
+        content: [{ type: 'text', text: `⏱ Timeout (${actualTimeout}ms). The browser tab is not open or not responding. I ${opened ? 'automatically opened this URL in your browser' : 'could not open the browser automatically'}: ${fallbackUrl}. Wait a few seconds for it to connect, then try again.` }]
       });
     }, actualTimeout);
 

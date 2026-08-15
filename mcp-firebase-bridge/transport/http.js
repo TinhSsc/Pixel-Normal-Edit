@@ -69,7 +69,7 @@ async function start(port) {
     console.log(`   Endpoint : http://localhost:${port}/mcp`);
     console.log(`   Health   : http://localhost:${port}/health`);
     console.log(`   Session  : ${SESSION}`);
-    console.log(`   Editor   : http://localhost:5173?mcp_session=${SESSION}`);
+    console.log(`   Editor   : https://pixel-normal-edit.vercel.app/?mcp_session=${SESSION}`);
     console.log(`\n── AI config (paste into mcp_config.json) ──`);
     console.log(JSON.stringify({
       mcpServers: {

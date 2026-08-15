@@ -27,6 +27,10 @@ require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') }
 
 const { createServer } = require('./core/server');
 const { registerAll: registerCoreTools } = require('./tools/index');
+const { openBrowser, buildEditorUrl } = require('./core/open-browser');
+const { doc, getDoc } = require('firebase/firestore');
+const { db } = require('./core/firebase');
+const { SESSION } = require('./core/command-bus');
 
 // ── Initialize ────────────────────────────────────────────────────────────
 const server = createServer();
@@ -36,6 +40,25 @@ registerCoreTools(server);
 
 // Future domains: registerPixelArt(server), registerCharacterDrawing(server), etc.
 
+// ── Auto-open the browser if the editor is not connected ──────────────────
+async function ensureBrowserOpen() {
+  try {
+    const sessionSnap = await getDoc(doc(db, 'mcp_sessions', SESSION));
+    const connected = sessionSnap.exists() &&
+      sessionSnap.data().currentUrl &&
+      (Date.now() - (sessionSnap.data().lastActive || 0)) < 10000;
+    if (!connected) {
+      const url = buildEditorUrl(SESSION);
+      console.log(`[open-browser] Editor tab not detected for session "${SESSION}". Opening ${url} ...`);
+      await openBrowser(url);
+    } else {
+      console.log(`[open-browser] Editor tab connected at ${sessionSnap.data().currentUrl}`);
+    }
+  } catch (e) {
+    console.warn(`[open-browser] Could not verify session connection: ${e.message}`);
+  }
+}
+
 // ── Start Transport ───────────────────────────────────────────────────────
 const HTTP_PORT = process.env.HTTP_PORT || (process.argv.includes('--http') ? 3456 : null);
 
@@ -44,3 +67,5 @@ if (HTTP_PORT) {
 } else {
   require('./transport/stdio').start(server).catch(console.error);
 }
+
+ensureBrowserOpen();
