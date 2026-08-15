@@ -12,7 +12,7 @@ if (tool) {
 } else if (searchParams.get('page') === 'editor') {
   tool = 'editor';
 } else {
-  tool = localStorage.getItem('last_visited_tool') === 'editor' ? 'editor' : 'home';
+  tool = 'home';
 }
 
 const isEditor = tool === 'editor';
