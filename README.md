@@ -4,7 +4,7 @@
 
 [![GitHub license](https://img.shields.io/github/license/TinhSsc/Pixel-Normal-Edit.svg?v=1)](https://github.com/TinhSsc/Pixel-Normal-Edit/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/TinhSsc/Pixel-Normal-Edit.svg?v=1)](https://github.com/TinhSsc/Pixel-Normal-Edit)
-[![Website](https://img.shields.io/website?url=https%3A%2F%2Fpixel-normal-edit.web.app%2F&label=Live%20Demo)](https://pixel-normal-edit.web.app/)
+[![Website](https://img.shields.io/website?url=https%3A%2F%2Fpixel-normal-edit.vercel.app%2F&label=Live%20Demo)](https://pixel-normal-edit.vercel.app/)
 
 ---
 
@@ -51,14 +51,14 @@ All tools run entirely in the browser — images never leave the device.
 
 | Tool | Description |
 |---|---|
-| [Convert](https://pixel-normal-edit.web.app/?tool=convert) | Convert between PNG, WebP, AVIF, JPG and other formats |
-| [Compress](https://pixel-normal-edit.web.app/?tool=compress) | Reduce file size 60–90% (lossy & lossless) |
-| [Resize](https://pixel-normal-edit.web.app/?tool=resize) | Resize freely, by ratio, or using common presets |
-| [Crop](https://pixel-normal-edit.web.app/?tool=crop) | Crop with ratio presets (1:1, 16:9, 4:3, …) |
-| [Rotate / Flip](https://pixel-normal-edit.web.app/?tool=rotate) | Rotate at any angle, flip horizontally/vertically |
-| [Frames → GIF / Video](https://pixel-normal-edit.web.app/?tool=frames-to-media) | Combine images into GIF or WebM, convert between GIF and video |
-| [GIF / Video → Frames](https://pixel-normal-edit.web.app/?tool=media-to-frames) | Split GIF/video frames into individual images |
-| [Simplify GIF / Speed-up video](https://pixel-normal-edit.web.app/?tool=gif-simplify) | Drop frames to shrink GIFs or speed up videos |
+| [Convert](https://pixel-normal-edit.vercel.app/?tool=convert) | Convert between PNG, WebP, AVIF, JPG and other formats |
+| [Compress](https://pixel-normal-edit.vercel.app/?tool=compress) | Reduce file size 60–90% (lossy & lossless) |
+| [Resize](https://pixel-normal-edit.vercel.app/?tool=resize) | Resize freely, by ratio, or using common presets |
+| [Crop](https://pixel-normal-edit.vercel.app/?tool=crop) | Crop with ratio presets (1:1, 16:9, 4:3, …) |
+| [Rotate / Flip](https://pixel-normal-edit.vercel.app/?tool=rotate) | Rotate at any angle, flip horizontally/vertically |
+| [Frames → GIF / Video](https://pixel-normal-edit.vercel.app/?tool=frames-to-media) | Combine images into GIF or WebM, convert between GIF and video |
+| [GIF / Video → Frames](https://pixel-normal-edit.vercel.app/?tool=media-to-frames) | Split GIF/video frames into individual images |
+| [Simplify GIF / Speed-up video](https://pixel-normal-edit.vercel.app/?tool=gif-simplify) | Drop frames to shrink GIFs or speed up videos |
 
 ### General
 
@@ -222,7 +222,7 @@ Created and maintained by [TinhSsc](https://github.com/TinhSsc).
 
 ## Support
 
-- **Live demo**: [pixel-normal-edit.web.app](https://pixel-normal-edit.web.app/)
+- **Live demo**: [pixel-normal-edit.vercel.app](https://pixel-normal-edit.vercel.app/)
 - **npm**: [npmjs.com/package/@pixel-normal-edit/mcp](https://www.npmjs.com/package/@pixel-normal-edit/mcp)
 - **GitHub**: [github.com/TinhSsc/Pixel-Normal-Edit](https://github.com/TinhSsc/Pixel-Normal-Edit)
 - Issues: [github.com/TinhSsc/Pixel-Normal-Edit/issues](https://github.com/TinhSsc/Pixel-Normal-Edit/issues)
