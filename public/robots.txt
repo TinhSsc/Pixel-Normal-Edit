@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://pixel-normal-edit.web.app/sitemap.xml
+Sitemap: https://pixel-normal-edit.vercel.app/sitemap.xml

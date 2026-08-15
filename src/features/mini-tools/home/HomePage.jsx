@@ -234,10 +234,10 @@ export default function HomePage() {
         schema={{
           "@type": "WebSite",
           "name": "Pixel Normal Edit",
-          "url": "https://pixel-normal-edit.web.app/",
+          "url": "https://pixel-normal-edit.vercel.app/",
           "potentialAction": {
             "@type": "SearchAction",
-            "target": "https://pixel-normal-edit.web.app/",
+            "target": "https://pixel-normal-edit.vercel.app/",
             "query-input": "required name=search_term_string"
           },
           "mainEntity": {
@@ -246,7 +246,7 @@ export default function HomePage() {
               "@type": "ListItem",
               "position": i + 1,
               "name": t(tool.titleKey, tool.title),
-              "url": `https://pixel-normal-edit.web.app/${tool.id}`
+              "url": `https://pixel-normal-edit.vercel.app/${tool.id}`
             }))
           }
         }}

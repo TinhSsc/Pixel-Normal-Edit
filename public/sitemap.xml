@@ -1,48 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://pixel-normal-edit.web.app/</loc>
+    <loc>https://pixel-normal-edit.vercel.app/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 
   <url>
-    <loc>https://pixel-normal-edit.web.app/convert</loc>
+    <loc>https://pixel-normal-edit.vercel.app/convert</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://pixel-normal-edit.web.app/compress</loc>
+    <loc>https://pixel-normal-edit.vercel.app/compress</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://pixel-normal-edit.web.app/resize</loc>
+    <loc>https://pixel-normal-edit.vercel.app/resize</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://pixel-normal-edit.web.app/crop</loc>
+    <loc>https://pixel-normal-edit.vercel.app/crop</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://pixel-normal-edit.web.app/rotate</loc>
+    <loc>https://pixel-normal-edit.vercel.app/rotate</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://pixel-normal-edit.web.app/frames-to-media</loc>
+    <loc>https://pixel-normal-edit.vercel.app/frames-to-media</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://pixel-normal-edit.web.app/media-to-frames</loc>
+    <loc>https://pixel-normal-edit.vercel.app/media-to-frames</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://pixel-normal-edit.web.app/gif-simplify</loc>
+    <loc>https://pixel-normal-edit.vercel.app/gif-simplify</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
