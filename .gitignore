@@ -56,3 +56,5 @@ scratch-skills2.txt
 
 # Temp files từ AI commands
 tmp-cmd.json
+.vercel
+.env*
