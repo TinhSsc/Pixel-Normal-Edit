@@ -326,7 +326,6 @@ export default function GlobalSettingsModal() {
                   defaultValue={getCurrentLang()}
                   onChange={(e) => {
                     setLang(e.target.value);
-                    window.location.reload();
                   }}
                   options={[
                     { value: 'vi', label: t('settings.langVietnamese') },
