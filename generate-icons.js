@@ -17,6 +17,11 @@ async function generate() {
     .png()
     .toFile(out192);
     
+  await sharp(svgPath)
+    .resize(48, 48)
+    .png()
+    .toFile(path.resolve('./public/favicon-48x48.png'));
+    
   console.log('Generated pwa-192x192.png');
   
   await sharp(svgPath)
