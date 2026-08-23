@@ -6,6 +6,8 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/home" />
     <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/home" />
     <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/home" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/home" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/home" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/home" />
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
@@ -15,6 +17,8 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/home" />
     <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/home" />
     <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/home" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/home" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/home" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/home" />
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
@@ -24,6 +28,30 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/home" />
     <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/home" />
     <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/home" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/home" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/home" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/home" />
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://pixel-normal-edit.vercel.app/ru/home</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/home" />
+    <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/home" />
+    <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/home" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/home" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/home" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/home" />
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://pixel-normal-edit.vercel.app/th/home</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/home" />
+    <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/home" />
+    <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/home" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/home" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/home" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/home" />
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
@@ -33,6 +61,8 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/convert" />
     <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/convert" />
     <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/convert" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/convert" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/convert" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/convert" />
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -42,6 +72,8 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/convert" />
     <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/convert" />
     <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/convert" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/convert" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/convert" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/convert" />
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -51,6 +83,30 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/convert" />
     <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/convert" />
     <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/convert" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/convert" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/convert" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/convert" />
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pixel-normal-edit.vercel.app/ru/convert</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/convert" />
+    <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/convert" />
+    <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/convert" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/convert" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/convert" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/convert" />
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pixel-normal-edit.vercel.app/th/convert</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/convert" />
+    <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/convert" />
+    <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/convert" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/convert" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/convert" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/convert" />
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -60,6 +116,8 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/compress" />
     <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/compress" />
     <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/compress" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/compress" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/compress" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/compress" />
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -69,6 +127,8 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/compress" />
     <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/compress" />
     <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/compress" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/compress" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/compress" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/compress" />
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -78,6 +138,30 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/compress" />
     <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/compress" />
     <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/compress" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/compress" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/compress" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/compress" />
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pixel-normal-edit.vercel.app/ru/compress</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/compress" />
+    <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/compress" />
+    <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/compress" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/compress" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/compress" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/compress" />
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pixel-normal-edit.vercel.app/th/compress</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/compress" />
+    <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/compress" />
+    <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/compress" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/compress" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/compress" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/compress" />
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -87,6 +171,8 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/resize" />
     <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/resize" />
     <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/resize" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/resize" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/resize" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/resize" />
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -96,6 +182,8 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/resize" />
     <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/resize" />
     <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/resize" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/resize" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/resize" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/resize" />
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -105,6 +193,30 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/resize" />
     <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/resize" />
     <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/resize" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/resize" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/resize" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/resize" />
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pixel-normal-edit.vercel.app/ru/resize</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/resize" />
+    <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/resize" />
+    <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/resize" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/resize" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/resize" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/resize" />
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pixel-normal-edit.vercel.app/th/resize</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/resize" />
+    <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/resize" />
+    <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/resize" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/resize" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/resize" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/resize" />
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -114,6 +226,8 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/crop" />
     <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/crop" />
     <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/crop" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/crop" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/crop" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/crop" />
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -123,6 +237,8 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/crop" />
     <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/crop" />
     <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/crop" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/crop" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/crop" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/crop" />
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -132,6 +248,30 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/crop" />
     <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/crop" />
     <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/crop" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/crop" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/crop" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/crop" />
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pixel-normal-edit.vercel.app/ru/crop</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/crop" />
+    <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/crop" />
+    <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/crop" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/crop" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/crop" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/crop" />
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pixel-normal-edit.vercel.app/th/crop</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/crop" />
+    <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/crop" />
+    <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/crop" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/crop" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/crop" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/crop" />
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -141,6 +281,8 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/rotate" />
     <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/rotate" />
     <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/rotate" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/rotate" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/rotate" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/rotate" />
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -150,6 +292,8 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/rotate" />
     <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/rotate" />
     <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/rotate" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/rotate" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/rotate" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/rotate" />
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -159,6 +303,30 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/rotate" />
     <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/rotate" />
     <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/rotate" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/rotate" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/rotate" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/rotate" />
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pixel-normal-edit.vercel.app/ru/rotate</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/rotate" />
+    <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/rotate" />
+    <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/rotate" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/rotate" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/rotate" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/rotate" />
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pixel-normal-edit.vercel.app/th/rotate</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/rotate" />
+    <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/rotate" />
+    <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/rotate" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/rotate" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/rotate" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/rotate" />
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -168,6 +336,8 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/frames-to-media" />
     <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/frames-to-media" />
     <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/frames-to-media" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/frames-to-media" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/frames-to-media" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/frames-to-media" />
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -177,6 +347,8 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/frames-to-media" />
     <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/frames-to-media" />
     <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/frames-to-media" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/frames-to-media" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/frames-to-media" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/frames-to-media" />
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -186,6 +358,30 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/frames-to-media" />
     <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/frames-to-media" />
     <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/frames-to-media" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/frames-to-media" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/frames-to-media" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/frames-to-media" />
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pixel-normal-edit.vercel.app/ru/frames-to-media</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/frames-to-media" />
+    <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/frames-to-media" />
+    <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/frames-to-media" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/frames-to-media" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/frames-to-media" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/frames-to-media" />
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pixel-normal-edit.vercel.app/th/frames-to-media</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/frames-to-media" />
+    <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/frames-to-media" />
+    <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/frames-to-media" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/frames-to-media" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/frames-to-media" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/frames-to-media" />
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -195,6 +391,8 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/media-to-frames" />
     <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/media-to-frames" />
     <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/media-to-frames" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/media-to-frames" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/media-to-frames" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/media-to-frames" />
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -204,6 +402,8 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/media-to-frames" />
     <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/media-to-frames" />
     <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/media-to-frames" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/media-to-frames" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/media-to-frames" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/media-to-frames" />
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -213,6 +413,30 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/media-to-frames" />
     <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/media-to-frames" />
     <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/media-to-frames" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/media-to-frames" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/media-to-frames" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/media-to-frames" />
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pixel-normal-edit.vercel.app/ru/media-to-frames</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/media-to-frames" />
+    <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/media-to-frames" />
+    <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/media-to-frames" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/media-to-frames" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/media-to-frames" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/media-to-frames" />
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pixel-normal-edit.vercel.app/th/media-to-frames</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/media-to-frames" />
+    <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/media-to-frames" />
+    <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/media-to-frames" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/media-to-frames" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/media-to-frames" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/media-to-frames" />
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -222,6 +446,8 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/gif-simplify" />
     <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/gif-simplify" />
     <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/gif-simplify" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/gif-simplify" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/gif-simplify" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/gif-simplify" />
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -231,6 +457,8 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/gif-simplify" />
     <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/gif-simplify" />
     <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/gif-simplify" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/gif-simplify" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/gif-simplify" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/gif-simplify" />
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -240,6 +468,30 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/gif-simplify" />
     <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/gif-simplify" />
     <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/gif-simplify" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/gif-simplify" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/gif-simplify" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/gif-simplify" />
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pixel-normal-edit.vercel.app/ru/gif-simplify</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/gif-simplify" />
+    <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/gif-simplify" />
+    <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/gif-simplify" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/gif-simplify" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/gif-simplify" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/gif-simplify" />
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://pixel-normal-edit.vercel.app/th/gif-simplify</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://pixel-normal-edit.vercel.app/en/gif-simplify" />
+    <xhtml:link rel="alternate" hreflang="vi" href="https://pixel-normal-edit.vercel.app/vi/gif-simplify" />
+    <xhtml:link rel="alternate" hreflang="id" href="https://pixel-normal-edit.vercel.app/id/gif-simplify" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://pixel-normal-edit.vercel.app/ru/gif-simplify" />
+    <xhtml:link rel="alternate" hreflang="th" href="https://pixel-normal-edit.vercel.app/th/gif-simplify" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://pixel-normal-edit.vercel.app/en/gif-simplify" />
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
