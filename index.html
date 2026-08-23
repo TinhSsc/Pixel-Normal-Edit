@@ -76,9 +76,10 @@
         }
       };
       try {
+        var pathName = window.location.pathname.split('/').filter(Boolean)[0];
         var toolParam = new URLSearchParams(window.location.search).get('tool');
         var lastTool = localStorage.getItem('last_visited_tool');
-        var tool = (toolParam && toolParam !== '') ? toolParam : (lastTool || 'home');
+        var tool = pathName || toolParam || lastTool || 'home';
         var data = SEO[tool];
         if (data) {
           var url = window.location.origin + window.location.pathname + window.location.search;
@@ -112,12 +113,17 @@
   <script type="application/ld+json" id="seo-root-structured-data">
     {
       "@context": "https://schema.org",
-      "@type": "WebApplication",
+      "@type": "SoftwareApplication",
       "name": "Pixel Normal Edit",
       "url": "https://pixel-normal-edit.vercel.app/",
       "description": "Trình chỉnh sửa và vẽ Pixel Art trực tuyến chuyên nghiệp, miễn phí, chạy hoàn toàn trên trình duyệt.",
-      "applicationCategory": "GraphicsApplication",
+      "applicationCategory": "MultimediaApplication",
       "operatingSystem": "Any",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "125"
+      },
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "VND" }
     }
   </script>

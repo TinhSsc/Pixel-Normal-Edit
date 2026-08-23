@@ -10,6 +10,7 @@ import { ICONS } from '../../../shared/ui/icons/icons.js';
 import { LucideIcon, reloadLucideIcons } from '../../../shared/dom/lucide-utils';
 import RelatedTools from '../shared/RelatedTools';
 import SEOContentBlock from '../shared/SEOContentBlock';
+import SocialSharePanel from '../shared/SocialSharePanel';
 import { FORMAT_REGISTRY } from '../../../shared/image/format-registry.js';
 import { encodeImage } from '../../../shared/image/encoder.js';
 import { decodeImageWithAdvancedEngine } from '../../../shared/image/advanced-engine.js';
@@ -324,6 +325,7 @@ export default function ConvertPage() {
       </main>
       
       <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '0 24px 80px' }}>
+        <SocialSharePanel />
         <SEOContentBlock 
           title={t('seo.convert.h2') || "Tại sao nên chuyển đổi định dạng ảnh tại Pixel Normal Edit?"}
           description={t('seo.convert.p1') || "Chuyển đổi định dạng hình ảnh (Convert) là nhu cầu thiết yếu khi làm việc với Pixel Art hoặc đồ hoạ web. Chúng tôi cung cấp giải pháp miễn phí, an toàn và nhanh chóng ngay trên trình duyệt."}

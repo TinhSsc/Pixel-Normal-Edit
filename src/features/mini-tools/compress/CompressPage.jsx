@@ -11,6 +11,7 @@ import { ICONS } from '../../../shared/ui/icons/icons.js';
 import { LucideIcon, reloadLucideIcons } from '../../../shared/dom/lucide-utils';
 import RelatedTools from '../shared/RelatedTools';
 import SEOContentBlock from '../shared/SEOContentBlock';
+import SocialSharePanel from '../shared/SocialSharePanel';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import { FORMAT_REGISTRY } from '../../../shared/image/format-registry.js';
@@ -303,7 +304,8 @@ export default function CompressPage() {
 
       </main>
 
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px 80px' }}>
+      <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '0 24px 80px' }}>
+        <SocialSharePanel />
         <SEOContentBlock 
           title={t('seo.compress.h2') || "Tại sao bạn cần công cụ Nén Ảnh?"}
           description={t('seo.compress.p1') || "Tối ưu dung lượng hình ảnh giúp website tải nhanh hơn, tiết kiệm băng thông và thân thiện với SEO."}
