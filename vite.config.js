@@ -14,7 +14,7 @@ export default defineConfig({
       manifest: {
         name: 'Pixel Normal Edit',
         short_name: 'PixelEdit',
-        description: 'Trình chỉnh sửa và vẽ Pixel Art trực tuyến chuyên nghiệp, miễn phí.',
+        description: 'Professional and free online Pixel Art editor and drawing tool.',
         theme_color: '#1e1e24',
         background_color: '#1e1e24',
         display: 'standalone',

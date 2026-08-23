@@ -1,7 +1,7 @@
 import React from 'react';
 import { t } from '../../../i18n/i18n.js';
 
-export default function SocialSharePanel({ url = window.location.href, text = "Tôi vừa xử lý ảnh cực nhanh trên Pixel Normal Edit! #pixelart #tools" }) {
+export default function SocialSharePanel({ url = window.location.href, text = "I just processed an image super fast on Pixel Normal Edit! #pixelart #tools" }) {
   const shareTwitter = () => {
     const shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
     window.open(shareUrl, '_blank', 'width=550,height=420');
@@ -26,7 +26,7 @@ export default function SocialSharePanel({ url = window.location.href, text = "T
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-primary)', fontWeight: '500' }}>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-        <span>{t('seo.sharePrompt') || "Chia sẻ công cụ này nếu bạn thấy hữu ích!"}</span>
+        <span>{t('seo.sharePrompt') || "Share this tool if you find it helpful!"}</span>
       </div>
       <div style={{ display: 'flex', gap: '12px' }}>
         <button 

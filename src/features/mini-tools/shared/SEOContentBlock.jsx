@@ -28,7 +28,7 @@ export default function SEOContentBlock({ title, description, features, faqs }) 
       
       {features && features.length > 0 && (
         <div style={{ marginBottom: '32px' }}>
-          <h2 style={{ fontSize: '20px', marginBottom: '12px' }}>{t('seo.features') || "Tính năng nổi bật"}</h2>
+          <h2 style={{ fontSize: '20px', marginBottom: '12px' }}>{t('seo.features') || "Key Features"}</h2>
           <ul style={{ paddingLeft: '20px', color: 'var(--text-muted)' }}>
             {features.map((feat, index) => (
               <li key={index} style={{ marginBottom: '8px' }}>
@@ -41,7 +41,7 @@ export default function SEOContentBlock({ title, description, features, faqs }) 
 
       {faqs && faqs.length > 0 && (
         <div className="seo-faq-section">
-          <h2 style={{ fontSize: '20px', marginBottom: '12px' }}>{t('seo.faq') || "Câu hỏi thường gặp (FAQ)"}</h2>
+          <h2 style={{ fontSize: '20px', marginBottom: '12px' }}>{t('seo.faq') || "Frequently Asked Questions (FAQ)"}</h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {faqs.map((faq, index) => (
               <div key={index} className="faq-item">

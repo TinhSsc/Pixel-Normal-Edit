@@ -327,14 +327,14 @@ export default function ConvertPage() {
       <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '0 24px 80px' }}>
         <SocialSharePanel />
         <SEOContentBlock 
-          title={t('seo.convert.h2') || "Tại sao nên chuyển đổi định dạng ảnh tại Pixel Normal Edit?"}
-          description={t('seo.convert.p1') || "Chuyển đổi định dạng hình ảnh (Convert) là nhu cầu thiết yếu khi làm việc với Pixel Art hoặc đồ hoạ web. Chúng tôi cung cấp giải pháp miễn phí, an toàn và nhanh chóng ngay trên trình duyệt."}
+          title={t('seo.convert.h2') || "Why convert image formats at Pixel Normal Edit?"}
+          description={t('seo.convert.p1') || "Converting image formats is essential when working with Pixel Art or web graphics. We provide a free, safe, and fast solution directly in your browser."}
           features={[
-            { title: t('seo.convert.f1.title') || "Không tải ảnh lên máy chủ", desc: t('seo.convert.f1.desc') || "Mọi tiến trình xử lý diễn ra trực tiếp trên trình duyệt của bạn (Client-side), đảm bảo quyền riêng tư tuyệt đối." },
-            { title: t('seo.convert.f2.title') || "Đa định dạng", desc: t('seo.convert.f2.desc') || "Hỗ trợ chuẩn xuất WebP tiên tiến cho web, cùng các định dạng thông dụng như PNG, JPG, GIF." }
+            { title: t('seo.convert.f1.title') || "No server uploads", desc: t('seo.convert.f1.desc') || "All processing happens directly on your browser (Client-side), ensuring absolute privacy." },
+            { title: t('seo.convert.f2.title') || "Multi-format", desc: t('seo.convert.f2.desc') || "Supports advanced WebP format for web, along with common formats like PNG, JPG, GIF." }
           ]}
           faqs={[
-            { q: t('seo.convert.faq1.q') || "Ảnh của tôi có bị giảm chất lượng không?", a: t('seo.convert.faq1.a') || "Không. Quá trình convert giữ nguyên chất lượng gốc trừ khi bạn chủ động điều chỉnh cài đặt nén (Quality)." }
+            { q: t('seo.convert.faq1.q') || "Will my image lose quality?", a: t('seo.convert.faq1.a') || "No. The conversion process preserves the original quality unless you actively adjust the compression settings." }
           ]}
         />
         <RelatedTools currentTool="convert" />

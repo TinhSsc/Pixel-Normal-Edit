@@ -7,8 +7,6 @@ export const dictionary = { vi, en };
 function getDefaultLang() {
   const saved = localStorage.getItem('appLang');
   if (saved) return saved;
-  const browserLang = navigator.language || navigator.userLanguage;
-  if (browserLang && browserLang.toLowerCase().startsWith('vi')) return 'vi';
   return 'en';
 }
 
