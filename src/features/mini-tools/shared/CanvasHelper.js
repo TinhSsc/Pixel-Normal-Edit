@@ -17,6 +17,29 @@ export const CanvasHelper = {
   },
 
   /**
+   * Chuẩn hóa EXIF và Lật/Xoay ảnh bằng Canvas
+   */
+  async normalizeAndTransformImage(src, rotation = 0, flipX = false, flipY = false) {
+    const img = await this.loadImage(src);
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    const isRotated = (Math.abs(rotation) % 180) === 90;
+    canvas.width = isRotated ? img.naturalHeight : img.naturalWidth;
+    canvas.height = isRotated ? img.naturalWidth : img.naturalHeight;
+    
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.rotate((rotation * Math.PI) / 180);
+    if (flipX) ctx.scale(-1, 1);
+    if (flipY) ctx.scale(1, -1);
+    
+    ctx.drawImage(img, -img.naturalWidth / 2, -img.naturalHeight / 2);
+    
+    const blob = await this.toBlob(canvas, 'image/png');
+    return URL.createObjectURL(blob);
+  },
+
+  /**
    * Vẽ ảnh lên canvas
    */
   drawImageToCanvas(img, width, height) {

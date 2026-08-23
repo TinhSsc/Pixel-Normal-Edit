@@ -23,8 +23,14 @@ export default function CropPage() {
   
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
-  const [rotation, setRotation] = useState(0);
-  const [aspect, setAspect] = useState(4 / 3);
+  const [aspect, setAspect] = useState(1); // default to 1 instead of NaN
+  
+  const [originalSize, setOriginalSize] = useState({ width: 0, height: 0 });
+  const [cropWidth, setCropWidth] = useState(0);
+  const [cropHeight, setCropHeight] = useState(0);
+  const [exportFormat, setExportFormat] = useState('image/png');
+  const [exportQuality, setExportQuality] = useState(90);
+  const [croppedFileSize, setCroppedFileSize] = useState(0);
   
   const [croppedCanvas, setCroppedCanvas] = useState(null);
   const [croppedSrc, setCroppedSrc] = useState(null);
@@ -33,12 +39,27 @@ export default function CropPage() {
   
   const croppedAreaPixelsRef = useRef(null);
   const fileInputRef = useRef(null);
+  const manualInputRef = useRef(false);
+  const typingTimer = useRef(null);
 
   // Hydrate icons after mount
-  useEffect(() => { reloadLucideIcons(); }, []);
+  useEffect(() => { 
+    reloadLucideIcons(); 
+    const onPaste = (e) => {
+      if (e.clipboardData && e.clipboardData.files.length > 0) {
+        handleFiles(e.clipboardData.files);
+      }
+    };
+    window.addEventListener('paste', onPaste);
+    return () => window.removeEventListener('paste', onPaste);
+  }, [advancedMode, croppedSrc, imageSrc]);
 
   const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
     croppedAreaPixelsRef.current = croppedAreaPixels;
+    if (!manualInputRef.current) {
+      setCropWidth(Math.round(croppedAreaPixels.width));
+      setCropHeight(Math.round(croppedAreaPixels.height));
+    }
   }, []);
 
   const handleFiles = async (files) => {
@@ -56,6 +77,16 @@ export default function CropPage() {
           const decodedBlob = await decodeImageWithAdvancedEngine(file);
           src = URL.createObjectURL(decodedBlob);
         }
+        
+        // Strip EXIF
+        src = await CanvasHelper.normalizeAndTransformImage(src, 0, false, false);
+        
+        const img = await CanvasHelper.loadImage(src);
+        setOriginalSize({ width: img.width, height: img.height });
+        setCropWidth(img.width);
+        setCropHeight(img.height);
+        setAspect(img.width / img.height);
+        
         setOriginalFile(file);
         setImageSrc(src);
         setCroppedCanvas(null);
@@ -63,11 +94,35 @@ export default function CropPage() {
         if (croppedSrc) URL.revokeObjectURL(croppedSrc);
         setCroppedSrc(null);
         setZoom(1);
-        setRotation(0);
         setError(null);
       } catch (err) {
         setError(err.message);
       }
+    }
+  };
+
+  const handleTransform = async (rot, fx, fy) => {
+    if (!imageSrc) return;
+    setIsCropping(true);
+    setError(null);
+    try {
+      await new Promise(r => setTimeout(r, 50));
+      const newSrc = await CanvasHelper.normalizeAndTransformImage(imageSrc, rot, fx, fy);
+      const img = await CanvasHelper.loadImage(newSrc);
+      
+      if (imageSrc && !imageSrc.startsWith('data:')) {
+         URL.revokeObjectURL(imageSrc);
+      }
+      
+      setOriginalSize({ width: img.width, height: img.height });
+      setCropWidth(img.width);
+      setCropHeight(img.height);
+      setImageSrc(newSrc);
+      setAspect(img.width / img.height);
+    } catch(err) {
+      setError(err.message);
+    } finally {
+      setIsCropping(false);
     }
   };
 
@@ -87,25 +142,24 @@ export default function CropPage() {
       await new Promise(r => setTimeout(r, 50));
       
       const image = await CanvasHelper.loadImage(imageSrc);
-      const { x, y, width, height } = croppedAreaPixelsRef.current;
+      const { x, y } = croppedAreaPixelsRef.current;
+      
+      const width = manualInputRef.current ? cropWidth : croppedAreaPixelsRef.current.width;
+      const height = manualInputRef.current ? cropHeight : croppedAreaPixelsRef.current.height;
+      
+      const safeX = Math.max(0, Math.min(x, originalSize.width - width));
+      const safeY = Math.max(0, Math.min(y, originalSize.height - height));
 
-      // Fix 1.4: When rotating 90 or 270 degrees, swap canvas dimensions
-      const isRotated = rotation % 180 !== 0;
       const canvas = document.createElement('canvas');
-      canvas.width = isRotated ? height : width;
-      canvas.height = isRotated ? width : height;
+      canvas.width = width;
+      canvas.height = height;
       const ctx = canvas.getContext('2d');
 
-      if (rotation) {
-        ctx.translate(canvas.width / 2, canvas.height / 2);
-        ctx.rotate((rotation * Math.PI) / 180);
-        ctx.translate(-canvas.width / 2, -canvas.height / 2);
-      }
-
-      ctx.drawImage(image, x, y, width, height, 0, 0, width, height);
+      ctx.drawImage(image, safeX, safeY, width, height, 0, 0, width, height);
       setCroppedCanvas(canvas);
       
-      const blob = await CanvasHelper.toBlob(canvas, 'image/png');
+      const blob = await CanvasHelper.toBlob(canvas, exportFormat, exportQuality / 100);
+      setCroppedFileSize(blob.size);
       setCroppedSrc(URL.createObjectURL(blob));
       
     } catch (err) {
@@ -117,10 +171,10 @@ export default function CropPage() {
 
   const handleDownload = async () => {
     if (!croppedCanvas) return;
-    // Fix 1.5: Always export PNG → use .png extension
-    const blob = await CanvasHelper.toBlob(croppedCanvas, 'image/png');
+    const blob = await CanvasHelper.toBlob(croppedCanvas, exportFormat, exportQuality / 100);
+    const ext = exportFormat.split('/')[1];
     const baseName = originalFile?.name?.split('.')[0] || 'cropped_image';
-    CanvasHelper.downloadBlob(blob, `${baseName}_cropped.png`);
+    CanvasHelper.downloadBlob(blob, `${baseName}_cropped.${ext}`);
   };
 
   const handleReset = () => {
@@ -222,8 +276,7 @@ export default function CropPage() {
                   image={imageSrc}
                   crop={crop}
                   zoom={zoom}
-                  rotation={rotation}
-                  aspect={aspect}
+                  aspect={Number.isFinite(aspect) && aspect > 0 ? aspect : 1}
                   onCropChange={setCrop}
                   onZoomChange={setZoom}
                   onCropComplete={onCropComplete}
@@ -249,22 +302,29 @@ export default function CropPage() {
                   <div style={{ fontSize: '14px', fontWeight: 600, color: '#B8C0CC', marginBottom: '12px' }}>{t('cropPage.ratio')}</div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
                     {[
-                      { label: t('cropPage.ratioFree'), value: NaN },
+                      { label: t('cropPage.original'), value: originalSize.width && originalSize.height ? originalSize.width / originalSize.height : 1 },
                       { label: '1:1', value: 1 / 1 },
                       { label: '4:3', value: 4 / 3 },
                       { label: '16:9', value: 16 / 9 },
+                      { label: '9:16', value: 9 / 16 },
                       { label: '3:2', value: 3 / 2 },
+                      { label: '2:3', value: 2 / 3 },
+                      { label: '4:5', value: 4 / 5 },
+                      { label: '3:4', value: 3 / 4 },
                       { label: '5:7', value: 5 / 7 },
                     ].map(a => (
                       <button 
                         key={a.label} 
-                        onClick={() => setAspect(a.value)}
+                        onClick={() => {
+                          setAspect(a.value);
+                          manualInputRef.current = false;
+                        }}
                         style={{ 
                           padding: '10px 4px', borderRadius: '8px', border: '1px solid', 
                           fontWeight: 600, fontSize: '13px', cursor: 'pointer', transition: 'all 0.2s',
-                          background: (isNaN(aspect) && isNaN(a.value)) || aspect === a.value ? 'rgba(139, 92, 246, 0.1)' : 'transparent',
-                          borderColor: (isNaN(aspect) && isNaN(a.value)) || aspect === a.value ? '#8b5cf6' : 'rgba(255,255,255,0.05)',
-                          color: (isNaN(aspect) && isNaN(a.value)) || aspect === a.value ? '#8b5cf6' : '#8B949E'
+                          background: Math.abs(aspect - a.value) < 0.01 ? 'rgba(139, 92, 246, 0.1)' : 'transparent',
+                          borderColor: Math.abs(aspect - a.value) < 0.01 ? '#8b5cf6' : 'rgba(255,255,255,0.05)',
+                          color: Math.abs(aspect - a.value) < 0.01 ? '#8b5cf6' : '#8B949E'
                         }}
                       >
                         {a.label}
@@ -273,18 +333,88 @@ export default function CropPage() {
                   </div>
                 </div>
 
-                {/* Xoay ảnh */}
+                {/* Kích thước & Export */}
                 <div style={{ marginBottom: '24px' }}>
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: '#B8C0CC', marginBottom: '12px' }}>{t('rotatePage.rotate')}</div>
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <button onClick={() => setRotation(r => r - 90)} className="interact-btn" style={{ flex: 1, background: '#0B0F16', color: '#B8C0CC', border: '1px solid rgba(255,255,255,0.05)', padding: '10px', borderRadius: '8px', cursor: 'pointer', display: 'flex', justifyContent: 'center' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                    <div style={{ fontSize: '14px', fontWeight: 600, color: '#B8C0CC' }}>{t('cropPage.cropSizeTitle')}</div>
+                    <div style={{ fontSize: '12px', color: '#8B949E' }}>{t('cropPage.original')}: {originalSize.width} x {originalSize.height}</div>
+                  </div>
+                  
+                  <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+                    <div style={{ flex: 1 }}>
+                      <label style={{ display: 'block', fontSize: '12px', color: '#8B949E', marginBottom: '6px' }}>{t('cropPage.width')}</label>
+                      <input 
+                        type="number" 
+                        value={cropWidth} 
+                        onChange={(e) => {
+                          manualInputRef.current = true;
+                          let val = parseInt(e.target.value) || 0;
+                          val = Math.min(Math.max(val, 1), originalSize.width);
+                          setCropWidth(val);
+                          setAspect(val / cropHeight);
+                          clearTimeout(typingTimer.current);
+                          typingTimer.current = setTimeout(() => { manualInputRef.current = false; }, 2000);
+                        }}
+                        style={{ width: '100%', background: '#0B0F16', color: '#F5F7FA', border: '1px solid rgba(255,255,255,0.1)', padding: '10px', borderRadius: '8px', fontSize: '14px', boxSizing: 'border-box' }}
+                      />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <label style={{ display: 'block', fontSize: '12px', color: '#8B949E', marginBottom: '6px' }}>{t('cropPage.height')}</label>
+                      <input 
+                        type="number" 
+                        value={cropHeight} 
+                        onChange={(e) => {
+                          manualInputRef.current = true;
+                          let val = parseInt(e.target.value) || 0;
+                          val = Math.min(Math.max(val, 1), originalSize.height);
+                          setCropHeight(val);
+                          setAspect(cropWidth / val);
+                          clearTimeout(typingTimer.current);
+                          typingTimer.current = setTimeout(() => { manualInputRef.current = false; }, 2000);
+                        }}
+                        style={{ width: '100%', background: '#0B0F16', color: '#F5F7FA', border: '1px solid rgba(255,255,255,0.1)', padding: '10px', borderRadius: '8px', fontSize: '14px', boxSizing: 'border-box' }}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '12px' }}>
+                    <div style={{ flex: 1 }}>
+                      <label style={{ display: 'block', fontSize: '12px', color: '#8B949E', marginBottom: '6px' }}>{t('cropPage.format')}</label>
+                      <select 
+                        value={exportFormat} onChange={(e) => setExportFormat(e.target.value)}
+                        style={{ width: '100%', background: '#0B0F16', color: '#F5F7FA', border: '1px solid rgba(255,255,255,0.1)', padding: '10px', borderRadius: '8px', fontSize: '14px', outline: 'none' }}
+                      >
+                        <option value="image/png">PNG</option>
+                        <option value="image/jpeg">JPG</option>
+                        <option value="image/webp">WebP</option>
+                      </select>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <label style={{ display: 'block', fontSize: '12px', color: (exportFormat === 'image/png') ? '#4b5563' : '#8B949E', marginBottom: '6px' }}>{t('cropPage.qualityLabel', exportQuality)}</label>
+                      <input 
+                        type="range" min="1" max="100" value={exportQuality} onChange={(e) => setExportQuality(Number(e.target.value))}
+                        disabled={exportFormat === 'image/png'}
+                        style={{ width: '100%', accentColor: '#8b5cf6', marginTop: '8px', opacity: exportFormat === 'image/png' ? 0.3 : 1 }}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Xoay & Lật ảnh */}
+                <div style={{ marginBottom: '24px' }}>
+                  <div style={{ fontSize: '14px', fontWeight: 600, color: '#B8C0CC', marginBottom: '12px' }}>{t('cropPage.transformTitle')}</div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                    <button onClick={() => handleTransform(-90, false, false)} className="interact-btn" style={{ background: '#0B0F16', color: '#B8C0CC', border: '1px solid rgba(255,255,255,0.05)', padding: '10px', borderRadius: '8px', cursor: 'pointer', display: 'flex', justifyContent: 'center' }}>
                       <LucideIcon name="rotate-ccw" width="16" height="16" />
                     </button>
-                    <button onClick={() => setRotation(r => r + 90)} className="interact-btn" style={{ flex: 1, background: '#0B0F16', color: '#B8C0CC', border: '1px solid rgba(255,255,255,0.05)', padding: '10px', borderRadius: '8px', cursor: 'pointer', display: 'flex', justifyContent: 'center' }}>
+                    <button onClick={() => handleTransform(90, false, false)} className="interact-btn" style={{ background: '#0B0F16', color: '#B8C0CC', border: '1px solid rgba(255,255,255,0.05)', padding: '10px', borderRadius: '8px', cursor: 'pointer', display: 'flex', justifyContent: 'center' }}>
                       <LucideIcon name="rotate-cw" width="16" height="16" />
                     </button>
-                    <button onClick={() => setRotation(0)} className="interact-btn" style={{ flex: 1, background: '#0B0F16', color: '#B8C0CC', border: '1px solid rgba(255,255,255,0.05)', padding: '10px', borderRadius: '8px', cursor: 'pointer', display: 'flex', justifyContent: 'center', fontSize: '13px', fontWeight: 600 }}>
-                      {t('cropPage.reset')}
+                    <button onClick={() => handleTransform(0, true, false)} className="interact-btn" style={{ background: '#0B0F16', color: '#B8C0CC', border: '1px solid rgba(255,255,255,0.05)', padding: '10px', borderRadius: '8px', cursor: 'pointer', display: 'flex', justifyContent: 'center', gap: '8px', fontSize: '13px' }}>
+                      <LucideIcon name="flip-horizontal" width="16" height="16" /> {t('transform.flipH')}
+                    </button>
+                    <button onClick={() => handleTransform(0, false, true)} className="interact-btn" style={{ background: '#0B0F16', color: '#B8C0CC', border: '1px solid rgba(255,255,255,0.05)', padding: '10px', borderRadius: '8px', cursor: 'pointer', display: 'flex', justifyContent: 'center', gap: '8px', fontSize: '13px' }}>
+                      <LucideIcon name="flip-vertical" width="16" height="16" /> {t('transform.flipV')}
                     </button>
                   </div>
                 </div>
@@ -302,8 +432,13 @@ export default function CropPage() {
               {/* Kết quả Crop */}
               {croppedSrc && (
                 <div className="anim-fade-in" style={{ background: '#161B22', border: '1px solid rgba(139, 92, 246, 0.3)', borderRadius: '20px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: '#8b5cf6', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <LucideIcon name="check-circle" width="16" height="16" /> {t('cropPage.done')}
+                  <div style={{ fontSize: '14px', fontWeight: 600, color: '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <LucideIcon name="check-circle" width="16" height="16" /> {t('cropPage.done')}
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#B8C0CC', background: 'rgba(255,255,255,0.1)', padding: '4px 8px', borderRadius: '6px' }}>
+                      {CanvasHelper.formatFileSize(croppedFileSize)}
+                    </div>
                   </div>
                   <div style={{ background: 'url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEiIGZpbGw9InJnYmEoMjU1LDI1NSwyNTUsMC4wNSkiLz48L3N2Zz4=") repeat', borderRadius: '8px', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '120px' }}>
                     <img src={croppedSrc} alt={t('cropPage.previewAlt')} style={{ maxWidth: '100%', maxHeight: '200px', objectFit: 'contain' }} />

@@ -330,7 +330,10 @@ export default function GlobalSettingsModal() {
                   }}
                   options={[
                     { value: 'vi', label: t('settings.langVietnamese') },
-                    { value: 'en', label: t('settings.langEnglish') }
+                    { value: 'en', label: t('settings.langEnglish') },
+                    { value: 'id', label: t('settings.langIndonesian') },
+                    { value: 'ru', label: t('settings.langRussian') },
+                    { value: 'th', label: t('settings.langThai') }
                   ]}
                 />
               </div>

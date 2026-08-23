@@ -1,12 +1,24 @@
-// i18n.js — dictionary split into vi.js and en.js
+// i18n.js — dictionary split into vi.js, en.js, id.js, ru.js and th.js
 import vi from './vi.js';
 import en from './en.js';
+import id from './id.js';
+import ru from './ru.js';
+import th from './th.js';
 
-export const dictionary = { vi, en };
+export const dictionary = { vi, en, id, ru, th };
 
 function getDefaultLang() {
+  if (window.__APP_LANG_FROM_URL__) {
+    return window.__APP_LANG_FROM_URL__;
+  }
+  
+  const pathParts = window.location.pathname.split('/').filter(Boolean);
+  if (pathParts.length > 0 && dictionary[pathParts[0]]) {
+    return pathParts[0];
+  }
+
   const saved = localStorage.getItem('appLang');
-  if (saved) return saved;
+  if (saved && dictionary[saved]) return saved;
   return 'en';
 }
 
@@ -31,13 +43,28 @@ export function t(key, ...args) {
 
 export function setLang(lang) {
   if (!dictionary[lang]) return;
+  if (currentLang === lang) return;
+  
   currentLang = lang;
   localStorage.setItem('appLang', lang);
-  updateDOM();
+  
+  // Update the URL to reflect the new language
+  const pathParts = window.location.pathname.split('/').filter(Boolean);
+  if (pathParts.length > 0 && dictionary[pathParts[0]]) {
+    pathParts[0] = lang; // replace existing lang
+  } else {
+    pathParts.unshift(lang); // prepend lang
+  }
+  
+  const newPath = '/' + pathParts.join('/');
+  
+  // Also preserve query string if any
+  window.location.assign(newPath + window.location.search);
 }
-
 export function toggleLang() {
-  setLang(currentLang === 'vi' ? 'en' : 'vi');
+  const order = ['vi', 'en', 'id', 'ru', 'th'];
+  const idx = order.indexOf(currentLang);
+  setLang(order[(idx + 1) % order.length]);
 }
 
 export function getCurrentLang() {

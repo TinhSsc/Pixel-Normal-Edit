@@ -275,7 +275,7 @@ export default function HomePage() {
           </button>
           <button onClick={toggleLanguage} title={t('settings.language') || 'Ngôn ngữ'} className="interact-btn" style={{ background: 'var(--home-surface)', color: 'var(--home-text)', border: '1px solid var(--home-border)', padding: '8px 12px', borderRadius: '6px', fontWeight: 600, cursor: 'pointer', fontSize: '14px', display: 'flex', alignItems: 'center', gap: '6px' }}>
             <i data-lucide="languages" width="16" height="16" style={{ color: 'var(--home-primary)' }}></i>
-            <span>{lang === 'vi' ? 'VI' : 'EN'}</span>
+            <span>{lang.toUpperCase()}</span>
           </button>
           {currentUser ? (
             <div onClick={() => window.location.href = '/'} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', background: 'var(--home-surface)', padding: '4px 12px 4px 4px', borderRadius: '20px', border: '1px solid var(--home-border)', transition: 'background 0.2s' }} onMouseEnter={e => e.currentTarget.style.background = 'var(--home-surface-alt)'} onMouseLeave={e => e.currentTarget.style.background = 'var(--home-surface)'}>

@@ -16,7 +16,15 @@ export default function ToolsApp() {
   const MINI_TOOLS_ROUTES = ['home', 'convert', 'compress', 'resize', 'crop', 'rotate', 'frames-to-media', 'media-to-frames', 'gif-simplify'];
 
   const getRoute = () => {
-    const path = window.location.pathname.split('/').filter(Boolean)[0];
+    const pathParts = window.location.pathname.split('/').filter(Boolean);
+    let path = null;
+    
+    if (pathParts.length > 0 && ['vi', 'en', 'id', 'ru', 'th'].includes(pathParts[0])) {
+      path = pathParts[1];
+    } else {
+      path = pathParts[0];
+    }
+
     if (path && MINI_TOOLS_ROUTES.includes(path)) return path;
 
     const params = new URLSearchParams(window.location.search);
@@ -29,7 +37,7 @@ export default function ToolsApp() {
 
 
   if (!MINI_TOOLS_ROUTES.includes(route)) {
-    window.location.href = '/';
+    window.location.href = `/${window.__APP_LANG_FROM_URL__ || 'en'}/home`;
     return null;
   }
 
