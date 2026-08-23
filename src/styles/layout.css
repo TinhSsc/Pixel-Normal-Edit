@@ -679,6 +679,12 @@
   color: var(--color-text);
 }
 
+.main-area.drag-over {
+  box-shadow: inset 0 0 0 4px var(--accent) !important;
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.05);
+}
+
 /* Custom Tooltip */
 #custom-tooltip {
   position: absolute;

@@ -10,7 +10,7 @@ export default defineConfig({
     visualizer({ open: false, filename: 'dist/stats.html' }),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'avatar.svg', 'robots.txt', 'sitemap.xml', 'pwa-192x192.png', 'pwa-512x512.png'],
+      includeAssets: ['avatar.svg', 'robots.txt', 'sitemap.xml', 'pwa-192x192.png', 'pwa-512x512.png'],
       manifest: {
         name: 'Pixel Normal Edit',
         short_name: 'PixelEdit',

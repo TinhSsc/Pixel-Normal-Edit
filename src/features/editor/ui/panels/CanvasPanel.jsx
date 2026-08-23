@@ -30,6 +30,7 @@ import { renderPixels, setForceFullRender } from '../../engine/core/render.js';
 import { getZoom, getPan, setPan, applyTransform } from '../../engine/core/viewport.js';
 import { t } from '../../../../i18n/i18n.js';
 import { blendUint32 } from '../../engine/core/color-utils.js';
+import { processImageBatch } from '../../io/upload/upload-modal.js';
 
 function OnionSkinLayer({ frame }) {
   const ref = React.useRef(null);
@@ -283,6 +284,27 @@ export default function CanvasPanel() {
     if (window.lucide) window.lucide.createIcons();
   });
 
+  const [isDragOverCanvas, setIsDragOverCanvas] = useState(false);
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragOverCanvas(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragOverCanvas(false);
+  };
+
+  const handleDrop = async (e) => {
+    e.preventDefault();
+    setIsDragOverCanvas(false);
+    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const files = Array.from(e.dataTransfer.files);
+      await processImageBatch(files, 'multi-tab', false);
+    }
+  };
+
   const navTools = (
     <>
       <button className="btn action-btn mobile-only undo-btn-action" data-i18n="tooltip.undo"><Icon name={ICONS.UNDO} /></button>
@@ -298,7 +320,14 @@ export default function CanvasPanel() {
   );
 
   return (
-    <div ref={mainAreaRef} className="main-area" style={{ width: '100%', height: '100%' }}>
+    <div 
+      ref={mainAreaRef} 
+      className={`main-area ${isDragOverCanvas ? 'drag-over' : ''}`} 
+      style={{ width: '100%', height: '100%' }}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
       <div id="canvasTabsContainer" className="canvas-tabs-container"></div>
       <div className="canvas-wrap" style={{ position: 'relative', overflow: 'hidden' }}>
         {/* Toast Notification Container */}
