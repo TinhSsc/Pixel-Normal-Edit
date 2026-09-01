@@ -11,6 +11,13 @@
     ],
     "cleanUrls": false,
     "trailingSlash": false,
+    "redirects": [
+      {
+        "source": "/:path*",
+        "destination": "https://pixel-normal-edit.vercel.app/:path*",
+        "type": 301
+      }
+    ],
     "rewrites": [
       {
         "source": "**",

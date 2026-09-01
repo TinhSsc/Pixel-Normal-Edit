@@ -18,6 +18,17 @@ const tools = [
 let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>${domain}/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="${domain}/en/home" />
+    <xhtml:link rel="alternate" hreflang="vi" href="${domain}/vi/home" />
+    <xhtml:link rel="alternate" hreflang="id" href="${domain}/id/home" />
+    <xhtml:link rel="alternate" hreflang="ru" href="${domain}/ru/home" />
+    <xhtml:link rel="alternate" hreflang="th" href="${domain}/th/home" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="${domain}/en/home" />
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
 `;
 
 for (const tool of tools) {

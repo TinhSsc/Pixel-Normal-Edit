@@ -76,7 +76,7 @@ const toolNames = {
 const SEO_DATA = {
   en: {
     home: {
-      title: "Top 1 Image Processing Tool & Pixel Art Editor | Pixel Normal Edit",
+      title: "Wonderful Image Processing Tool & Pixel Art Editor | Pixel Normal Edit",
       desc: "Browser-based image processing platform and Pixel Art editor. Fast, 100% private, and completely free.",
       keywords: "pixel art editor, draw pixel art online, pixel art tool, pixel normal edit, create pixel art, edit pixel, convert image format, compress image, resize image, crop image, rotate image, gif, video, crop picture pixels, image processor online, free image tools, secure image editor",
       h1: "Pixel Normal Edit - Free Online Pixel Art Editor & Image Studio",
@@ -201,7 +201,7 @@ const SEO_DATA = {
   },
   vi: {
     home: {
-      title: "Công Cụ Xử Lý Ảnh Top 1 & Vẽ Pixel Art | Pixel Normal Edit",
+      title: "Công Cụ Xử Lý Ảnh Tuyệt Vời & Vẽ Pixel Art | Pixel Normal Edit",
       desc: "Nền tảng xử lý ảnh và vẽ Pixel Art trực tiếp trên trình duyệt. Nhanh, bảo mật 100% và hoàn toàn miễn phí.",
       keywords: "chỉnh sửa ảnh pixel, vẽ pixel online, chuyển đổi ảnh, nén ảnh, cắt ảnh, ghép ảnh thành gif, video sang gif, tạo gif, cắt ảnh theo pixel",
       h1: "Pixel Normal Edit - Trình Chỉnh Sửa Pixel Art & Xử Lý Ảnh Trực Tuyến",
@@ -323,7 +323,7 @@ const SEO_DATA = {
   },
   id: {
     home: {
-      title: "Alat Pengolah Gambar No. 1 & Editor Seni Piksel | Pixel Normal Edit",
+      title: "Alat Pengolah Gambar Hebat & Editor Seni Piksel | Pixel Normal Edit",
       desc: "Platform pengolah gambar dan editor Pixel Art di browser. Cepat, aman, dan gratis 100%.",
       keywords: "editor pixel art, gambar pixel online, alat pixel, convert gambar, kompres gambar, potong gambar",
       h1: "Pixel Normal Edit - Editor Pixel Art & Pengolah Gambar Online Gratis",
@@ -400,7 +400,7 @@ const SEO_DATA = {
   },
   ru: {
     home: {
-      title: "Топ-1 инструмент для обработки изображений и Pixel Art | Pixel Normal Edit",
+      title: "Отличный инструмент для обработки изображений и Pixel Art | Pixel Normal Edit",
       desc: "Платформа для обработки изображений и рисования пиксельной графики в браузере. Быстро и бесплатно.",
       keywords: "редактор пиксельной графики, рисование пикселей онлайн, конвертер изображений, сжатие изображений, обрезка изображений",
       h1: "Pixel Normal Edit - Бесплатный онлайн редактор пиксель-арта",
@@ -477,7 +477,7 @@ const SEO_DATA = {
   },
   th: {
     home: {
-      title: "เครื่องมือประมวลผลภาพอันดับ 1 และโปรแกรมวาด Pixel Art | Pixel Normal Edit",
+      title: "เครื่องมือประมวลผลภาพที่ยอดเยี่ยม และโปรแกรมวาด Pixel Art | Pixel Normal Edit",
       desc: "แพลตฟอร์มประมวลผลภาพและวาดภาพ Pixel Art ในเบราว์เซอร์ เร็ว ปลอดภัย 100% และฟรีทั้งหมด",
       keywords: "ตัวแก้ไขพิกเซล อาร์ต วาดพิกเซลออนไลน์ เครื่องมือพิกเซล แปลงภาพ บีบอัดภาพ ตัดภาพ",
       h1: "Pixel Normal Edit - โปรแกรมแก้ไข Pixel Art และเครื่องมือจัดการรูปภาพออนไลน์",
