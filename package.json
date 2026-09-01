@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node prerender-routes.mjs && node generate-sitemap.mjs",
     "lint": "oxlint",
     "i18n": "node src/i18n/convert.js",
     "preview": "vite preview",

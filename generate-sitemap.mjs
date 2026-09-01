@@ -43,4 +43,10 @@ xml += `</urlset>\n`;
 
 const sitemapPath = path.resolve('public/sitemap.xml');
 fs.writeFileSync(sitemapPath, xml, 'utf8');
-console.log('Successfully generated public/sitemap.xml with localized routes!');
+
+const distPath = path.resolve('dist');
+if (fs.existsSync(distPath)) {
+  fs.writeFileSync(path.join(distPath, 'sitemap.xml'), xml, 'utf8');
+}
+console.log('Successfully generated public/sitemap.xml & dist/sitemap.xml with localized routes!');
+
