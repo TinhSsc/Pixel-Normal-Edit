@@ -12,11 +12,13 @@ import {
   setMainSelectionBox,
   setSelectionComparisonEnabled,
 } from '../core/selection-comparison.js';
+import { isQuickColorSelectArmed, applyQuickColorSelectAt } from '../core/quick-color-select.js';
 
 let isDragging = false;
 let startCell = null;
 let mode = 'none'; // 'create', 'move'
 let comparisonTarget = 'main';
+let isQuickSelectGesture = false;
 let offsetMove = { x: 0, y: 0 };
 let originalFloatingState = null;
 
@@ -165,8 +167,17 @@ function handleSelectionComparison(event, cell) {
   if (event === 'down') {
     isDragging = true;
     startCell = { ...cell };
+
     const comparison = getSelectionComparisonState();
     comparisonTarget = comparison.mainBox ? comparison.activeTarget : 'main';
+
+    // Chế độ "chọn nhanh theo màu": giữ lại cử chỉ, quyết định ở pointerup.
+    if (isQuickColorSelectArmed()) {
+      isQuickSelectGesture = true;
+      return;
+    }
+    isQuickSelectGesture = false;
+
     const box = { x: cell.x, y: cell.y, width: 1, height: 1 };
 
     if (comparisonTarget === 'compare') {
@@ -178,6 +189,8 @@ function handleSelectionComparison(event, cell) {
   }
 
   if (event === 'move' && isDragging && startCell) {
+    if (isQuickSelectGesture) return;
+
     const box = getSelectionBoxFromCell(startCell, cell);
     if (comparisonTarget === 'compare') {
       setCompareSelectionBox(box);
@@ -188,6 +201,18 @@ function handleSelectionComparison(event, cell) {
   }
 
   if (event === 'up' && isDragging && startCell) {
+    const wasQuickGesture = isQuickSelectGesture;
+    isQuickSelectGesture = false;
+
+    // Bấm tại chỗ (không kéo) khi đang bật chọn nhanh → lan theo màu.
+    if (wasQuickGesture && cell && startCell.x === cell.x && startCell.y === cell.y) {
+      isDragging = false;
+      startCell = null;
+      applyQuickColorSelectAt(cell);
+      return;
+    }
+
+    // Kéo khi đang bật chọn nhanh → coi như kéo chọn vùng thường.
     const box = getSelectionBoxFromCell(startCell, cell);
     if (comparisonTarget === 'compare') {
       setCompareSelectionBox(box);

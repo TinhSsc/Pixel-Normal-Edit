@@ -14,6 +14,13 @@ import {
   subscribeSelectionComparison,
 } from '../../engine/core/selection-comparison.js';
 import { calculateSelectionComparison, calculateSelectionSizes, SELECTION_RATIO_PRESETS } from '../../engine/core/selection-ratio.js';
+import {
+  getQuickColorSelectState,
+  resetQuickColorSelect,
+  setQuickColorSelectOptions,
+  subscribeQuickColorSelect,
+  toggleQuickColorSelect,
+} from '../../engine/core/quick-color-select.js';
 
 function formatNumber(value) {
   if (!Number.isFinite(value)) return '0';
@@ -59,6 +66,7 @@ export default function SelectionComparisonPanel() {
   const [comparison, setComparison] = useState(getSelectionComparisonState);
   const [copyState, setCopyState] = useState('idle');
   const [copiedRange, setCopiedRange] = useState(null);
+  const [quick, setQuick] = useState(getQuickColorSelectState());
   const [referenceWidthDraft, setReferenceWidthDraft] = useState('');
   const [referenceHeightDraft, setReferenceHeightDraft] = useState('');
   const copyResetTimer = useRef(null);
@@ -69,6 +77,8 @@ export default function SelectionComparisonPanel() {
   const hasReference = Boolean(comparison.mainReference);
 
   useEffect(() => subscribeSelectionComparison(setComparison), []);
+
+  useEffect(() => subscribeQuickColorSelect(setQuick), []);
 
   useEffect(() => {
     if (!comparisonEnabled) return undefined;
@@ -111,6 +121,7 @@ export default function SelectionComparisonPanel() {
   };
 
   const handleReset = () => {
+    resetQuickColorSelect();
     resetSelectionComparison();
     redrawCanvas();
   };
@@ -334,6 +345,89 @@ export default function SelectionComparisonPanel() {
             <Icon name={ICONS.COPY} />
           </span>
         </button>
+      </div>
+
+      <div className="selection-comparison-section-title">{t('selectionRatio.quickSelectTitle')}</div>
+      <div className="selection-comparison-quick">
+        <button
+          type="button"
+          className={`selection-comparison-quick-arm${quick.armed ? ' armed' : ''}`}
+          onClick={toggleQuickColorSelect}
+          title={t('selectionRatio.quickSelectHint')}
+        >
+          <Icon name={ICONS.PIPETTE} />
+          <span>{quick.armed ? t('selectionRatio.quickSelectArmed') : t('selectionRatio.quickSelectArm')}</span>
+        </button>
+
+        <div className="selection-comparison-quick-options">
+          <div className="selection-comparison-quick-row">
+            <span className="selection-comparison-quick-label">{t('selectionRatio.quickSelectTarget')}</span>
+            <div className="selection-comparison-quick-toggle">
+              <button
+                type="button"
+                className={quick.target === 'compare' ? 'active' : ''}
+                onClick={() => setQuickColorSelectOptions({ target: 'compare' })}
+                title={t('selectionRatio.compare')}
+              >
+                {t('selectionRatio.compare')}
+              </button>
+              <button
+                type="button"
+                className={quick.target === 'main' ? 'active' : ''}
+                onClick={() => setQuickColorSelectOptions({ target: 'main' })}
+                title={t('selectionRatio.main')}
+              >
+                {t('selectionRatio.main')}
+              </button>
+            </div>
+          </div>
+
+          <div className="selection-comparison-quick-row">
+            <span className="selection-comparison-quick-label">{t('selectionRatio.quickSelectSpread')}</span>
+            <div className="selection-comparison-quick-toggle">
+              <button
+                type="button"
+                className={quick.contiguous ? 'active' : ''}
+                onClick={() => setQuickColorSelectOptions({ contiguous: true })}
+                title={t('selectionRatio.quickSelectContiguousHint')}
+              >
+                {t('selectionRatio.quickSelectContiguous')}
+              </button>
+              <button
+                type="button"
+                className={!quick.contiguous ? 'active' : ''}
+                onClick={() => setQuickColorSelectOptions({ contiguous: false })}
+                title={t('selectionRatio.quickSelectGlobalHint')}
+              >
+                {t('selectionRatio.quickSelectGlobal')}
+              </button>
+            </div>
+          </div>
+
+          <div className="selection-comparison-quick-row">
+            <label className="selection-comparison-quick-label" htmlFor="quickSelectTolerance">
+              {t('selectionRatio.quickSelectTolerance')}
+            </label>
+            <input
+              id="quickSelectTolerance"
+              type="number"
+              min="0"
+              max="255"
+              step="1"
+              inputMode="numeric"
+              className="selection-comparison-quick-tolerance"
+              value={quick.tolerance}
+              onChange={(event) => setQuickColorSelectOptions({ tolerance: event.target.value })}
+              title={t('selectionRatio.quickSelectToleranceHint')}
+            />
+          </div>
+        </div>
+
+        {quick.lastResult && (
+          <div className="selection-comparison-quick-result">
+            {t('selectionRatio.quickSelectResultShort', formatNumber(quick.lastResult.count), quick.lastResult.colorHex, `${quick.lastResult.box.width} × ${quick.lastResult.box.height}`)}
+          </div>
+        )}
       </div>
 
       <div className="selection-comparison-section-title">{t('selectionRatio.presetTitle')}</div>

@@ -7,6 +7,7 @@ import { bresenhamLine } from '../algorithms/line-algo.js';
 import { circlePoints } from '../algorithms/circle-algo.js';
 import { isMirrorModeActive } from './pixel-writer.js';
 import { getSelectionComparisonState } from './selection-comparison.js';
+import { getQuickRegionMask } from './color-region-select.js';
 
 let showGridFlag = true;
 
@@ -88,6 +89,29 @@ function computeBoundingRect(pixels) {
   return { x: minX, y: minY, w: maxX - minX + 1, h: maxY - minY + 1 };
 }
 
+// ── Highlight vùng đã "lan" theo màu (chọn nhanh) ───────────────────────
+const QUICK_REGION_HIGHLIGHT = 'rgba(0, 229, 160, 0.65)';
+let quickHighlightColor = null;
+
+function applyQuickRegionHighlight() {
+  const region = getQuickRegionMask();
+  if (!region) return;
+
+  if (quickHighlightColor === null) {
+    quickHighlightColor = parseColorToUint32(QUICK_REGION_HIGHLIGHT);
+  }
+
+  const { mask, width, height } = region;
+  for (let y = 0; y < height; y++) {
+    const rowOffset = y * width;
+    for (let x = 0; x < width; x++) {
+      const idx = rowOffset + x;
+      if (mask[idx] !== 1) continue;
+      offscreenData32[idx] = blendUint32(offscreenData32[idx], quickHighlightColor);
+    }
+  }
+}
+
 function mergeRects(...rects) {
   const validRects = rects.filter(r => r !== null && r !== undefined);
   if (validRects.length === 0) return null;
@@ -141,6 +165,7 @@ export function renderPixels(isPreviewOnly = false) {
       }
     }
 
+    applyQuickRegionHighlight();
     ctx.putImageData(offscreenImageData, 0, 0);
 
     drawFloatingSelection();
@@ -198,6 +223,7 @@ export function renderPixels(isPreviewOnly = false) {
   }
 
   // Put only the dirty rectangle to the canvas
+  applyQuickRegionHighlight();
   ctx.putImageData(
     offscreenImageData, 
     0, 0, 
