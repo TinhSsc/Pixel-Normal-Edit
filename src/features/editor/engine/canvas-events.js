@@ -26,9 +26,11 @@ import { useHandTool } from './tools/hand.js';
 import { useReplaceColor } from './tools/replace-color.js';
 import { useSelectTool } from './tools/select.js';
 import { useTextTool } from './tools/text.js';
+import { isSelectionComparisonEnabled } from './core/selection-comparison.js';
 import { toolbarConfig } from './tool-registry/toolbar-manager.js';
 import { navigationConfig } from '../ui/edit-panel/navigation-manager.js';
 let isDrawing = false;
+let isComparisonGesture = false;
 let lastCell = null;
 let panStart = null;
 let rulerAnchor = null;
@@ -42,6 +44,12 @@ const VALID_TOOLS = new Set([
   ...Object.keys(navigationConfig.tools),
   'pan'
 ]);
+
+const COMPARISON_UI_SELECTOR = '.selection-comparison-ui, #selectionComparisonToggleBtn';
+
+function isComparisonUiEvent(event) {
+  return event.target instanceof Element && Boolean(event.target.closest(`.text-tool-overlay-ui, ${COMPARISON_UI_SELECTOR}`));
+}
 
 function getColor(btn) {
   if (btn === 2) return els.colorPicker2?.value || '#ffffff';
@@ -267,7 +275,8 @@ let lastParticleTime = 0;
 let lastMoveEvent = null;
 
 function onPointerDown(e) {
-  if (e.target.closest('.text-tool-overlay-ui')) return;
+  isComparisonGesture = false;
+  if (isComparisonUiEvent(e)) return;
 
   if (isTaskRunning()) {
     abortCurrentTask();
@@ -345,7 +354,8 @@ function onPointerDown(e) {
   rulerDir = null;
 
   const isAsyncTool = ['fill', 'magic-eraser', 'outline', 'replace-color'].includes(currentTool);
-  if (!isAsyncTool) {
+  isComparisonGesture = currentTool === 'select' && isSelectionComparisonEnabled();
+  if (!isAsyncTool && !isComparisonGesture) {
     beginStroke();
   }
 
@@ -356,6 +366,8 @@ function onPointerDown(e) {
 }
 
 function onPointerMove(e) {
+  if (isComparisonUiEvent(e)) return;
+
   if (panStart) {
     const dx = e.clientX - panStart.x;
     const dy = e.clientY - panStart.y;
@@ -453,7 +465,7 @@ function onPointerUp(e) {
 
 
   const isAsyncTool = ['fill', 'magic-eraser', 'outline'].includes(currentTool);
-  if (!isAsyncTool) {
+  if (!isAsyncTool && !isComparisonGesture) {
     commitStroke(pixelMap);
   }
 
@@ -463,10 +475,14 @@ function onPointerUp(e) {
   rulerAnchor = null;
   rulerDir = null;
   hideRulerOverlay();
-  debouncedSaveWorkspace();
+  if (!isComparisonGesture) {
+    debouncedSaveWorkspace();
+  }
+  isComparisonGesture = false;
 }
 
 function onWheel(e) {
+  if (isComparisonUiEvent(e)) return;
   e.preventDefault();
   const canvas = document.getElementById('pixelCanvas');
   const zoom = getZoom();

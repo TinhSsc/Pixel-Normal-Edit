@@ -1,4 +1,4 @@
-import { ctx, GRID_WIDTH, GRID_HEIGHT, layers, pixelMap, previewPixels, offscreenImageData, offscreenData32, selectionBox, floatingSelection } from './state.js';
+import { ctx, GRID_WIDTH, GRID_HEIGHT, layers, pixelMap, previewPixels, offscreenImageData, offscreenData32, selectionBox, floatingSelection, currentTool } from './state.js';
 import { getZoom, getPan, applyTransform } from './viewport.js';
 import { getCellPx } from './viewport.js';
 import { syncPreviewPixels } from './preview-group-manager.js';
@@ -6,6 +6,7 @@ import { parseColorToUint32, blendUint32 } from './color-utils.js';
 import { bresenhamLine } from '../algorithms/line-algo.js';
 import { circlePoints } from '../algorithms/circle-algo.js';
 import { isMirrorModeActive } from './pixel-writer.js';
+import { getSelectionComparisonState } from './selection-comparison.js';
 
 let showGridFlag = true;
 
@@ -239,9 +240,7 @@ function drawFloatingSelection() {
   ctx.drawImage(tempCanvas, x, y);
 }
 
-function drawSelectionBox() {
-  let box = selectionBox || (floatingSelection ? floatingSelection : null);
-  const el = document.getElementById('selectionOverlay');
+function positionSelectionOverlay(el, box) {
   if (!el) return;
   if (!box) {
     el.style.display = 'none';
@@ -252,6 +251,32 @@ function drawSelectionBox() {
   el.style.top = `${(box.y / GRID_HEIGHT) * 100}%`;
   el.style.width = `${(box.width / GRID_WIDTH) * 100}%`;
   el.style.height = `${(box.height / GRID_HEIGHT) * 100}%`;
+}
+
+function drawSelectionBox() {
+  const comparison = getSelectionComparisonState();
+  const standardOverlay = document.getElementById('selectionOverlay');
+  const mainOverlay = document.getElementById('selectionMainOverlay');
+  const compareOverlay = document.getElementById('selectionCompareOverlay');
+
+  if (comparison.enabled) {
+    if (standardOverlay) standardOverlay.style.display = 'none';
+    mainOverlay?.classList.toggle('is-active', comparison.activeTarget === 'main');
+    compareOverlay?.classList.toggle('is-active', comparison.activeTarget === 'compare');
+    if (currentTool === 'select') {
+      positionSelectionOverlay(mainOverlay, comparison.mainBox);
+      positionSelectionOverlay(compareOverlay, comparison.compareBox);
+    } else {
+      positionSelectionOverlay(mainOverlay, null);
+      positionSelectionOverlay(compareOverlay, null);
+    }
+    return;
+  }
+
+  positionSelectionOverlay(mainOverlay, null);
+  positionSelectionOverlay(compareOverlay, null);
+  const box = selectionBox || (floatingSelection ? floatingSelection : null);
+  positionSelectionOverlay(standardOverlay, box);
 }
 
 function drawStampedPreview() {

@@ -9,6 +9,7 @@ import { pushResizeHistory, setResizeRestoreHandler } from '../core/history.js';
 import { setStatus } from '../core/state.js';
 import { debouncedSaveWorkspace, saveCurrentTabState } from '../core/tab-manager.js';
 import { debounceExtractCanvasColors } from '../core/color-palette.js';
+import { resetSelectionComparison } from '../core/selection-comparison.js';
 import { isAnimationMode, resizeAnimation, getAnimationState, setAnimationState, loadFrameToCurrentState } from '../core/animation-state.js';
 
 import { pixelMap } from '../core/state.js';
@@ -32,6 +33,7 @@ function makeImageData(w, h) {
 }
 
 function restoreSnapshot(snapshot) {
+  resetSelectionComparison();
   const imgData = makeImageData(snapshot.w, snapshot.h);
   const data32 = new Uint32Array(imgData.data.buffer);
   setGridSizeParams(snapshot.w, snapshot.h, imgData, data32);
@@ -54,6 +56,7 @@ function restoreSnapshot(snapshot) {
 
 export function setGridSize(w, h, mode = 'clear', dx = 0, dy = 0) {
   setResizeRestoreHandler(restoreSnapshot);
+  resetSelectionComparison();
 
   const oldW = GRID_WIDTH;
   const oldH = GRID_HEIGHT;

@@ -5,10 +5,18 @@ import {
 } from '../core/state.js';
 import { renderPixels } from '../core/render.js';
 import { beginStroke, commitStroke, recordChange, popLastStroke, pushStrokeDirectly, undo } from '../core/history.js';
+import {
+  getSelectionComparisonState,
+  isSelectionComparisonEnabled,
+  setCompareSelectionBox,
+  setMainSelectionBox,
+  setSelectionComparisonEnabled,
+} from '../core/selection-comparison.js';
 
 let isDragging = false;
 let startCell = null;
 let mode = 'none'; // 'create', 'move'
+let comparisonTarget = 'main';
 let offsetMove = { x: 0, y: 0 };
 let originalFloatingState = null;
 
@@ -26,6 +34,9 @@ export function cancelSelection() {
 window.addEventListener('tool-changed', (e) => {
   if (e.detail.tool !== 'select') {
     cancelSelection();
+    if (isSelectionComparisonEnabled()) {
+      setSelectionComparisonEnabled(false);
+    }
   }
 });
 
@@ -130,6 +141,11 @@ export function extractSelectionToFloating() {
 }
 
 export function clearSelection() {
+  if (isSelectionComparisonEnabled()) {
+    renderPixels(true);
+    return;
+  }
+
   setSelectionBox(null);
   if (floatingSelection) {
     commitFloatingSelection();
@@ -137,7 +153,58 @@ export function clearSelection() {
   renderPixels(true);
 }
 
-export function useSelectTool(event, cell, color, prevCell) {
+function getSelectionBoxFromCell(start, end) {
+  const minX = Math.min(start.x, end.x);
+  const minY = Math.min(start.y, end.y);
+  const maxX = Math.max(start.x, end.x);
+  const maxY = Math.max(start.y, end.y);
+  return { x: minX, y: minY, width: maxX - minX + 1, height: maxY - minY + 1 };
+}
+
+function handleSelectionComparison(event, cell) {
+  if (event === 'down') {
+    isDragging = true;
+    startCell = { ...cell };
+    const comparison = getSelectionComparisonState();
+    comparisonTarget = comparison.mainBox ? comparison.activeTarget : 'main';
+    const box = { x: cell.x, y: cell.y, width: 1, height: 1 };
+
+    if (comparisonTarget === 'compare') {
+      setCompareSelectionBox(box);
+    } else {
+      setMainSelectionBox(box);
+    }
+    return;
+  }
+
+  if (event === 'move' && isDragging && startCell) {
+    const box = getSelectionBoxFromCell(startCell, cell);
+    if (comparisonTarget === 'compare') {
+      setCompareSelectionBox(box);
+    } else {
+      setMainSelectionBox(box);
+    }
+    return;
+  }
+
+  if (event === 'up' && isDragging && startCell) {
+    const box = getSelectionBoxFromCell(startCell, cell);
+    if (comparisonTarget === 'compare') {
+      setCompareSelectionBox(box);
+    } else {
+      setMainSelectionBox(box, true);
+    }
+    isDragging = false;
+    startCell = null;
+  }
+}
+
+export function useSelectTool(event, cell, _color, _prevCell) {
+  if (isSelectionComparisonEnabled()) {
+    handleSelectionComparison(event, cell);
+    return;
+  }
+
   if (event === 'down') {
     if (floatingSelection) {
       if (isPointInBox(cell.x, cell.y, floatingSelection)) {

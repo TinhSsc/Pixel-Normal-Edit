@@ -31,6 +31,7 @@ import {
     forceRedrawAllPreviews
 } from './preview-group-manager.js';
 import { clearSelection } from '../tools/select.js';
+import { resetSelectionComparison } from './selection-comparison.js';
 
 function syncPreviews() {
     syncPreviewsWithFrames(frames, activeFrameIndex, isAnimationMode);
@@ -334,6 +335,7 @@ export function loadFrameToCurrentState(index) {
     const frame = frames[index];
     if (!frame) return null;
 
+    resetSelectionComparison();
     setActiveFrameIndex(index);
     resetLayers(frame.layers, frame.activeLayerIndex, new Map(frame.groupMap));
     setHistoryState(

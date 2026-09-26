@@ -26,6 +26,8 @@ import { GRID_WIDTH, GRID_HEIGHT } from '../../engine/core/state.js';
 import { debouncedSaveWorkspace } from '../../engine/core/tab-manager.js';
 import CanvasSettingsModal from '../resize/CanvasSettingsModal.jsx';
 import TextToolOverlay from '../text/TextToolOverlay.jsx';
+import SelectionComparisonPanel from '../selection/SelectionComparisonPanel.jsx';
+import SelectionComparisonToggle from '../selection/SelectionComparisonToggle.jsx';
 import { renderPixels, setForceFullRender } from '../../engine/core/render.js';
 import { getZoom, getPan, setPan, applyTransform } from '../../engine/core/viewport.js';
 import { t } from '../../../../i18n/i18n.js';
@@ -371,6 +373,8 @@ export default function CanvasPanel() {
               />
             </div>
 
+            <SelectionComparisonToggle />
+
             <button
               id="toggleAnimationModeBtn"
               className="btn"
@@ -395,8 +399,12 @@ export default function CanvasPanel() {
         ))}
         <div id="gridOverlay" style={{ pointerEvents: 'none', position: 'absolute', top: '-1px', left: '-1px', transformOrigin: '0 0', zIndex: 10 }}>
           <div id="mirrorLine" style={{ display: 'none', position: 'absolute', left: '50%', top: 0, bottom: 0, background: 'rgba(255, 60, 60, 0.8)', zIndex: 10 }}></div>
+          <div id="selectionMainOverlay"><span data-i18n="selectionRatio.main">{t('selectionRatio.main')}</span></div>
+          <div id="selectionCompareOverlay"><span data-i18n="selectionRatio.compare">{t('selectionRatio.compare')}</span></div>
           <div id="selectionOverlay" style={{ display: 'none', position: 'absolute', pointerEvents: 'none', border: '1px dashed white', boxShadow: '0 0 0 1px black', zIndex: 20 }}></div>
         </div>
+
+        <SelectionComparisonPanel />
         
         <TextToolOverlay />
         

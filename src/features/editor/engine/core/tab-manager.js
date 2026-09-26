@@ -16,6 +16,7 @@ import { showNotification } from '../../../storage/cloud/drive-ui.js';
 import { debounceExtractCanvasColors } from './color-palette.js';
 import { getAnimationState, setAnimationState, loadFrameToCurrentState } from './animation-state.js';
 import { setPreviewBackground, removePreviewBackground } from './preview-group-manager.js';
+import { resetSelectionComparison } from './selection-comparison.js';
 
 let tabs = [];
 let activeTabId = null;
@@ -52,6 +53,7 @@ function createTabObject(id, name, w, h, pixelMapData = null, layersData = null,
 
 function refreshUI(targetTab) {
   if (targetTab) loadTabState(targetTab);
+  resetSelectionComparison();
   resizeCanvas();
   fitToScreen();
   renderPixels();

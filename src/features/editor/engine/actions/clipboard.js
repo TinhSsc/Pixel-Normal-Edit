@@ -6,8 +6,16 @@ import { extractSelectionToFloating, commitFloatingSelection, clearSelection } f
 import { renderPixels } from '../core/render.js';
 import { beginStroke, commitStroke, recordChange } from '../core/history.js';
 import { t } from '../../../../i18n/i18n.js';
+import { isSelectionComparisonEnabled } from '../core/selection-comparison.js';
+
+function blockClipboardActionInComparisonMode() {
+  if (!isSelectionComparisonEnabled()) return false;
+  setStatus(t('status.selectionRatioReadOnly'), true);
+  return true;
+}
 
 export function handleCopy() {
+  if (blockClipboardActionInComparisonMode()) return;
   if (floatingSelection) {
     const { width, height, pixels } = floatingSelection;
     setClipboardData({ width, height, pixels: new Uint32Array(pixels) });
@@ -34,6 +42,7 @@ export function handleCopy() {
 }
 
 export function handleCut() {
+  if (blockClipboardActionInComparisonMode()) return;
   if (floatingSelection) {
     handleCopy();
     setFloatingSelection(null);
@@ -62,6 +71,7 @@ export function handleCut() {
 }
 
 export function handlePaste() {
+  if (blockClipboardActionInComparisonMode()) return;
   if (!clipboardData) return;
   
   // If there is an existing floating selection, commit it first
@@ -90,6 +100,7 @@ export function handlePaste() {
 }
 
 export function handleDeleteSelection() {
+  if (blockClipboardActionInComparisonMode()) return;
   if (floatingSelection) {
     setFloatingSelection(null);
     clearSelection();
