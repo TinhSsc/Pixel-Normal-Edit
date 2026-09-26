@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Icon, ICONS } from '../../../../shared/ui/icons';
 import { getCurrentLang, t } from '../../../../i18n/i18n.js';
-import { GRID_WIDTH, GRID_HEIGHT } from '../../engine/core/state.js';
+import { GRID_WIDTH, GRID_HEIGHT, setStatus } from '../../engine/core/state.js';
 import { renderPixels, setForceFullRender } from '../../engine/core/render.js';
 import {
   applySelectionRatio,
@@ -58,13 +58,23 @@ async function writeClipboardText(text) {
 export default function SelectionComparisonPanel() {
   const [comparison, setComparison] = useState(getSelectionComparisonState);
   const [copyState, setCopyState] = useState('idle');
+  const [copiedRange, setCopiedRange] = useState(null);
   const [referenceWidthDraft, setReferenceWidthDraft] = useState('');
   const [referenceHeightDraft, setReferenceHeightDraft] = useState('');
   const copyResetTimer = useRef(null);
+  const rangeCopyResetTimer = useRef(null);
   const comparisonReferenceWidth = comparison.mainReference?.width;
   const comparisonReferenceHeight = comparison.mainReference?.height;
+  const comparisonEnabled = comparison.enabled;
+  const hasReference = Boolean(comparison.mainReference);
 
   useEffect(() => subscribeSelectionComparison(setComparison), []);
+
+  useEffect(() => {
+    if (!comparisonEnabled) return undefined;
+    const timer = setTimeout(() => window.lucide?.createIcons?.(), 0);
+    return () => clearTimeout(timer);
+  }, [comparisonEnabled, hasReference]);
 
   useEffect(() => {
     setReferenceWidthDraft(comparisonReferenceWidth ? String(comparisonReferenceWidth) : '');
@@ -73,6 +83,7 @@ export default function SelectionComparisonPanel() {
 
   useEffect(() => () => {
     if (copyResetTimer.current) clearTimeout(copyResetTimer.current);
+    if (rangeCopyResetTimer.current) clearTimeout(rangeCopyResetTimer.current);
   }, []);
 
   if (!comparison.enabled) return null;
@@ -164,6 +175,23 @@ export default function SelectionComparisonPanel() {
 
     if (copyResetTimer.current) clearTimeout(copyResetTimer.current);
     copyResetTimer.current = setTimeout(() => setCopyState('idle'), 1800);
+  };
+
+  const handleCopyRange = async (target, label, range) => {
+    if (!range) return;
+    const text = `${label}: ${formatCellRange(range)}`;
+
+    try {
+      await writeClipboardText(text);
+      setCopiedRange(target);
+      setStatus(t('selectionRatio.rangeCopied', text));
+    } catch {
+      setCopiedRange(null);
+      setStatus(t('selectionRatio.copyFailed'), true);
+    }
+
+    if (rangeCopyResetTimer.current) clearTimeout(rangeCopyResetTimer.current);
+    rangeCopyResetTimer.current = setTimeout(() => setCopiedRange(null), 1400);
   };
 
   let hintKey = 'selectionRatio.hintEdit';
@@ -280,14 +308,32 @@ export default function SelectionComparisonPanel() {
 
       <div className="selection-comparison-section-title">{t('selectionRatio.rangeTitle')}</div>
       <div className="selection-comparison-ranges" title={t('selectionRatio.rangeHint')}>
-        <div>
+        <button
+          type="button"
+          className={copiedRange === 'main' ? 'copied' : ''}
+          onClick={() => handleCopyRange('main', t('selectionRatio.main'), sizes?.mainRange)}
+          disabled={!sizes?.mainRange}
+          aria-label={`${t('selectionRatio.copyRange')}: ${t('selectionRatio.main')}`}
+        >
           <span>{t('selectionRatio.main')}</span>
-          <strong>{formatCellRange(sizes?.mainRange)}</strong>
-        </div>
-        <div>
+          <span className="selection-comparison-range-value">
+            <strong>{formatCellRange(sizes?.mainRange)}</strong>
+            <Icon name={ICONS.COPY} />
+          </span>
+        </button>
+        <button
+          type="button"
+          className={copiedRange === 'compare' ? 'copied' : ''}
+          onClick={() => handleCopyRange('compare', t('selectionRatio.compare'), sizes?.compareRange)}
+          disabled={!sizes?.compareRange}
+          aria-label={`${t('selectionRatio.copyRange')}: ${t('selectionRatio.compare')}`}
+        >
           <span>{t('selectionRatio.compare')}</span>
-          <strong>{formatCellRange(sizes?.compareRange)}</strong>
-        </div>
+          <span className="selection-comparison-range-value">
+            <strong>{formatCellRange(sizes?.compareRange)}</strong>
+            <Icon name={ICONS.COPY} />
+          </span>
+        </button>
       </div>
 
       <div className="selection-comparison-section-title">{t('selectionRatio.presetTitle')}</div>

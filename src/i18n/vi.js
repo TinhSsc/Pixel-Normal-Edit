@@ -1202,7 +1202,7 @@ export default {
   "selectionRatio.clearReference": "Xóa pixel tham chiếu",
   "selectionRatio.mainRange": "Dải Main",
   "selectionRatio.compareRange": "Dải ô phụ",
-  "selectionRatio.rangeHint": "Dải ô trong lưới tham chiếu. Số thứ tự bắt đầu từ 1 và bao gồm ô cuối.",
+  "selectionRatio.rangeHint": "Dải ô trong lưới tham chiếu. Số thứ tự bắt đầu từ 1 và bao gồm ô cuối. Bấm vào một dòng để sao chép.",
   "selectionRatio.rowShort": "H",
   "selectionRatio.columnShort": "C",
   "selectionRatio.rangeTitle": "Dải ô trong lưới Main",
@@ -1211,4 +1211,6 @@ export default {
   "tooltip.copyPrimaryColor": "Sao chép màu chính",
   "tooltip.copySecondaryColor": "Sao chép màu phụ",
   "colorPicker.copyGroup": "Sao chép mã màu",
+  "selectionRatio.copyRange": "Sao chép dải ô",
+  "selectionRatio.rangeCopied": "Đã sao chép {0}",
 }

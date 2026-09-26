@@ -1154,7 +1154,7 @@ export default {
   "selectionRatio.clearReference": "ล้างพิกเซลอ้างอิง",
   "selectionRatio.mainRange": "ช่วง Main",
   "selectionRatio.compareRange": "ช่วงเปรียบเทียบ",
-  "selectionRatio.rangeHint": "ช่วงเซลในตารางอ้างอิง เริ่มนับที่ 1 และรวมเซลสุดท้าย",
+  "selectionRatio.rangeHint": "ช่วงเซลในตารางอ้างอิง เริ่มนับที่ 1 และรวมเซลสุดท้าย คลิกแถวเพื่อคัดลอก",
   "selectionRatio.rowShort": "ช",
   "selectionRatio.columnShort": "ค",
   "selectionRatio.rangeTitle": "ช่วงเซลในตาราง Main",
@@ -1163,4 +1163,6 @@ export default {
   "tooltip.copyPrimaryColor": "คัดลอกสีหลัก",
   "tooltip.copySecondaryColor": "คัดลอกสีรอง",
   "colorPicker.copyGroup": "คัดลอกรหัสสี",
+  "selectionRatio.copyRange": "คัดลอกช่วงเซล",
+  "selectionRatio.rangeCopied": "คัดลอก {0} แล้ว",
 };

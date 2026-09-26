@@ -1200,7 +1200,7 @@ export default {
   "selectionRatio.clearReference": "Hapus piksel referensi",
   "selectionRatio.mainRange": "Rentang Main",
   "selectionRatio.compareRange": "Rentang pembanding",
-  "selectionRatio.rangeHint": "Rentang sel dalam grid referensi. Penomoran mulai dari 1 dan menyertakan sel terakhir.",
+  "selectionRatio.rangeHint": "Rentang sel dalam grid referensi. Penomoran mulai dari 1 dan menyertakan sel terakhir. Klik baris untuk menyalin.",
   "selectionRatio.rowShort": "B",
   "selectionRatio.columnShort": "K",
   "selectionRatio.rangeTitle": "Rentang sel kisi Main",
@@ -1209,4 +1209,6 @@ export default {
   "tooltip.copyPrimaryColor": "Salin warna utama",
   "tooltip.copySecondaryColor": "Salin warna sekunder",
   "colorPicker.copyGroup": "Salin kode warna",
+  "selectionRatio.copyRange": "Salin rentang sel",
+  "selectionRatio.rangeCopied": "{0} disalin",
 };

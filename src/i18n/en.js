@@ -1200,7 +1200,7 @@ export default {
   "selectionRatio.clearReference": "Clear reference pixels",
   "selectionRatio.mainRange": "Main range",
   "selectionRatio.compareRange": "Compare range",
-  "selectionRatio.rangeHint": "Cell range in the reference grid. Indexing starts at 1 and includes the last cell.",
+  "selectionRatio.rangeHint": "Cell range in the reference grid. Indexing starts at 1 and includes the last cell. Click a row to copy it.",
   "selectionRatio.rowShort": "R",
   "selectionRatio.columnShort": "C",
   "selectionRatio.rangeTitle": "Main grid cell range",
@@ -1209,4 +1209,6 @@ export default {
   "tooltip.copyPrimaryColor": "Copy primary color",
   "tooltip.copySecondaryColor": "Copy secondary color",
   "colorPicker.copyGroup": "Copy color codes",
+  "selectionRatio.copyRange": "Copy cell range",
+  "selectionRatio.rangeCopied": "Copied {0}",
 };

@@ -1154,7 +1154,7 @@ export default {
   "selectionRatio.clearReference": "Очистить эталонные пиксели",
   "selectionRatio.mainRange": "Диапазон Main",
   "selectionRatio.compareRange": "Диапазон сравнения",
-  "selectionRatio.rangeHint": "Диапазон ячеек в эталонной сетке. Нумерация начинается с 1 и включает последнюю ячейку.",
+  "selectionRatio.rangeHint": "Диапазон ячеек в эталонной сетке. Нумерация начинается с 1 и включает последнюю ячейку. Нажмите строку, чтобы скопировать её.",
   "selectionRatio.rowShort": "С",
   "selectionRatio.columnShort": "К",
   "selectionRatio.rangeTitle": "Диапазон ячеек сетки Main",
@@ -1163,4 +1163,6 @@ export default {
   "tooltip.copyPrimaryColor": "Копировать основной цвет",
   "tooltip.copySecondaryColor": "Копировать дополнительный цвет",
   "colorPicker.copyGroup": "Копирование кодов цвета",
+  "selectionRatio.copyRange": "Копировать диапазон ячеек",
+  "selectionRatio.rangeCopied": "Скопировано {0}",
 };
