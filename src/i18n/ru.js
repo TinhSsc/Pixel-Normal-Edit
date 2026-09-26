@@ -1158,4 +1158,9 @@ export default {
   "selectionRatio.rowShort": "С",
   "selectionRatio.columnShort": "К",
   "selectionRatio.rangeTitle": "Диапазон ячеек сетки Main",
+  "status.colorCopied": "Цвет {0} скопирован",
+  "status.colorCopyFailed": "Не удалось скопировать цвет",
+  "tooltip.copyPrimaryColor": "Копировать основной цвет",
+  "tooltip.copySecondaryColor": "Копировать дополнительный цвет",
+  "colorPicker.copyGroup": "Копирование кодов цвета",
 };

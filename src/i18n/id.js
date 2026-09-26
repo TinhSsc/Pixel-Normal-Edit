@@ -1204,4 +1204,9 @@ export default {
   "selectionRatio.rowShort": "B",
   "selectionRatio.columnShort": "K",
   "selectionRatio.rangeTitle": "Rentang sel kisi Main",
+  "status.colorCopied": "Warna {0} disalin",
+  "status.colorCopyFailed": "Gagal menyalin warna",
+  "tooltip.copyPrimaryColor": "Salin warna utama",
+  "tooltip.copySecondaryColor": "Salin warna sekunder",
+  "colorPicker.copyGroup": "Salin kode warna",
 };

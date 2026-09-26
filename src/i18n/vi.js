@@ -1206,4 +1206,9 @@ export default {
   "selectionRatio.rowShort": "H",
   "selectionRatio.columnShort": "C",
   "selectionRatio.rangeTitle": "Dải ô trong lưới Main",
+  "status.colorCopied": "Đã sao chép màu {0}",
+  "status.colorCopyFailed": "Không thể sao chép mã màu",
+  "tooltip.copyPrimaryColor": "Sao chép màu chính",
+  "tooltip.copySecondaryColor": "Sao chép màu phụ",
+  "colorPicker.copyGroup": "Sao chép mã màu",
 }

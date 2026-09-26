@@ -1158,4 +1158,9 @@ export default {
   "selectionRatio.rowShort": "ช",
   "selectionRatio.columnShort": "ค",
   "selectionRatio.rangeTitle": "ช่วงเซลในตาราง Main",
+  "status.colorCopied": "คัดลอกสี {0} แล้ว",
+  "status.colorCopyFailed": "คัดลอกสีไม่สำเร็จ",
+  "tooltip.copyPrimaryColor": "คัดลอกสีหลัก",
+  "tooltip.copySecondaryColor": "คัดลอกสีรอง",
+  "colorPicker.copyGroup": "คัดลอกรหัสสี",
 };

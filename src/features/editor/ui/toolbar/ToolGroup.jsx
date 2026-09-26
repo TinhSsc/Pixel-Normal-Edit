@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import ToolButton from './ToolButton';
 import { Icon, ICONS } from '../../../../shared/ui/icons';
 import ColorPalette from './ColorPalette';
+import ColorCopyButtons from './ColorCopyButtons';
 
 const STORAGE_KEY = 'toolPopupPins';
 
@@ -52,12 +53,15 @@ export default function ToolGroup({ groupConfig, toolsConfig }) {
     return (
       <div className="tool-group">
         <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
-          <div className="color-picker-wrapper" style={{ flexShrink: 0 }}>
-            <input type="color" id="colorPicker" className="color-input primary-color" defaultValue="#000000" data-i18n="tooltip.primaryColor" />
-            <input type="color" id="colorPicker2" className="color-input secondary-color" defaultValue="#ffffff" data-i18n="tooltip.secondaryColor" />
-            <button id="swapColorsBtn" className="swap-colors-btn" data-i18n="tooltip.swapColors">
-              <Icon name={ICONS.ARROW_LEFT_RIGHT} />
-            </button>
+          <div className="color-picker-column">
+            <div className="color-picker-wrapper">
+              <input type="color" id="colorPicker" className="color-input primary-color" defaultValue="#000000" data-i18n="tooltip.primaryColor" />
+              <input type="color" id="colorPicker2" className="color-input secondary-color" defaultValue="#ffffff" data-i18n="tooltip.secondaryColor" />
+              <button id="swapColorsBtn" className="swap-colors-btn" data-i18n="tooltip.swapColors">
+                <Icon name={ICONS.ARROW_LEFT_RIGHT} />
+              </button>
+            </div>
+            <ColorCopyButtons />
           </div>
           <ColorPalette />
         </div>

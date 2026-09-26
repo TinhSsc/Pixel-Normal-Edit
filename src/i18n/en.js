@@ -1204,4 +1204,9 @@ export default {
   "selectionRatio.rowShort": "R",
   "selectionRatio.columnShort": "C",
   "selectionRatio.rangeTitle": "Main grid cell range",
+  "status.colorCopied": "Copied color {0}",
+  "status.colorCopyFailed": "Could not copy the color",
+  "tooltip.copyPrimaryColor": "Copy primary color",
+  "tooltip.copySecondaryColor": "Copy secondary color",
+  "colorPicker.copyGroup": "Copy color codes",
 };
