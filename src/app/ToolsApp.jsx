@@ -11,9 +11,10 @@ const RotatePage = lazy(() => import('../features/mini-tools/rotate/RotatePage.j
 const FramesToMediaPage = lazy(() => import('../features/mini-tools/frames-to-media/FramesToMediaPage.jsx'));
 const MediaToFramesPage = lazy(() => import('../features/mini-tools/media-to-frames/MediaToFramesPage.jsx'));
 const GifSimplifyPage = lazy(() => import('../features/mini-tools/gif-simplify/GifSimplifyPage.jsx'));
+const VideoToWebpPage = lazy(() => import('../features/mini-tools/video-to-webp/VideoToWebpPage.jsx'));
 
 export default function ToolsApp() {
-  const MINI_TOOLS_ROUTES = ['home', 'convert', 'compress', 'resize', 'crop', 'rotate', 'frames-to-media', 'media-to-frames', 'gif-simplify'];
+  const MINI_TOOLS_ROUTES = ['home', 'convert', 'compress', 'resize', 'crop', 'rotate', 'frames-to-media', 'media-to-frames', 'gif-simplify', 'video-to-webp'];
 
   const getRoute = () => {
     const pathParts = window.location.pathname.split('/').filter(Boolean);
@@ -52,6 +53,7 @@ export default function ToolsApp() {
       {route === 'frames-to-media' && <FramesToMediaPage />}
       {route === 'media-to-frames' && <MediaToFramesPage />}
       {route === 'gif-simplify' && <GifSimplifyPage />}
+      {route === 'video-to-webp' && <VideoToWebpPage />}
     </Suspense>
   );
 }

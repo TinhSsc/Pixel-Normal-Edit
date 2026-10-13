@@ -12,7 +12,8 @@ const tools = [
   'rotate',
   'frames-to-media',
   'media-to-frames',
-  'gif-simplify'
+  'gif-simplify',
+  'video-to-webp'
 ];
 
 const toolNames = {
@@ -25,7 +26,8 @@ const toolNames = {
     rotate: 'Rotate & Flip Image',
     'frames-to-media': 'Merge Images to GIF / Video',
     'media-to-frames': 'Extract GIF / Video to Frames',
-    'gif-simplify': 'Simplify GIF & Speed Up Video'
+    'gif-simplify': 'Simplify GIF & Speed Up Video',
+    'video-to-webp': 'Convert Video to WebP/GIF by Target Size'
   },
   vi: {
     home: 'Trình chỉnh sửa Pixel Art & Xử lý ảnh',
@@ -36,7 +38,8 @@ const toolNames = {
     rotate: 'Xoay & Lật ảnh',
     'frames-to-media': 'Ghép ảnh thành GIF / Video',
     'media-to-frames': 'Tách GIF / Video thành từng khung hình',
-    'gif-simplify': 'Tối ưu GIF & Tăng tốc video'
+    'gif-simplify': 'Tối ưu GIF & Tăng tốc video',
+    'video-to-webp': 'Chuyển Video sang WebP/GIF đúng dung lượng'
   },
   id: {
     home: 'Editor Seni Piksel & Studio Gambar',
@@ -47,7 +50,8 @@ const toolNames = {
     rotate: 'Putar & Balik Gambar',
     'frames-to-media': 'Gabungkan Gambar ke GIF / Video',
     'media-to-frames': 'Ekstrak GIF / Video ke Gambar',
-    'gif-simplify': 'Sederhanakan GIF & Percepat Video'
+    'gif-simplify': 'Sederhanakan GIF & Percepat Video',
+    'video-to-webp': 'Konversi Video ke WebP/GIF Sesuai Ukuran'
   },
   ru: {
     home: 'Редактор пиксельной графики и студия изображений',
@@ -58,7 +62,8 @@ const toolNames = {
     rotate: 'Поворот и отражение изображений',
     'frames-to-media': 'Создание GIF / Видео из картинок',
     'media-to-frames': 'Извлечение кадров из GIF / Видео',
-    'gif-simplify': 'Оптимизация GIF и ускорение видео'
+    'gif-simplify': 'Оптимизация GIF и ускорение видео',
+    'video-to-webp': 'Конвертер видео в WebP/GIF по размеру'
   },
   th: {
     home: 'โปรแกรมแก้ไข Pixel Art และสตูดิโอประมวลผลภาพ',
@@ -69,7 +74,8 @@ const toolNames = {
     rotate: 'หมุนและพลิกรูปภาพ',
     'frames-to-media': 'รวมรูปภาพเป็น GIF / วิดีโอ',
     'media-to-frames': 'แยกเฟรมรูปภาพจาก GIF / วิดีโอ',
-    'gif-simplify': 'ลดขนาด GIF และเร่งความเร็ววิดีโอ'
+    'gif-simplify': 'ลดขนาด GIF และเร่งความเร็ววิดีโอ',
+    'video-to-webp': 'แปลงวิดีโอเป็น WebP/GIF ตามขนาดไฟล์'
   }
 };
 
@@ -197,6 +203,19 @@ const SEO_DATA = {
       faqs: [
         { q: "Why simplify a GIF?", a: "Simplifying frames drastically reduces file size for discord, forums, or web embeds." }
       ]
+    },
+    'video-to-webp': {
+      title: "Convert Video to WebP/GIF by Target Size (2MB) | Pixel Normal Edit",
+      desc: "Upload a video, pick a max size like 2MB, and get an animated WebP or GIF that fits — full video kept, no trimming. Auto WebP vs GIF recommendation, 100% local.",
+      keywords: "video to webp, video to gif, compress gif to 2mb, webp size reducer, animated webp converter, fit gif size",
+      h1: "Convert Video to WebP / GIF That Fits Your Target Size",
+      features: [
+        { title: "Target-Size Autofit", desc: "Set 2MB and the tool tunes quality, resolution and playback speed until it fits — never trims content." },
+        { title: "WebP vs GIF Compare", desc: "Both versions are rendered side-by-side with a recommendation for the lighter, sharper pick." }
+      ],
+      faqs: [
+        { q: "Is any part of my video cut?", a: "No. The full video is always kept; only quality, size and playback speed are adjusted." }
+      ]
     }
   },
   vi: {
@@ -318,6 +337,19 @@ const SEO_DATA = {
       ],
       faqs: [
         { q: "Tại sao nên tối ưu GIF?", a: "Giúp ảnh GIF tải nhanh hơn trên Discord, Zalo hoặc chèn vào website." }
+      ]
+    },
+    'video-to-webp': {
+      title: "Chuyển Video sang WebP/GIF đúng dung lượng (2MB) | Pixel Normal Edit",
+      desc: "Upload video, chọn dung lượng tối đa (vd 2MB), tool tự canh quality/kích thước/tốc độ để vừa file, giữ nguyên toàn bộ video không cắt. So sánh WebP vs GIF và gợi ý bản tối ưu. Xử lý 100% trên trình duyệt.",
+      keywords: "chuyển video sang webp, video sang gif, nén gif còn 2mb, giảm dung lượng webp, gif vừa khít",
+      h1: "Chuyển Video sang WebP / GIF Vừa Khít Dung Lượng",
+      features: [
+        { title: "Tự Fit Dung Lượng", desc: "Chọn 2MB, tool tự giảm chất lượng → thu nhỏ → tua nhanh nhẹ đến khi vừa, không cắt nội dung." },
+        { title: "So Sánh & Gợi Ý", desc: "Render cả WebP lẫn GIF, preview cạnh nhau và đề xuất bản nhẹ/nét nhất." }
+      ],
+      faqs: [
+        { q: "Video có bị cắt ngắn không?", a: "Không. Toàn bộ video được giữ nguyên, chỉ điều chỉnh chất lượng, kích thước và tốc độ phát." }
       ]
     }
   },

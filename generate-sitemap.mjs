@@ -12,7 +12,8 @@ const tools = [
   { id: 'rotate', priority: '0.8' },
   { id: 'frames-to-media', priority: '0.8' },
   { id: 'media-to-frames', priority: '0.8' },
-  { id: 'gif-simplify', priority: '0.8' }
+  { id: 'gif-simplify', priority: '0.8' },
+  { id: 'video-to-webp', priority: '0.8' }
 ];
 
 let xml = `<?xml version="1.0" encoding="UTF-8"?>

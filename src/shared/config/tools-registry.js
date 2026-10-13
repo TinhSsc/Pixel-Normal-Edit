@@ -94,6 +94,17 @@ export const TOOLS = [
     color: '#a855f7'
   },
   {
+    id: 'video-to-webp',
+    icon: ICONS.FILM || 'film',
+    titleKey: 'home.tool.videoToWebp',
+    title: 'Video → WebP / GIF',
+    descKey: 'home.tool.videoToWebpDesc',
+    desc: 'Video vừa khít dung lượng bạn chọn, tự gợi ý WebP hay GIF tối ưu.',
+    detailKey: 'home.tool.videoToWebpDetail',
+    detail: 'Fit 2MB • Không cắt',
+    color: '#ec4899'
+  },
+  {
     id: 'editor',
     icon: ICONS.PEN_TOOL,
     titleKey: 'home.tool.editor',
