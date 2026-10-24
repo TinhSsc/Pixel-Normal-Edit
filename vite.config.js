@@ -38,7 +38,13 @@ export default defineConfig({
         ]
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,wasm}'],
+        // Không precache HTML và không dùng navigateFallback: mọi điều hướng
+        // (kể cả click từ Google, bookmark) luôn lấy index.html mới nhất từ
+        // network. HTML được server trả với Cache-Control: no-cache, còn
+        // JS/CSS có hash vẫn được precache nên không ảnh hưởng tốc độ.
+        globPatterns: ['**/*.{js,css,ico,png,svg,wasm}'],
+        navigateFallback: null,
+        cleanupOutdatedCaches: true,
         maximumFileSizeToCacheInBytes: 20000000 // 20MB for WebAssembly or large files
       },
       devOptions: {

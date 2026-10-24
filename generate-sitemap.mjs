@@ -16,11 +16,15 @@ const tools = [
   { id: 'video-to-webp', priority: '0.8' }
 ];
 
+// Giúp search engine biết nội dung đã thay đổi và crawl lại sớm hơn.
+const lastmod = new Date().toISOString().split('T')[0];
+
 let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>${domain}/</loc>
+    <lastmod>${lastmod}</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="${domain}/en/home" />
     <xhtml:link rel="alternate" hreflang="vi" href="${domain}/vi/home" />
     <xhtml:link rel="alternate" hreflang="id" href="${domain}/id/home" />
@@ -37,6 +41,7 @@ for (const tool of tools) {
     const url = `${domain}/${lang}/${tool.id}`;
     xml += `  <url>\n`;
     xml += `    <loc>${url}</loc>\n`;
+    xml += `    <lastmod>${lastmod}</lastmod>\n`;
     
     // Add alternate links for all languages
     for (const altLang of langs) {
